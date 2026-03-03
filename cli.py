@@ -74,7 +74,7 @@ def _build_scanners(langs: list[str]) -> dict[str, object]:
     return scanners
 
 
-def _run_once(root: Path, scanners: dict, errors_only: bool = False) -> list:
+def _run_once(root: Path, scanners: dict, errors_only: bool = False):
     from common.issue import Issue
     from common.writer import print_issues, write_issues_file
 
@@ -87,8 +87,9 @@ def _run_once(root: Path, scanners: dict, errors_only: bool = False) -> list:
 
     issues.sort()
     print_issues(issues, errors_only=errors_only)
-    write_issues_file(issues, root)
-    return issues
+    delta = write_issues_file(issues, root)
+    delta.print_banner(pre_commit=errors_only)
+    return issues, delta
 
 
 # ── commands ─────────────────────────────────────────────────────────────────
@@ -140,24 +141,8 @@ def scan(path: str, watch: bool, lang: str | None, pre_commit: bool) -> None:
         click.echo(f"Scanning {root} — {', '.join(scanners)}", err=True)
 
     if not watch:
-        issues = _run_once(root, scanners, errors_only=pre_commit)
-        n_err  = sum(1 for i in issues if i.severity.value == "error")
-        n_warn = sum(1 for i in issues if i.severity.value == "warning")
-
-        if pre_commit:
-            if n_err:
-                click.echo(
-                    f"\n{n_err} errors — commit blocked. See proj/ISSUES for details.",
-                    err=True,
-                )
-            # exit code drives the block — no further output needed
-        else:
-            click.echo(
-                f"\n{len(issues)} issues ({n_err} errors, {n_warn} warnings)"
-                f" — proj/ISSUES updated",
-                err=True,
-            )
-        sys.exit(1 if n_err else 0)
+        issues, delta = _run_once(root, scanners, errors_only=pre_commit)
+        sys.exit(1 if delta.errors else 0)
 
     # ── watch mode ───────────────────────────────────────────────────────────
     try:
@@ -200,7 +185,6 @@ def scan(path: str, watch: bool, lang: str | None, pre_commit: bool) -> None:
         while True:
             time.sleep(0.5)
             if handler.consume():
-                # Reload config in case it changed
                 langs    = _resolve_languages(root, lang)
                 scanners = _build_scanners(langs)
                 click.echo("\n[change — rescanning]", err=True)
