@@ -101,6 +101,15 @@ def cli() -> None:
 
 @cli.command()
 @click.argument("path", default=".", type=click.Path(exists=True, file_okay=False))
+@click.pass_context
+def setup(ctx, path: str) -> None:
+    """Detect languages + install VSCode task + pre-commit hook in one step."""
+    ctx.invoke(detect, path=path)
+    ctx.invoke(init, path=path)
+
+
+@cli.command()
+@click.argument("path", default=".", type=click.Path(exists=True, file_okay=False))
 def detect(path: str) -> None:
     """Auto-detect languages and write proj/rulestools.toml."""
     from common.config import ScanConfig
