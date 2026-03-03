@@ -9,6 +9,8 @@ from common.file_size import check as check_file_size
 from common.nesting import check as check_nesting
 from common.debt import check as check_debt
 from common.secrets import check as check_secrets
+from common.topology import check as check_topology
+from common.import_direction import check as check_imports
 from js.checks.modules import check as check_modules
 from js.checks.safety import check as check_safety
 from js.checks.validation import check as check_validation
@@ -37,6 +39,8 @@ def scan_file(path: Path) -> list[Issue]:
     issues.extend(check_safety(path, lines))
     issues.extend(check_validation(path, lines))
     issues.extend(check_typescript(path, lines))
+    issues.extend(check_topology(path, lines))
+    issues.extend(check_imports(path, lines))
     return issues
 
 

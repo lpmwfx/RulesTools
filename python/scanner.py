@@ -8,6 +8,8 @@ from common.issue import Issue
 from common.file_size import check as check_file_size
 from common.debt import check as check_debt
 from common.secrets import check as check_secrets
+from common.topology import check as check_topology
+from common.import_direction import check as check_imports
 from python.checks.types_check import check as check_types
 from python.checks.nesting_check import check as check_nesting
 from python.checks.validation_check import check as check_validation
@@ -32,6 +34,8 @@ def scan_file(path: Path) -> list[Issue]:
     issues.extend(check_nesting(path, lines))
     issues.extend(check_validation(path, lines))
     issues.extend(check_antipatterns(path, lines))
+    issues.extend(check_topology(path, lines))
+    issues.extend(check_imports(path, lines))
     return issues
 
 

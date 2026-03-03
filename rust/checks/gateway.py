@@ -19,6 +19,26 @@ from common.issue import Issue, Severity
 
 _RULE = "gateway/io/layer-violation"
 
+
+def _is_test_context(lines: list[str], lineno: int) -> bool:
+    """Heuristic: are we inside a #[test] or #[cfg(test)] block?"""
+    for i in range(lineno - 2, max(lineno - 102, -1), -1):
+        l = lines[i].strip()
+        if "#[test]" in l or "#[cfg(test)]" in l:
+            return True
+        if re.match(r"(pub\s+)?(async\s+)?fn\s+\w+", l):
+            prev = lines[i - 1].strip() if i > 0 else ""
+            if "#[test]" in prev or "#[cfg(test)]" in prev:
+                return True
+            for j in range(i - 1, max(i - 60, -1), -1):
+                lj = lines[j].strip()
+                if "#[cfg(test)]" in lj or "#[test]" in lj:
+                    return True
+                if re.match(r"(pub\s+)?(async\s+)?fn\s+\w+", lj):
+                    return False
+            return False
+    return False
+
 # IO patterns that belong ONLY in the gateway layer
 _FS_DIRECT    = re.compile(r"\bstd\s*::\s*fs\s*::\s*(read|write|remove|create|copy|rename|metadata)")
 _REQWEST      = re.compile(r"\breqwest\s*::\s*(get|post|put|delete|patch|Client)")
@@ -55,6 +75,9 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     for lineno, raw in enumerate(lines, start=1):
         stripped = raw.lstrip()
         if stripped.startswith("//"):
+            continue
+
+        if _is_test_context(lines, lineno):
             continue
 
         for pattern, label in _IO_PATTERNS:

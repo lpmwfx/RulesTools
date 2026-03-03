@@ -47,6 +47,8 @@ mcp__rules__get_rule(file="rust/errors.md")
 
 | Scanner file | Checks | Source rule (MCP) |
 |---|---|---|
+| `common/topology.py` | type suffix matches layer folder — `_adp`/`_core`/`_gtw` etc. (all languages) | `global/topology.md` |
+| `common/import_direction.py` | import DAG violations — folder-path + type-suffix (_adp/_core etc.) in import lines | `global/topology.md` |
 | `common/debt.py` | TODO/FIXME/HACK/NOCOMMIT (all languages) | `global/tech-debt.md` |
 | `common/secrets.py` | hardcoded passwords, API keys, PEM keys (all languages) | `global/secrets.md` |
 | `common/nesting.py` | brace depth (all languages) | `global/nesting.md` |
