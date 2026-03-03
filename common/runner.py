@@ -65,7 +65,7 @@ def build_scanners(langs: list[str]) -> dict[str, object]:
     return scanners
 
 
-def run_once(root: Path, scanners: dict, errors_only: bool = False):
+def run_once(root: Path, scanners: dict[str, object], errors_only: bool = False):
     from common.issue import Issue
     from common.writer import print_issues, write_issues_file
 

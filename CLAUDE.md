@@ -62,6 +62,7 @@ mcp__rules__get_rule(file="rust/errors.md")
 | `css/checks/tokens.py` | hardcoded colors, !important, font px | `css/custom-properties.md` |
 | `python/checks/types_check.py` | future annotations, Optional, bare except | `python/types.md` |
 | `python/checks/nesting_check.py` | indent depth | `global/nesting.md` |
+| `python/checks/validation_check.py` | json.loads/response.json without pydantic, raw dict params | `python/validation.md` |
 | `kotlin/checks/safety.py` | !!, java.* imports, multi-class | `kotlin/encapsulation.md` |
 | `common/nesting.py` | brace depth (all languages) | `global/nesting.md` |
 | `common/file_size.py` | line count limits | `global/file-limits.md` |
