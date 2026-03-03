@@ -7,9 +7,12 @@ from typing import Generator
 from common.issue import Issue
 from common.file_size import check as check_file_size
 from common.nesting import check as check_nesting
+from common.debt import check as check_debt
+from common.secrets import check as check_secrets
 from js.checks.modules import check as check_modules
 from js.checks.safety import check as check_safety
 from js.checks.validation import check as check_validation
+from js.checks.typescript import check as check_typescript
 
 # JS: fn body = depth 1, flag at >= 4 (fn + 3 logic levels)
 _NESTING_MAX_ABS = 4
@@ -28,9 +31,12 @@ def scan_file(path: Path) -> list[Issue]:
     issues: list[Issue] = []
     issues.extend(check_file_size(path, lines))
     issues.extend(check_nesting(path, lines, lang="js", max_abs_depth=_NESTING_MAX_ABS))
+    issues.extend(check_debt(path, lines))
+    issues.extend(check_secrets(path, lines))
     issues.extend(check_modules(path, lines))
     issues.extend(check_safety(path, lines))
     issues.extend(check_validation(path, lines))
+    issues.extend(check_typescript(path, lines))
     return issues
 
 

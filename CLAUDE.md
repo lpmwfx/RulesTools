@@ -47,25 +47,34 @@ mcp__rules__get_rule(file="rust/errors.md")
 
 | Scanner file | Checks | Source rule (MCP) |
 |---|---|---|
+| `common/debt.py` | TODO/FIXME/HACK/NOCOMMIT (all languages) | `global/tech-debt.md` |
+| `common/secrets.py` | hardcoded passwords, API keys, PEM keys (all languages) | `global/secrets.md` |
+| `common/nesting.py` | brace depth (all languages) | `global/nesting.md` |
+| `common/file_size.py` | line count limits | `global/file-limits.md` |
 | `rust/checks/errors.py` | unwrap/expect/panic/Box<dyn Error> | `rust/errors.md` |
 | `rust/checks/naming.py` | banned names, bool prefix, unsafe comment | `rust/naming.md` |
 | `rust/checks/modules.py` | utils.rs, inline mod | `rust/modules.md` |
 | `rust/checks/types.py` | &Vec, &String, println!, static mut | `rust/types.md` |
-| `rust/checks/threading.py` | fire-and-forget, Arc/Rc comment | `rust/threading.md` + `rust/ownership.md` |
+| `rust/checks/threading.py` | fire-and-forget, Arc/Rc comment | `rust/threading.md` |
 | `rust/checks/coupling.py` | use super::sibling, pub(super) | `rust/modules.md` |
+| `rust/checks/clone.py` | .clone() spam (>3 per function) | `rust/ownership.md` |
 | `slint/checks/tokens.py` | hardcoded colors/sizes | `uiux/tokens.md` |
 | `slint/checks/structure.py` | multiple components per file | `global/module-tree.md` |
 | `slint/checks/events.py` | callback logic, state mutations | `uiux/state-flow.md` |
+| `slint/checks/strings.py` | hardcoded string literals in components | `slint/validation.md` |
+| `slint/checks/architecture.py` | multiple gateway objects across tree | `uiux/state-flow.md` |
 | `js/checks/modules.py` | require/CJS, mutable exports | `js/modules.md` |
-| `js/checks/safety.py` | eval, layer violation, promise | `js/safety.md` |
+| `js/checks/safety.py` | eval, layer violation, promise, console.log | `js/safety.md` |
 | `js/checks/validation.py` | JSON.parse/fetch without schema | `js/validation.md` |
+| `js/checks/typescript.py` | any, @ts-ignore, non-null assertion | `js/safety.md` |
 | `css/checks/tokens.py` | hardcoded colors, !important, font px | `css/custom-properties.md` |
+| `css/checks/layout.py` | magic z-index, hardcoded transition durations | `css/validation.md` |
 | `python/checks/types_check.py` | future annotations, Optional, bare except | `python/types.md` |
 | `python/checks/nesting_check.py` | indent depth | `global/nesting.md` |
-| `python/checks/validation_check.py` | json.loads/response.json without pydantic, raw dict params | `python/validation.md` |
+| `python/checks/validation_check.py` | json.loads/response.json without pydantic | `python/validation.md` |
+| `python/checks/antipatterns.py` | mutable defaults, global keyword, eval | `python/types.md` |
 | `kotlin/checks/safety.py` | !!, java.* imports, multi-class | `kotlin/encapsulation.md` |
-| `common/nesting.py` | brace depth (all languages) | `global/nesting.md` |
-| `common/file_size.py` | line count limits | `global/file-limits.md` |
+| `kotlin/checks/coroutines.py` | Thread.sleep, runBlocking, untracked launch | `kotlin/coroutines.md` |
 
 ## CLI
 

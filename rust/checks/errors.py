@@ -23,13 +23,27 @@ _BOX_DYN    = re.compile(r"Box\s*<\s*dyn\s+Error")
 
 def _is_test_context(lines: list[str], lineno: int) -> bool:
     """Heuristic: are we inside a #[test] or #[cfg(test)] block?"""
-    # Look back up to 50 lines for #[test] or #[cfg(test)]
-    for i in range(lineno - 2, max(lineno - 52, -1), -1):
+    # Look back up to 100 lines for #[test] or #[cfg(test)]
+    for i in range(lineno - 2, max(lineno - 102, -1), -1):
         l = lines[i].strip()
         if "#[test]" in l or "#[cfg(test)]" in l:
             return True
         # Stop at fn definitions that are NOT test fns
-        if re.match(r"(pub\s+)?(async\s+)?fn\s+\w+", l) and "#[test]" not in l:
+        if re.match(r"(pub\s+)?(async\s+)?fn\s+\w+", l):
+            # Check if #[test] is on the preceding line (common Rust pattern)
+            prev = lines[i - 1].strip() if i > 0 else ""
+            if "#[test]" in prev or "#[cfg(test)]" in prev:
+                return True
+            # Not a direct test fn — but may be a helper inside a #[cfg(test)] mod.
+            # Continue scanning backward: if we find #[cfg(test)] before another
+            # fn boundary, this helper lives inside a test module.
+            for j in range(i - 1, max(i - 60, -1), -1):
+                lj = lines[j].strip()
+                if "#[cfg(test)]" in lj or "#[test]" in lj:
+                    return True
+                # Another fn definition before finding a test marker → not test code
+                if re.match(r"(pub\s+)?(async\s+)?fn\s+\w+", lj):
+                    return False
             return False
     return False
 

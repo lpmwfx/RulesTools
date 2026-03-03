@@ -18,6 +18,7 @@ _RULE_BASE = "js/safety"
 
 _EVAL           = re.compile(r"\beval\s*\(")
 _THEN_NO_CATCH  = re.compile(r"\.then\s*\([^)]*\)\s*;")  # .then(...); with no .catch
+_CONSOLE        = re.compile(r"\bconsole\s*\.\s*(log|warn|error|debug|info)\s*\(")
 
 
 def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
@@ -55,3 +56,17 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 rule=f"{_RULE_BASE}/unhandled-promise",
                 message=".then() without .catch() — all promises must be handled",
             )
+
+        # --- console.log/warn/error in non-test code ---
+        is_test = "test" in path.parts or path.stem.endswith((".test", ".spec"))
+        if not is_test:
+            if m := _CONSOLE.search(raw):
+                yield Issue(
+                    file=path, line=lineno, col=m.start() + 1,
+                    severity=Severity.WARNING,
+                    rule=f"{_RULE_BASE}/no-console",
+                    message=(
+                        f"console.{m.group(1)}() in production code — "
+                        f"use a structured logger (e.g. pino, winston) instead"
+                    ),
+                )

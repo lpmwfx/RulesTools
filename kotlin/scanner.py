@@ -7,7 +7,10 @@ from typing import Generator
 from common.issue import Issue
 from common.file_size import check as check_file_size
 from common.nesting import check as check_nesting
+from common.debt import check as check_debt
+from common.secrets import check as check_secrets
 from kotlin.checks.safety import check as check_safety
+from kotlin.checks.coroutines import check as check_coroutines
 
 # Kotlin: class(1) + fun(2) + 3 logic = 5 → flag at 6
 _NESTING_MAX_ABS = 6
@@ -26,7 +29,10 @@ def scan_file(path: Path) -> list[Issue]:
     issues: list[Issue] = []
     issues.extend(check_file_size(path, lines))
     issues.extend(check_nesting(path, lines, lang="kotlin", max_abs_depth=_NESTING_MAX_ABS))
+    issues.extend(check_debt(path, lines))
+    issues.extend(check_secrets(path, lines))
     issues.extend(check_safety(path, lines))
+    issues.extend(check_coroutines(path, lines))
     return issues
 
 

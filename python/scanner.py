@@ -6,9 +6,12 @@ from typing import Generator
 
 from common.issue import Issue
 from common.file_size import check as check_file_size
+from common.debt import check as check_debt
+from common.secrets import check as check_secrets
 from python.checks.types_check import check as check_types
 from python.checks.nesting_check import check as check_nesting
 from python.checks.validation_check import check as check_validation
+from python.checks.antipatterns import check as check_antipatterns
 
 EXTENSIONS = {".py"}
 
@@ -23,9 +26,12 @@ def scan_file(path: Path) -> list[Issue]:
 
     issues: list[Issue] = []
     issues.extend(check_file_size(path, lines))
+    issues.extend(check_debt(path, lines))
+    issues.extend(check_secrets(path, lines))
     issues.extend(check_types(path, lines))
     issues.extend(check_nesting(path, lines))
     issues.extend(check_validation(path, lines))
+    issues.extend(check_antipatterns(path, lines))
     return issues
 
 
