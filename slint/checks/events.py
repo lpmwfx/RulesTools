@@ -99,8 +99,11 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             )
 
         # ── 2. Multiple root.x = assignments ────────────────────────────────
-        root_assigns = [(ln, l, _ROOT_ASSIGN.findall(l)) for ln, l in meaningful
-                        if _ROOT_ASSIGN.search(l)]
+        root_assigns: list[tuple[int, str, list[str]]] = []
+        for ln, l in meaningful:
+            props = _ROOT_ASSIGN.findall(l)
+            if props:
+                root_assigns.append((ln, l, props))
         all_props = [prop for _, _, props in root_assigns for prop in props]
         if len(all_props) >= 2:
             first_ln = root_assigns[0][0]
