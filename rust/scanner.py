@@ -20,6 +20,8 @@ from rust.checks.coupling import check as check_coupling
 from rust.checks.clone import check as check_clone
 from rust.checks.gateway import check as check_gateway
 from rust.checks.adapter import check as check_adapter
+from rust.checks.core_purity import check as check_core_purity
+from rust.checks.pal_isolation import check as check_pal_isolation
 
 # Rust: impl body = depth 2 (mod + impl), fn body = depth 1–2
 # Flag at absolute brace depth >= 5 (impl + fn + 3 logic levels)
@@ -48,6 +50,8 @@ def scan_file(path: Path) -> list[Issue]:
     issues.extend(check_clone(path, lines))
     issues.extend(check_gateway(path, lines))
     issues.extend(check_adapter(path, lines))
+    issues.extend(check_core_purity(path, lines))
+    issues.extend(check_pal_isolation(path, lines))
     issues.extend(check_topology(path, lines))
     issues.extend(check_imports(path, lines))
     return issues
