@@ -299,9 +299,48 @@ def init(path: str) -> None:
     else:
         click.echo("  skipped pre-commit (no .git found)")
 
+    # ── proj/RULES-MCP.md — AI context file ──────────────────────────────────
+    proj_dir = root / "proj"
+    proj_dir.mkdir(exist_ok=True)
+    rules_mcp_dst = proj_dir / "RULES-MCP.md"
+
+    rules_mcp_content = (
+        "# Rules MCP — AI context for proj/ISSUES\n\n"
+        "This project is scanned by rulestools.\n"
+        "Violations are written to `proj/ISSUES` after every commit\n"
+        "and on file change when the VSCode scanner task is running.\n\n"
+        "## Reading proj/ISSUES\n\n"
+        "Every issue line follows this format:\n\n"
+        "    path/to/file.rs:42:5: error rust/errors/no-unwrap: unwrap() in non-test code\n\n"
+        "Fields: `file:line:col: severity rule-id: message`\n\n"
+        "New issues since the last scan are marked `[NEW]`.\n\n"
+        "## Getting fix guidance via MCP\n\n"
+        "The rule ID maps directly to a Rules MCP file:\n\n"
+        "    Take the first two segments of the rule ID and append .md\n\n"
+        "    rust/errors/no-unwrap            ->  rust/errors.md\n"
+        "    rust/modules/no-sibling-coupling ->  rust/modules.md\n"
+        "    global/nesting                   ->  global/nesting.md\n"
+        "    uiux/state-flow/no-callback-logic ->  uiux/state-flow.md\n\n"
+        "Then call:\n\n"
+        "    mcp__rules__get_rule(file=\"rust/errors.md\")\n\n"
+        "to get the full rule text with examples and fix guidance.\n\n"
+        "## Fix workflow\n\n"
+        "1. Open `proj/ISSUES` — look for `[NEW]` markers\n"
+        "2. For each rule ID, derive the MCP file and call `mcp__rules__get_rule`\n"
+        "3. Fix the violation\n"
+        "4. Run `rulestools scan` to confirm it is gone\n"
+    )
+
+    if rules_mcp_dst.exists():
+        click.echo(f"  skipped (exists): {rules_mcp_dst}")
+    else:
+        rules_mcp_dst.write_text(rules_mcp_content, encoding="utf-8")
+        click.echo(f"  created: {rules_mcp_dst}")
+
     click.echo(
         f"\nDone. Run 'rulestools detect' to create proj/rulestools.toml\n"
-        f"Then open VSCode — the scanner starts automatically."
+        f"Then open VSCode — the scanner starts automatically.\n"
+        f"AI context: add '@proj/RULES-MCP.md' to your project CLAUDE.md."
     )
 
 

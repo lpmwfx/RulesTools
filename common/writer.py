@@ -89,6 +89,7 @@ def write_issues_file(issues: list[Issue], project_root: Path) -> "Delta":
         f"# ISSUES — {ts}",
         f"# {len(errors)} errors · {len(warnings)} warnings · {len(infos)} info",
         f"# delta: +{len(new_keys)} new  -{len(resolved_keys)} resolved",
+        "# Rule lookup: mcp__rules__get_rule(file=\"<lang>/<topic>.md\")  (first two rule-ID segments + .md)",
         "",
     ]
 
