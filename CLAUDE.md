@@ -77,6 +77,12 @@ mcp__rules__get_rule(file="rust/errors.md")
 | `python/checks/antipatterns.py` | mutable defaults, global keyword, eval | `python/types.md` |
 | `kotlin/checks/safety.py` | !!, java.* imports, multi-class | `kotlin/encapsulation.md` |
 | `kotlin/checks/coroutines.py` | Thread.sleep, runBlocking, untracked launch | `kotlin/coroutines.md` |
+| `csharp/checks/types.py` | #nullable disable, dynamic, object param | `csharp/types.md` |
+| `csharp/checks/errors.py` | catch (Exception), naked catch, throw new Exception | `csharp/errors.md` |
+| `csharp/checks/naming.py` | banned names, bool prefix, interface I-prefix, _camelCase fields | `csharp/naming.md` |
+| `csharp/checks/threading.py` | .Result, .Wait(), GetAwaiter().GetResult(), Thread.Sleep, async void, fire-and-forget | `csharp/threading.md` |
+| `csharp/checks/linq.py` | First() without OrDefault, Count()>0, Select+Where order, side effects, ToList in loop | `csharp/linq.md` |
+| `csharp/checks/security.py` | SQL injection, Process.Start injection, Environment.Exit, hardcoded passwords | `csharp/errors.md` |
 
 ## CLI
 

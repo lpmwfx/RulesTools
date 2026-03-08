@@ -17,4 +17,4 @@ rulestools = "cli:cli"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["common*", "rust*", "js*", "slint*", "css*", "python*", "kotlin*"]
+include = ["common*", "rust*", "js*", "slint*", "css*", "python*", "kotlin*", "csharp*"]
