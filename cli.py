@@ -192,5 +192,36 @@ def init(path: str) -> None:
     )
 
 
+@cli.command()
+@click.argument("path", default=".", type=click.Path(exists=True, file_okay=False))
+def selfcheck(path: str) -> None:
+    """Scan the RulesTools/RulesMCP source for local drive-path references.
+
+    Checks every source file under PATH for violations of
+    global/install-architecture.md — no local drive-letter paths,
+    no file:/// URLs, no sys.path local inserts, no editable installs.
+
+    Use this after editing the rules repos to confirm no local-path
+    dependency was accidentally introduced.
+    """
+    from common.selfcheck import scan_tree
+    from common.writer import print_issues
+
+    root = Path(path).resolve()
+    click.echo(f"Self-check: scanning {root} for local drive-path references ...", err=True)
+
+    issues = sorted(scan_tree(root))
+    print_issues(issues)
+
+    if issues:
+        click.echo(
+            f"\n{len(issues)} violation(s) found — fix before pushing to GitHub.",
+            err=True,
+        )
+        sys.exit(1)
+    else:
+        click.echo("  clean — no local drive-path references found.", err=True)
+
+
 if __name__ == "__main__":
     cli()
