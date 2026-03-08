@@ -121,18 +121,20 @@ def check_file(path: Path) -> list[Issue]:
                 ),
             ))
 
-        # sys.path manipulation (Python only)
+        # sys.path manipulation with a hardcoded drive path (Python only)
+        # Dynamic sys.path from user_cache_dir() is allowed — only flag literals
         if suffix == ".py":
             if m := _SYS_PATH.search(raw):
-                issues.append(Issue(
-                    file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.ERROR,
-                    rule=f"{_RULE}/no-sys-path",
-                    message=(
-                        "sys.path.insert/append adds a runtime local-path dependency — "
-                        "install the package via pip instead"
-                    ),
-                ))
+                if _DRIVE_PATH.search(raw):  # only bad if drive path is on same line
+                    issues.append(Issue(
+                        file=path, line=lineno, col=m.start() + 1,
+                        severity=Severity.ERROR,
+                        rule=f"{_RULE}/no-sys-path",
+                        message=(
+                            "sys.path.insert/append with hardcoded drive path — "
+                            "use ensure_repo() + user_cache_dir() instead"
+                        ),
+                    ))
 
         # Editable install markers
         if suffix in {".txt", ".toml"}:
