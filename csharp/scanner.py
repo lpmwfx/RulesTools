@@ -17,11 +17,13 @@ from csharp.checks.naming import check as check_naming
 from csharp.checks.threading import check as check_threading
 from csharp.checks.linq import check as check_linq
 from csharp.checks.security import check as check_security
+from csharp.checks.project_file import check as check_project_file
 
 # C# nesting: namespace(1) + class(2) + method(3) + 3 logic levels = 6 → flag at 7
 _NESTING_MAX_ABS = 7
 
 EXTENSIONS = {".cs", ".csx"}
+PROJ_EXTENSIONS = {".csproj", ".props"}
 
 _SKIP_DIRS = {".git", "bin", "obj", ".vs", "packages", "TestResults"}
 
@@ -31,6 +33,9 @@ def scan_file(path: Path) -> list[Issue]:
         lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
     except OSError:
         return []
+
+    if path.suffix in PROJ_EXTENSIONS:
+        return list(check_project_file(path, lines))
 
     issues: list[Issue] = []
     issues.extend(check_file_size(path, lines))
@@ -50,6 +55,12 @@ def scan_file(path: Path) -> list[Issue]:
 
 def scan_tree(root: Path) -> Generator[Issue, None, None]:
     for ext in EXTENSIONS:
+        for path in root.rglob(f"*{ext}"):
+            if any(skip in path.parts for skip in _SKIP_DIRS):
+                continue
+            yield from scan_file(path)
+
+    for ext in PROJ_EXTENSIONS:
         for path in root.rglob(f"*{ext}"):
             if any(skip in path.parts for skip in _SKIP_DIRS):
                 continue
