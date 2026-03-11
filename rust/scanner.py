@@ -18,6 +18,7 @@ from rust.checks.types import check as check_types
 from rust.checks.threading import check as check_threading
 from rust.checks.coupling import check as check_coupling
 from rust.checks.clone import check as check_clone
+from rust.checks.mother_child import check as check_mother_child
 from rust.checks.gateway import check as check_gateway
 from rust.checks.adapter import check as check_adapter
 from rust.checks.core_purity import check as check_core_purity
@@ -52,6 +53,7 @@ def scan_file(path: Path) -> list[Issue]:
     issues.extend(check_adapter(path, lines))
     issues.extend(check_core_purity(path, lines))
     issues.extend(check_pal_isolation(path, lines))
+    issues.extend(check_mother_child(path, lines))
     issues.extend(check_topology(path, lines))
     issues.extend(check_imports(path, lines))
     return issues

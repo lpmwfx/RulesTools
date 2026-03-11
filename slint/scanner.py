@@ -19,6 +19,7 @@ from slint.checks.tokens import check as check_tokens
 from slint.checks.structure import check as check_structure
 from slint.checks.events import check as check_events
 from slint.checks.strings import check as check_strings
+from slint.checks.mother_child import check as check_mother_child
 from slint.checks.architecture import check_tree as check_architecture
 
 # Slint: component (1) + layout (2) + nested layout (3) + if/for (4) + widget (5) = normal
@@ -52,6 +53,7 @@ def scan_file(path: Path) -> list[Issue]:
     issues.extend(check_structure(path, lines))
     issues.extend(check_events(path, lines))
     issues.extend(check_strings(path, lines))
+    issues.extend(check_mother_child(path, lines))
     return issues
 
 

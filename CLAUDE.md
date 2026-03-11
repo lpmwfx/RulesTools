@@ -60,10 +60,12 @@ mcp__rules__get_rule(file="rust/errors.md")
 | `rust/checks/threading.py` | fire-and-forget, Arc/Rc comment | `rust/threading.md` |
 | `rust/checks/coupling.py` | use super::sibling, pub(super) | `rust/modules.md` |
 | `rust/checks/clone.py` | .clone() spam (>3 per function) | `rust/ownership.md` |
+| `rust/checks/mother_child.py` | mother-too-many-fns (>3 warn, >6 error in mod.rs/main.rs), child-owns-state (static/lazy_static/thread_local/OnceLock in leaf files) | `uiux/mother-child.md` |
 | `slint/checks/tokens.py` | hardcoded colors/sizes | `uiux/tokens.md` |
 | `slint/checks/structure.py` | multiple components per file | `global/module-tree.md` |
 | `slint/checks/events.py` | callback logic, state mutations | `uiux/state-flow.md` |
 | `slint/checks/strings.py` | hardcoded string literals in components | `slint/validation.md` |
+| `slint/checks/mother_child.py` | child-has-state (in-out property without <=> in non-Window component), sibling-import (view importing sibling view) | `uiux/mother-child.md` |
 | `slint/checks/architecture.py` | multiple gateway objects across tree | `uiux/state-flow.md` |
 | `js/checks/modules.py` | require/CJS, mutable exports | `js/modules.md` |
 | `js/checks/safety.py` | eval, layer violation, promise, console.log | `js/safety.md` |
