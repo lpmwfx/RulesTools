@@ -53,8 +53,12 @@ class ScanConfig:
             return None
         with open(config_file, "rb") as f:
             data = tomllib.load(f)
+        langs = (
+            data.get("scan", {}).get("languages", [])
+            or data.get("project", {}).get("languages", [])
+        )
         return cls(
-            languages    = data.get("scan", {}).get("languages", []),
+            languages    = langs,
             ignore_paths = data.get("ignore", {}).get("paths", list(_DEFAULT_IGNORE)),
         )
 
