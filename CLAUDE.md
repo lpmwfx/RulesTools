@@ -61,6 +61,7 @@ mcp__rules__get_rule(file="rust/errors.md")
 | `rust/checks/coupling.py` | use super::sibling, pub(super) | `rust/modules.md` |
 | `rust/checks/clone.py` | .clone() spam (>3 per function) | `rust/ownership.md` |
 | `rust/checks/mother_child.py` | mother-too-many-fns (>3 warn, >6 error in mod.rs/main.rs), child-owns-state (static/lazy_static/thread_local/OnceLock in leaf files) | `uiux/mother-child.md` |
+| `rust/checks/extract_child.py` | extract-single-caller (fn with 1 caller + ≥20 lines), extract-orchestrator (fn calling ≥4 distinct fns) | `uiux/mother-child.md` |
 | `slint/checks/tokens.py` | hardcoded colors/sizes | `uiux/tokens.md` |
 | `slint/checks/structure.py` | multiple components per file | `global/module-tree.md` |
 | `slint/checks/events.py` | callback logic, state mutations | `uiux/state-flow.md` |
