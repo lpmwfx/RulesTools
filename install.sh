@@ -85,6 +85,16 @@ else
     echo "  installing rustdocumenter, rustdoc-viewer ..."
     cargo install --quiet --git "$GITHUB/RustDocumenter" --bins 2>&1 \
         | grep -E "Installed|Installing|Compiling|Finished" | tail -5 || true
+
+    # Install rustman wrapper scripts into ~/.cargo/bin/
+    CARGO_BIN="${CARGO_HOME:-$HOME/.cargo}/bin"
+    echo "  installing rustman wrapper → $CARGO_BIN ..."
+    SCRIPTS_URL="https://raw.githubusercontent.com/lpmwfx/RustDocumenter/master/scripts"
+    curl -sSf "$SCRIPTS_URL/rustman" -o "$CARGO_BIN/rustman" && chmod +x "$CARGO_BIN/rustman" || \
+        echo "  [!] could not install rustman (bash)" >&2
+    # Windows .bat (harmless on Linux/macOS)
+    curl -sSf "$SCRIPTS_URL/rustman.bat" -o "$CARGO_BIN/rustman.bat" 2>/dev/null || true
+
     echo "  [ok] Rust binaries installed"
 fi
 
@@ -127,7 +137,7 @@ echo ""
 echo "Done."
 echo ""
 echo "  Python: rulestools  rulestools-mcp  rules-mcp"
-echo "  Rust:   file_size   nesting         secrets   rustdocumenter  rustdoc-viewer"
+echo "  Rust:   file_size   nesting         secrets   rustdocumenter  rustdoc-viewer  rustman"
 echo ""
 if [ "$MODE" = "update" ]; then
     echo "All components updated from GitHub."
