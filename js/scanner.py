@@ -21,7 +21,7 @@ _NESTING_MAX_ABS = 4
 
 EXTENSIONS = {".js", ".mjs", ".ts"}
 
-_SKIP_DIRS = {"node_modules", ".git", "dist", "build", ".cache"}
+_SKIP_DIRS = {"node_modules", ".git", "dist", "build", ".cache", "target"}
 
 
 def scan_file(path: Path) -> list[Issue]:

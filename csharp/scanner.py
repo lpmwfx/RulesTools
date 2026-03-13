@@ -25,7 +25,7 @@ _NESTING_MAX_ABS = 7
 EXTENSIONS = {".cs", ".csx"}
 PROJ_EXTENSIONS = {".csproj", ".props"}
 
-_SKIP_DIRS = {".git", "bin", "obj", ".vs", "packages", "TestResults"}
+_SKIP_DIRS = {".git", "bin", "obj", ".vs", "packages", "TestResults", "target"}
 
 
 def scan_file(path: Path) -> list[Issue]:
