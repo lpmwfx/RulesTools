@@ -1,18 +1,26 @@
-"""Slint token checks — from uiux/tokens.md.
+"""Slint token checks — from uiux/tokens.md + slint/states.md.
+
+Stateless, data-driven, no-literals architecture:
+ANY literal value in a component file is hardcoding.
 
 BANNED in Slint components:
   - Hardcoded hex colors   (#rgb / #rrggbb / #rrggbbaa)
-  - Hardcoded pixel sizes  on ANY property (not just a whitelist)
-  - Hardcoded font sizes   (font-size: 14px)
   - Hardcoded rgb/rgba()   (rgba(0,0,0,0.5))
-  - Hardcoded opacity      (opacity: 0.4 — anything not 0.0 or 1.0)
+  - Hardcoded pixel sizes  (ALL values including 0px, 1px)
+  - Hardcoded percentages  (100%, 50%, etc.)
+  - Hardcoded durations    (200ms, 1s, etc.)
+  - Hardcoded integers     (0, 1, 2, 400, 700, etc.)
+  - Hardcoded floats       (0.5, 1.5, etc.)
 
-Exempt:
-  - Token definition files: globals/, tokens/ folders
-  - property <length> declarations (default values are OK)
-  - 0px, 1px  (border/hairline values accepted as-is)
-  - 100% (fill patterns are idiomatic Slint)
+Exempt (definition files):
+  - Folders: globals/, tokens/, theme/, state/
   - Lines inside // comments
+  - true/false (boolean keywords)
+
+Slint syntax exceptions (compiler requires literals):
+  - GridLayout row: / col:  (compile-time integer constants)
+  - @image-url("...")       (compile-time string literal)
+  - @tr("...") template     (compile-time string literal)
 """
 
 from __future__ import annotations
@@ -23,39 +31,56 @@ import re
 
 from common.issue import Issue, Severity
 
-_RULE_BASE = "uiux/tokens"
+_RULE_BASE = "slint/states"
+_RULE_COLORS = "uiux/tokens"
 
-_HEX_COLOR   = re.compile(r"#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b")
-_RGB_FUNC    = re.compile(r"\brgb[a]?\s*\(")
-# Any px value >= 5px (0-4px are border/hairline values — allowed)
-_PIXEL_VALUE = re.compile(r"\b([5-9]\d*(?:\.\d+)?|\d{2,}(?:\.\d+)?)\s*px\b")
-# Opacity values that are not 0.0 or 1.0
-_OPACITY_PROP = re.compile(r"\bopacity\s*:", re.IGNORECASE)
-_OPACITY_VAL  = re.compile(r"\b0\.[1-9]\d*\b")
+# ── Patterns ─────────────────────────────────────────────────────────────────
 
-# Token definition folders — exempt from checks
-_TOKEN_FOLDERS = {"globals", "tokens", "theme"}
+_HEX_COLOR = re.compile(r"#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b")
+_RGB_FUNC = re.compile(r"\brgb[a]?\s*\(")
+
+# ALL px values (including 0px, 1px)
+_PIXEL_VALUE = re.compile(r"\b\d+(?:\.\d+)?\s*px\b")
+
+# ALL percentage values (100%, 50%, 0%)
+_PERCENT_VALUE = re.compile(r"\b\d+(?:\.\d+)?\s*%")
+
+# ALL duration values (200ms, 1s, 0ms)
+_DURATION_VALUE = re.compile(r"\b\d+(?:\.\d+)?\s*(?:ms|s)\b")
+
+# Bare float literals (0.5, 1.0, 0.0, etc.)
+_FLOAT_VALUE = re.compile(r"(?<![#\w])\b\d+\.\d+\b(?!\s*(?:px|%|ms|s)\b)")
+
+# Bare integer literals (0, 1, 2, 400, etc.)
+_INT_VALUE = re.compile(r"(?<![#\w\.\-])\b(\d+)\b(?!\s*(?:px|%|ms|s)\b)(?![.\w])")
+
+# ── Syntax exceptions (Slint compiler requires literals) ─────────────────────
+
+_GRID_ROW_COL = re.compile(r"\b(?:row|col)\s*:\s*\d+")
+_IMAGE_URL = re.compile(r"@image-url\s*\(")
+_TR_MACRO = re.compile(r"@tr\s*\(")
+
+# ── Definition file folders — exempt from all checks ─────────────────────────
+
+_DEFINITION_FOLDERS = {"globals", "tokens", "theme", "state"}
 
 
-def _is_token_file(path: Path) -> bool:
-    """Token definition files are allowed to contain raw values."""
-    return any(part in _TOKEN_FOLDERS for part in path.parts)
+def _is_definition_file(path: Path) -> bool:
+    return any(part in _DEFINITION_FOLDERS for part in path.parts)
 
 
 def _is_property_decl(raw: str, match_start: int) -> bool:
-    """True if the px value is inside a property <length> declaration (default value)."""
     before = raw[:match_start]
     return bool(re.search(r"\bproperty\s*<", before))
 
 
 def _comment_start(raw: str) -> int:
-    """Return the index of // comment start, or len(raw) if none."""
     m = re.search(r"//", raw)
     return m.start() if m else len(raw)
 
 
 def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
-    if _is_token_file(path):
+    if _is_definition_file(path):
         return
 
     for lineno, raw in enumerate(lines, start=1):
@@ -64,57 +89,83 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             continue
 
         comment_at = _comment_start(raw)
+        segment = raw[:comment_at]
 
-        # ── Hardcoded hex color ─────────────────────────────────────────────
-        for m in _HEX_COLOR.finditer(raw):
-            if m.start() >= comment_at:
-                continue
+        # Skip lines with @image-url() or @tr() — syntax exceptions
+        if _IMAGE_URL.search(segment) or _TR_MACRO.search(segment):
+            continue
+
+        # ── Hardcoded hex color ──────────────────────────────────────────
+        for m in _HEX_COLOR.finditer(segment):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
                 severity=Severity.ERROR,
-                rule=f"{_RULE_BASE}/no-hardcoded-color",
-                message=(
-                    f"hardcoded color '{m.group()}' — token paradigm (uiux/tokens): "
-                    f"all colors must be named tokens, e.g. Colors.bg-primary from tokens/colors.slint"
-                ),
+                rule=f"{_RULE_COLORS}/no-hardcoded-color",
+                message=f"hardcoded color '{m.group()}' — use Colors.* token",
             )
 
-        # ── rgb() / rgba() ──────────────────────────────────────────────────
-        for m in _RGB_FUNC.finditer(raw):
-            if m.start() >= comment_at:
-                continue
+        # ── rgb() / rgba() ───────────────────────────────────────────────
+        for m in _RGB_FUNC.finditer(segment):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
                 severity=Severity.ERROR,
-                rule=f"{_RULE_BASE}/no-hardcoded-color",
-                message="hardcoded rgb/rgba() — token paradigm (uiux/tokens): all colors must be named tokens, e.g. Colors.surface from tokens/colors.slint",
+                rule=f"{_RULE_COLORS}/no-hardcoded-color",
+                message="hardcoded rgb/rgba() — use Colors.* token",
             )
 
-        # ── Hardcoded pixel sizes (ALL properties, not just a whitelist) ────
-        for m in _PIXEL_VALUE.finditer(raw):
-            if m.start() >= comment_at:
-                continue
+        # ── Hardcoded pixel sizes (ALL, including 0px) ───────────────────
+        for m in _PIXEL_VALUE.finditer(segment):
             if _is_property_decl(raw, m.start()):
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
                 severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-hardcoded-size",
-                message=(
-                    f"hardcoded size '{m.group()}' — token paradigm (uiux/tokens): "
-                    f"all sizes must be named tokens, e.g. Spacing.md from tokens/spacing.slint"
-                ),
+                message=f"hardcoded size '{m.group().strip()}' — use Sizes.* or Spacing.* variable",
             )
 
-        # ── Hardcoded opacity (not 0.0 or 1.0) ─────────────────────────────
-        if _OPACITY_PROP.search(raw[:comment_at]):
-            for m in _OPACITY_VAL.finditer(raw[:comment_at]):
-                yield Issue(
-                    file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.ERROR,
-                    rule=f"{_RULE_BASE}/no-hardcoded-opacity",
-                    message=(
-                        f"hardcoded opacity '{m.group()}' — token paradigm (uiux/tokens): "
-                        f"all opacity values must be named tokens, e.g. Spacing.opacity-disabled from tokens/"
-                    ),
-                )
+        # ── Hardcoded percentages (ALL, including 100%) ──────────────────
+        for m in _PERCENT_VALUE.finditer(segment):
+            if _is_property_decl(raw, m.start()):
+                continue
+            yield Issue(
+                file=path, line=lineno, col=m.start() + 1,
+                severity=Severity.ERROR,
+                rule=f"{_RULE_BASE}/no-hardcoded-size",
+                message=f"hardcoded percentage '{m.group().strip()}' — use Sizes.full / Sizes.half variable",
+            )
+
+        # ── Hardcoded durations (ALL, including 0ms) ─────────────────────
+        for m in _DURATION_VALUE.finditer(segment):
+            if _is_property_decl(raw, m.start()):
+                continue
+            yield Issue(
+                file=path, line=lineno, col=m.start() + 1,
+                severity=Severity.ERROR,
+                rule=f"{_RULE_BASE}/no-hardcoded-duration",
+                message=f"hardcoded duration '{m.group().strip()}' — use Durations.* variable",
+            )
+
+        # ── Hardcoded float literals ─────────────────────────────────────
+        for m in _FLOAT_VALUE.finditer(segment):
+            if _is_property_decl(raw, m.start()):
+                continue
+            yield Issue(
+                file=path, line=lineno, col=m.start() + 1,
+                severity=Severity.ERROR,
+                rule=f"{_RULE_BASE}/no-hardcoded-number",
+                message=f"hardcoded float '{m.group()}' — use state variable or theme token",
+            )
+
+        # ── Hardcoded integer literals ───────────────────────────────────
+        for m in _INT_VALUE.finditer(segment):
+            if _is_property_decl(raw, m.start()):
+                continue
+            if _GRID_ROW_COL.search(raw):
+                continue
+            yield Issue(
+                file=path, line=lineno, col=m.start() + 1,
+                severity=Severity.ERROR,
+                rule=f"{_RULE_BASE}/no-hardcoded-number",
+                message=f"hardcoded integer '{m.group(1)}' — use state variable (ViewStates.*, Sizes.*)",
+            )

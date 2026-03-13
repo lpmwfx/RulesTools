@@ -1,17 +1,21 @@
-"""Rust hardcoded file path checks — from rust/constants.md.
+"""Rust hardcoded duration checks — from rust/constants.md.
 
-File names and paths embedded as string literals are scattered across
-the codebase with no central definition. A rename requires hunting
-every occurrence.
+Zero-literal architecture: Duration values must be named constants
+from state/ modules or _cfg struct fields.
 
 BANNED:
-  - String literals ending in .json/.toml/.yaml/.txt/.png/.svg/.wasm
-    that are NOT on a const/static definition line
+  - Duration::from_secs(N) with literal N
+  - Duration::from_millis(N) with literal N
+  - Duration::from_nanos(N) with literal N
+  - Duration::from_micros(N) with literal N
+  - Duration::new(N, N) with literal N
+  - tokio::time::sleep(Duration::from_*) with literal
 
 Exempt:
-  - const / static definitions (these ARE the source of truth)
+  - const / static definition lines
   - Test files and #[cfg(test)] blocks
-  - Lines that are comments
+  - Comments
+  - Duration::from_secs(0) — zero is exempt everywhere
 """
 
 from __future__ import annotations
@@ -24,13 +28,12 @@ from common.issue import Issue, Severity
 
 _RULE_BASE = "rust/constants"
 
-# String literal that looks like a filename with an extension
-_FILE_STRING = re.compile(
-    r'"([^"]*\.(?:json|toml|yaml|yml|txt|png|svg|wasm|ron))"',
-    re.IGNORECASE,
+# Duration constructors with literal numeric arguments
+_DURATION_LITERAL = re.compile(
+    r"Duration::(?:from_secs|from_millis|from_nanos|from_micros|new)\s*\(\s*(\d+)"
 )
 
-# const / static definition — the source of truth, not a violation
+# const / static line — exempt
 _CONST_DEF = re.compile(r"^\s*(?:pub\s+)?(?:const|static)\s+")
 
 
@@ -67,19 +70,18 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if _is_test_context(lines, lineno):
             continue
 
-        for m in _FILE_STRING.finditer(raw):
-            filename = m.group(1)
-            # Skip paths that look like full paths (contain / or \)
-            # — those are test fixtures or doc examples
-            if "/" in filename or "\\" in filename:
+        for m in _DURATION_LITERAL.finditer(raw):
+            val = m.group(1)
+            # Duration::from_secs(0) is exempt (zero is universal)
+            if val == "0":
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
                 severity=Severity.ERROR,
-                rule=f"{_RULE_BASE}/no-hardcoded-path",
+                rule=f"{_RULE_BASE}/no-hardcoded-duration",
                 message=(
-                    f'hardcoded path "{filename}" — config-driven paradigm (rust/types): '
-                    f"all filenames must be named constants in paths module, "
-                    f"e.g. const NAME: &str = \"{filename}\";"
+                    f"hardcoded duration literal {val} — "
+                    f"use named const from state/ module, "
+                    f"e.g. Duration::from_secs(TIMEOUT_SECS)"
                 ),
             )

@@ -63,9 +63,11 @@ mcp__rules__get_rule(file="rust/errors.md")
 | `rust/checks/mother_child.py` | mother-too-many-fns (>3 warn, >6 error in mod.rs/main.rs), child-owns-state (static/lazy_static/thread_local/OnceLock in leaf files) | `uiux/mother-child.md` |
 | `rust/checks/extract_child.py` | extract-single-caller (fn with 1 caller + ≥20 lines), extract-orchestrator (fn calling ≥4 distinct fns) | `uiux/mother-child.md` |
 | `rust/checks/string_states.py` | stringly-typed match arms (`"foo" =>`), stringly-typed comparisons (`== "foo"`) — discriminators must be enums or named consts | `rust/types.md` |
-| `rust/checks/magic_numbers.py` | unnamed f32/f64 literals ≥2.0, unnamed integers ≥10 outside const/static — all values must be named | `rust/types.md` |
-| `rust/checks/hardcoded_paths.py` | string literals ending in .json/.toml/.yaml/.txt/.png/.svg/.wasm outside const/static — filenames must be named constants | `rust/types.md` |
-| `slint/checks/tokens.py` | hardcoded colors (#hex, rgb/rgba), hardcoded sizes (≥5px), hardcoded opacity — all values must be tokens | `uiux/tokens.md` |
+| `rust/checks/magic_numbers.py` | zero-literal enforcement: ALL integers ≥2, ALL floats except 0.0/1.0 — 6 exemptions: 0/1, const/static, tests, format macros, derives, enum variants | `rust/constants.md` |
+| `rust/checks/hardcoded_paths.py` | string literals ending in .json/.toml/.yaml/.txt/.png/.svg/.wasm outside const/static — filenames must be named constants | `rust/constants.md` |
+| `rust/checks/hardcoded_durations.py` | Duration::from_secs/millis/nanos/micros/new with literal arguments — durations must be named constants from state/ | `rust/constants.md` |
+| `rust/checks/hardcoded_urls.py` | "http://..."/"https://..." URL literals outside const/static — URLs must be named constants from state/ or _cfg | `rust/constants.md` |
+| `slint/checks/tokens.py` | zero-literal enforcement: ALL hardcoded values (colors, px, %, ms, int, float) — 3 syntax exceptions: GridLayout row/col, @image-url, @tr | `slint/states.md` + `uiux/tokens.md` |
 | `slint/checks/string_states.py` | stringly-typed state comparisons (`== "state-value"`) in components — all state values must be named constants in globals/ | `uiux/tokens.md` |
 | `slint/checks/structure.py` | multiple components per file | `global/module-tree.md` |
 | `slint/checks/events.py` | callback logic, state mutations | `uiux/state-flow.md` |

@@ -1,17 +1,15 @@
-"""Rust hardcoded file path checks — from rust/constants.md.
+"""Rust hardcoded URL checks — from rust/constants.md.
 
-File names and paths embedded as string literals are scattered across
-the codebase with no central definition. A rename requires hunting
-every occurrence.
+Zero-literal architecture: URL strings must be named constants
+from state/ modules or _cfg struct fields.
 
 BANNED:
-  - String literals ending in .json/.toml/.yaml/.txt/.png/.svg/.wasm
-    that are NOT on a const/static definition line
+  - "http://..." or "https://..." string literals outside const/static
 
 Exempt:
-  - const / static definitions (these ARE the source of truth)
+  - const / static definition lines (these ARE the named constant)
   - Test files and #[cfg(test)] blocks
-  - Lines that are comments
+  - Comments
 """
 
 from __future__ import annotations
@@ -24,13 +22,10 @@ from common.issue import Issue, Severity
 
 _RULE_BASE = "rust/constants"
 
-# String literal that looks like a filename with an extension
-_FILE_STRING = re.compile(
-    r'"([^"]*\.(?:json|toml|yaml|yml|txt|png|svg|wasm|ron))"',
-    re.IGNORECASE,
-)
+# URL string literal
+_URL_STRING = re.compile(r'"(https?://[^"]+)"')
 
-# const / static definition — the source of truth, not a violation
+# const / static line — exempt
 _CONST_DEF = re.compile(r"^\s*(?:pub\s+)?(?:const|static)\s+")
 
 
@@ -67,19 +62,16 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if _is_test_context(lines, lineno):
             continue
 
-        for m in _FILE_STRING.finditer(raw):
-            filename = m.group(1)
-            # Skip paths that look like full paths (contain / or \)
-            # — those are test fixtures or doc examples
-            if "/" in filename or "\\" in filename:
-                continue
+        for m in _URL_STRING.finditer(raw):
+            url = m.group(1)
+            # Truncate for display
+            display = url if len(url) <= 40 else url[:37] + "..."
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
                 severity=Severity.ERROR,
-                rule=f"{_RULE_BASE}/no-hardcoded-path",
+                rule=f"{_RULE_BASE}/no-hardcoded-url",
                 message=(
-                    f'hardcoded path "{filename}" — config-driven paradigm (rust/types): '
-                    f"all filenames must be named constants in paths module, "
-                    f"e.g. const NAME: &str = \"{filename}\";"
+                    f'hardcoded URL "{display}" — '
+                    f"use named const from state/ module or _cfg field"
                 ),
             )
