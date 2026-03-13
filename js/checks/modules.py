@@ -57,7 +57,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         for m in _UNDERSCORE_PRIVATE.finditer(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/private-fields",
                 message=(
                     f"this._{m.group(1)} — use ES2022 private field #{ m.group(1)} instead"

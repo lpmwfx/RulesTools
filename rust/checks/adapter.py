@@ -56,7 +56,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _UI_GET.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-ui-read-in-handler",
                 message=(
                     "ui.get_*() reads state from the widget — "
@@ -69,7 +69,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not _is_init_fn(lines, lineno):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/register-in-init",
                     message=(
                         f"ui.on_{m.group(1)}() registered outside init() — "

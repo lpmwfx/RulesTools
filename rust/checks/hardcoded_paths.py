@@ -75,7 +75,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-hardcoded-path",
                 message=(
                     f'hardcoded path "{filename}" — config-driven paradigm (rust/types): '

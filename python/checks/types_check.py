@@ -60,7 +60,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     if not has_future and has_hints:
         yield Issue(
             file=path, line=1, col=1,
-            severity=Severity.WARNING,
+            severity=Severity.ERROR,
             rule=f"{_RULE_BASE}/future-annotations",
             message=(
                 "missing 'from __future__ import annotations' — "
@@ -75,7 +75,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         for m in _OPTIONAL.finditer(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/modern-union",
                 message="use 'X | None' instead of Optional (PEP 604 modern union syntax)",
             )
@@ -102,7 +102,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                     continue
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-print",
                     message="print call in library code — use logging or structlog instead",
                 )

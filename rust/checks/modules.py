@@ -27,7 +27,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     if stem in _BANNED_FILENAMES:
         yield Issue(
             file=path, line=1, col=1,
-            severity=Severity.WARNING,
+            severity=Severity.ERROR,
             rule=f"{_RULE_BASE}/no-generic-filenames",
             message=(
                 f"'{path.name}' is a banned generic module name — "
@@ -49,7 +49,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 # We're inside something — this is a nested mod
                 yield Issue(
                     file=path, line=lineno, col=1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/one-module-per-file",
                     message=(
                         "nested inline mod block — extract to a separate file "

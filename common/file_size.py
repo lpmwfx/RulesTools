@@ -61,7 +61,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     elif count >= soft:
         yield Issue(
             file=path, line=count, col=1,
-            severity=Severity.WARNING,
+            severity=Severity.ERROR,
             rule=f"{_RULE}/{ext.lstrip('.')}",
             message=(
                 f"file has {count} lines — approaching limit of {hard} "

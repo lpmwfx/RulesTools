@@ -122,7 +122,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if tag is None:
             yield Issue(
                 file=path, line=lineno, col=m.start(1) + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=_RULE,
                 message=(
                     f"'{type_name}' in {expected}/ has no layer suffix "

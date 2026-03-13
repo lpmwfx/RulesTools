@@ -72,7 +72,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _IMPORTANT.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule="css/cascade/no-important",
                 message=(
                     "!important — signals broken cascade. "
@@ -84,7 +84,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _FONT_PX.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/use-rem",
                 message=(
                     f"{m.group(1)} in px — use rem or var(--*) "

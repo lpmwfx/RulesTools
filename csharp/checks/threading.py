@@ -87,7 +87,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _ASYNC_VOID.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-async-void",
                 message=(
                     "async void — exceptions are unobservable and crash the process. "
@@ -101,7 +101,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not re.search(r"(\bawait\b|=\s*Task\.Run|\breturn\b)", raw):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-fire-and-forget",
                     message=(
                         "Task.Run(...) without storing the task — fire-and-forget. "

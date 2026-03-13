@@ -78,7 +78,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         elif count >= _WARN_THRESHOLD:
             yield Issue(
                 file=path, line=start_ln, col=1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=_RULE,
                 message=(
                     f"{count} .clone() calls in this function — "

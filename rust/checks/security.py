@@ -52,7 +52,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if m := _CMD_FORMAT_ARG.search(raw):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/cmd-arg-injection",
                     message=(
                         ".arg(format!(...)) passes formatted string as command argument — "

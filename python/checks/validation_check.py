@@ -71,7 +71,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not _in_string(raw, m.start()) and not _nearby(lines, lineno, _PYDANTIC_VAL):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/schema-at-boundary",
                     message=(
                         "json.loads() without pydantic validation — "
@@ -84,7 +84,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not _in_string(raw, m.start()) and not _nearby(lines, lineno, _PYDANTIC_VAL, 8):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/schema-at-boundary",
                     message=(
                         "response.json() without pydantic validation — "
@@ -97,7 +97,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not _in_string(raw, m.start()):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-raw-dict-boundary",
                     message=(
                         "bare dict parameter — define a pydantic BaseModel "

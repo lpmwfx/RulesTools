@@ -54,7 +54,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not same_line_comment and not prev_line_comment:
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/arc-rc-comment",
                     message=(
                         f"{m.group(1)}::new() without explaining comment — "

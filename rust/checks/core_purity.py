@@ -73,7 +73,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if _TOKIO_GENERAL.match(raw):
                 yield Issue(
                     file=path, line=lineno, col=1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=_RULE,
                     message=(
                         "tokio in core/ - use only tokio::sync primitives here; "

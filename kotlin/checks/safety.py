@@ -52,7 +52,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             lineno = pos_to_line(m.start())
             yield Issue(
                 file=path, line=lineno, col=1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/encapsulation/one-class-per-file",
                 message=(
                     f"'{m.group(1)}' — multiple types in one file. "
@@ -98,7 +98,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _THROW_BARE.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/result-pattern/no-bare-throw",
                 message=(
                     f"throw {m.group(1)}() — use sealed Result.Error for expected failures"

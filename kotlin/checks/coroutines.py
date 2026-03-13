@@ -69,7 +69,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not any(x in path_lower for x in ("ui", "view", "screen", "fragment", "activity")):
                 yield Issue(
                     file=path, line=lineno, col=raw.index("Main") + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/wrong-dispatcher",
                     message=(
                         "Dispatchers.Main outside UI layer — "
@@ -85,7 +85,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 if not _is_test(path, lines, lineno):
                     yield Issue(
                         file=path, line=lineno, col=m.start() + 1,
-                        severity=Severity.WARNING,
+                        severity=Severity.ERROR,
                         rule=f"{_RULE_BASE}/untracked-coroutine",
                         message=(
                             "launch{} result not stored — untracked coroutine cannot "

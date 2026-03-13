@@ -53,7 +53,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if "OrDefault" not in raw[m.start(): m.start() + 20]:
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/use-first-or-default",
                     message=(
                         ".First() throws if sequence is empty — "
@@ -65,7 +65,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _COUNT_GT_ZERO.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/use-any",
                 message=(
                     ".Count() > 0 — use .Any() for existence checks "
@@ -77,7 +77,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _SELECT_WHERE.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/where-before-select",
                 message=(
                     ".Select(...).Where(...) — filter before projecting: "
@@ -89,7 +89,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _SELECT_SIDE_FX.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-select-side-effects",
                 message=(
                     ".Select(x => { ... }) — side effects inside LINQ expressions "
@@ -101,7 +101,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if inside_loop and (m := _TO_LIST.search(raw)):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-tolist-in-loop",
                 message=(
                     ".ToList() inside a loop — materialises the collection on every "

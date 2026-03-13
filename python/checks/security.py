@@ -93,7 +93,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if m := _OS_SYSTEM.search(raw):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-os-system",
                     message=(
                         "os.system() invokes the shell — "
@@ -105,7 +105,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if m := _HARDCODED_TMP.search(raw):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-hardcoded-tmp",
                     message=(
                         "hardcoded /tmp/ path is not portable and may be predictable — "

@@ -58,7 +58,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         elif level >= 5:
             yield Issue(
                 file=path, line=lineno, col=len(raw) - len(raw.lstrip()) + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=_RULE,
                 message=(
                     f"nesting depth {level} — approaching limit of 3 logic levels. "

@@ -68,7 +68,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             display = url if len(url) <= 40 else url[:37] + "..."
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-hardcoded-url",
                 message=(
                     f'hardcoded URL "{display}" — '

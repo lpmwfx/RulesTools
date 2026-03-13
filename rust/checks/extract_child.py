@@ -153,7 +153,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if callers == 1:
                 yield Issue(
                     file=path, line=start, col=1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/extract-single-caller",
                     message=(
                         f"fn `{name}` ({body_lines} lines) has exactly 1 caller "
@@ -168,7 +168,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if callees >= _FAN_OUT_MIN_CALLS:
                 yield Issue(
                     file=path, line=start, col=1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/extract-orchestrator",
                     message=(
                         f"fn `{name}` calls {callees} distinct functions — "

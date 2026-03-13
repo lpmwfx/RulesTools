@@ -60,7 +60,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
 
         yield Issue(
             file=path, line=lineno, col=raw.index('"') + 1,
-            severity=Severity.WARNING,
+            severity=Severity.ERROR,
             rule=_RULE,
             message=(
                 f"hardcoded string '{value}' in component — "

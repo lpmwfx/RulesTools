@@ -125,7 +125,7 @@ def _check_mother(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         names = ", ".join(name for _, name in fn_locations)
         yield Issue(
             file=path, line=first_ln, col=1,
-            severity=Severity.WARNING,
+            severity=Severity.ERROR,
             rule=f"{_RULE_BASE}/mother-too-many-fns",
             message=(
                 f"mother file has {count} fn definitions ({names}) — "

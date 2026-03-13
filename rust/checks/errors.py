@@ -83,7 +83,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         for m in _BOX_DYN.finditer(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-box-dyn-error",
                 message="Box<dyn Error> — use a concrete error type (thiserror)",
             )

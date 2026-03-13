@@ -48,7 +48,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         for m in _AMP_VEC.finditer(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/use-slice",
                 message="&Vec<T> parameter — use &[T] instead (more general, zero cost)",
             )
@@ -57,7 +57,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         for m in _AMP_STRING.finditer(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/use-str",
                 message="&String parameter — use &str instead (accepts both String and &str)",
             )
@@ -67,7 +67,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             for m in _PRINTLN.finditer(raw):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-println",
                     message=(
                         f"{m.group(1)}!() in library code — "

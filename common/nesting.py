@@ -110,7 +110,7 @@ def check(
             col = raw.index("{") + 1 if "{" in raw else 1
             yield Issue(
                 file=path, line=lineno, col=col,
-                severity=Severity.ERROR if depth > max_abs_depth else Severity.WARNING,
+                severity=Severity.ERROR if depth > max_abs_depth else Severity.ERROR,
                 rule=_RULE,
                 message=(
                     f"nesting depth {depth} exceeds limit of "

@@ -57,7 +57,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if name.lower() in _BANNED_NAMES:
                 yield Issue(
                     file=path, line=lineno, col=m.start(1) + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-generic-names",
                     message=(
                         f"'{name}' — generic variable name. "
@@ -73,7 +73,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if len(name) > 3:
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/bool-prefix",
                     message=(
                         f"bool '{name}' — booleans must start with "
@@ -86,7 +86,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             name = m.group(1)
             yield Issue(
                 file=path, line=lineno, col=m.start(1) + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/interface-i-prefix",
                 message=(
                     f"interface '{name}' — interfaces must start with 'I' "
@@ -100,7 +100,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not name.startswith("_") and not name[0].isupper():
                 yield Issue(
                     file=path, line=lineno, col=m.start(1) + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/private-field-underscore",
                     message=(
                         f"private field '{name}' — private fields must use "

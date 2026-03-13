@@ -64,7 +64,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     if not warnings_covered:
         yield Issue(
             file=path, line=1, col=1,
-            severity=Severity.WARNING,
+            severity=Severity.ERROR,
             rule=f"{_RULE_BASE}/warnings-as-errors",
             message=(
                 "<TreatWarningsAsErrors>true</TreatWarningsAsErrors> missing — "

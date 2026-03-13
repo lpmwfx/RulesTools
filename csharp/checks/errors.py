@@ -67,7 +67,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:  # noqa
             if not is_test:
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-base-exception",
                     message=(
                         "throw new Exception() — use a typed exception subclass "
@@ -80,7 +80,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:  # noqa
         if m := _CATCH_BARE.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-pokemon-catch",
                 message=(
                     "catch (Exception) — catching all exceptions hides bugs. "
@@ -91,7 +91,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:  # noqa
         if m := _CATCH_NAKED.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-naked-catch",
                 message=(
                     "catch { } without exception type — "
@@ -147,7 +147,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:  # noqa
                 if catch_has_log and not catch_has_action and not is_test:
                     yield Issue(
                         file=path, line=catch_start_lineno, col=1,
-                        severity=Severity.WARNING,
+                        severity=Severity.ERROR,
                         rule=f"{_RULE_BASE}/log-without-rethrow",
                         message=(
                             "catch block only logs without rethrow/sink.Report/return Result — "

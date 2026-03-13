@@ -95,7 +95,7 @@ def check_tree(paths: list[Path]) -> Generator[Issue, None, None]:
         for path, lineno in locations:
             yield Issue(
                 file=path, line=lineno, col=1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=_RULE,
                 message=(
                     f"callback calls '{receiver}' but the gateway is '{dominant}' — "

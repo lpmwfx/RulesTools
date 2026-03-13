@@ -68,7 +68,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if _GLOBAL_STMT.match(raw):
             yield Issue(
                 file=path, line=lineno, col=len(raw) - len(raw.lstrip()) + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-global-state",
                 message=(
                     "'global' keyword introduces shared mutable state — "

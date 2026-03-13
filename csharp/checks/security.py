@@ -93,7 +93,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if "+" in after or "$\"" in after or "$'" in after:
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/process-start-injection",
                     message=(
                         "Process.Start() with dynamic argument — "
@@ -104,7 +104,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _ENV_EXIT.search(raw):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/no-environment-exit",
                 message=(
                     "Environment.Exit() — bypasses IDisposable cleanup and "
@@ -153,7 +153,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not _is_test_context(lines, lineno):
                 yield Issue(
                     file=path, line=lineno, col=1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/path-traversal",
                     message=(
                         "File.* with interpolated path — "
@@ -168,7 +168,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 if not _is_test_context(lines, lineno):
                     yield Issue(
                         file=path, line=lineno, col=m.start() + 1,
-                        severity=Severity.WARNING,
+                        severity=Severity.ERROR,
                         rule=f"{_RULE_BASE}/regex-no-timeout",
                         message=(
                             "new Regex() without matchTimeout — ReDoS risk on user-supplied patterns. "

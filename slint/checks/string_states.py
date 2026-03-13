@@ -68,7 +68,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/string-state-comparison",
                 message=(
                     f'stringly-typed state == "{val}" — config-driven paradigm (uiux/tokens): '

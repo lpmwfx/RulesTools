@@ -41,7 +41,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if not _nearby(lines, lineno, _SCHEMA_PARSE):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/schema-at-boundary",
                     message=(
                         "JSON.parse() without schema validation — "
@@ -54,7 +54,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if _RES_JSON.search(raw) and not _nearby(lines, lineno, _SCHEMA_PARSE, window=8):
                 yield Issue(
                     file=path, line=lineno, col=1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/schema-at-boundary",
                     message=(
                         ".json()/.text() response without schema validation — "

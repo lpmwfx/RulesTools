@@ -18,9 +18,9 @@ _MARKERS: list[tuple[re.Pattern, Severity]] = [
     (re.compile(r"\bNOCOMMIT\b",  re.IGNORECASE), Severity.ERROR),
     (re.compile(r"\bHACK\b",      re.IGNORECASE), Severity.ERROR),
     (re.compile(r"\bWORKAROUND\b",re.IGNORECASE), Severity.ERROR),
-    (re.compile(r"\bTODO\b",      re.IGNORECASE), Severity.WARNING),
-    (re.compile(r"\bFIXME\b",     re.IGNORECASE), Severity.WARNING),
-    (re.compile(r"\bXXX\b"),                       Severity.WARNING),
+    (re.compile(r"\bTODO\b",      re.IGNORECASE), Severity.ERROR),
+    (re.compile(r"\bFIXME\b",     re.IGNORECASE), Severity.ERROR),
+    (re.compile(r"\bXXX\b"),                       Severity.ERROR),
 ]
 
 # File types where these are documentation, not tech debt

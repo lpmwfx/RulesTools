@@ -33,7 +33,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if m := _Z_INDEX.search(raw):
             value = int(m.group(1))
             if value > 10:
-                severity = Severity.ERROR if value >= 100 else Severity.WARNING
+                severity = Severity.ERROR if value >= 100 else Severity.ERROR
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
                     severity=severity,
@@ -51,7 +51,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 prop = m.group(1)
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-magic-duration",
                     message=(
                         f"hardcoded {prop} duration {duration}ms — "

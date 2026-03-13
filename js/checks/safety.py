@@ -52,7 +52,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if _THEN_NO_CATCH.search(raw) and ".catch" not in raw:
             yield Issue(
                 file=path, line=lineno, col=raw.index(".then") + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/unhandled-promise",
                 message=".then() without .catch() — all promises must be handled",
             )
@@ -63,7 +63,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if m := _CONSOLE.search(raw):
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-console",
                     message=(
                         f"console.{m.group(1)}() in production code — "

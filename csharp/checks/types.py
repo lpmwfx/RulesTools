@@ -56,7 +56,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if before.count('"') % 2 == 0:
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-object-param",
                     message=(
                         "`object` as parameter or variable — "

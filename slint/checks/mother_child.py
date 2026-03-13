@@ -79,7 +79,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         if _IN_OUT_PROP.match(stripped) and not _DELEGATION.search(raw):
             yield Issue(
                 file=path, line=lineno, col=1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/child-has-state",
                 message=(
                     "in-out property in child component — children must be "
@@ -116,7 +116,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             # Same-folder import in views/ = sibling coupling
             yield Issue(
                 file=path, line=lineno, col=m.start(1) + 1,
-                severity=Severity.WARNING,
+                severity=Severity.ERROR,
                 rule=f"{_RULE_BASE}/sibling-import",
                 message=(
                     f"view imports sibling view '{import_path}' — views are "

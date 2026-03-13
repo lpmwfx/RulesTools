@@ -47,7 +47,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             if name in _BANNED_BARE:
                 yield Issue(
                     file=path, line=lineno, col=m.start(1) + 1,
-                    severity=Severity.WARNING,
+                    severity=Severity.ERROR,
                     rule=f"{_RULE_BASE}/no-noise-names",
                     message=(
                         f"'{name}' is a banned bare name — add a domain suffix "
@@ -62,7 +62,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 if not any(name.startswith(p) for p in _BOOL_PREFIXES):
                     yield Issue(
                         file=path, line=lineno, col=m.start(1) + 1,
-                        severity=Severity.WARNING,
+                        severity=Severity.ERROR,
                         rule=f"{_RULE_BASE}/bool-prefix",
                         message=(
                             f"boolean '{name}' must start with "

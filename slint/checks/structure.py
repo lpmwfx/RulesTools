@@ -44,7 +44,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         lineno = pos_to_line(m.start())
         yield Issue(
             file=path, line=lineno, col=1,
-            severity=Severity.WARNING,
+            severity=Severity.ERROR,
             rule=_RULE,
             message=(
                 f"component '{m.group(1)}' — multiple components in one file. "
