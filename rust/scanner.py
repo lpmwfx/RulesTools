@@ -27,6 +27,7 @@ from rust.checks.gateway import check as check_gateway
 from rust.checks.adapter import check as check_adapter
 from rust.checks.core_purity import check as check_core_purity
 from rust.checks.pal_isolation import check as check_pal_isolation
+from rust.checks.scanner_installed import check_tree as check_scanner_installed
 
 # Rust: impl body = depth 2 (mod + impl), fn body = depth 1–2
 # Flag at absolute brace depth >= 5 (impl + fn + 3 logic levels)
@@ -74,3 +75,5 @@ def scan_tree(root: Path) -> Generator[Issue, None, None]:
         if "target" in parts or ".cargo" in parts:
             continue
         yield from scan_file(path)
+    # Project-level: verify rustscanners is wired into build.rs
+    yield from check_scanner_installed(root)

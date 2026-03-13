@@ -67,6 +67,7 @@ mcp__rules__get_rule(file="rust/errors.md")
 | `rust/checks/hardcoded_paths.py` | string literals ending in .json/.toml/.yaml/.txt/.png/.svg/.wasm outside const/static — filenames must be named constants | `rust/constants.md` |
 | `rust/checks/hardcoded_durations.py` | Duration::from_secs/millis/nanos/micros/new with literal arguments — durations must be named constants from state/ | `rust/constants.md` |
 | `rust/checks/hardcoded_urls.py` | "http://..."/"https://..." URL literals outside const/static — URLs must be named constants from state/ or _cfg | `rust/constants.md` |
+| `rust/checks/scanner_installed.py` | **TREE-LEVEL** project must have `rustscanners::scan_project()` in a build.rs — ERROR if missing (AI removal guard) | `rust/build/scanner-required` |
 | `slint/checks/tokens.py` | zero-literal enforcement: ALL hardcoded values (colors, px, %, ms, int, float) — 3 syntax exceptions: GridLayout row/col, @image-url, @tr | `slint/states.md` + `uiux/tokens.md` |
 | `slint/checks/string_states.py` | stringly-typed state comparisons (`== "state-value"`) in components — all state values must be named constants in globals/ | `uiux/tokens.md` |
 | `slint/checks/structure.py` | multiple components per file | `global/module-tree.md` |
@@ -74,6 +75,7 @@ mcp__rules__get_rule(file="rust/errors.md")
 | `slint/checks/strings.py` | hardcoded string literals in components | `slint/validation.md` |
 | `slint/checks/mother_child.py` | child-has-state (in-out property without <=> in non-Window component), sibling-import (view importing sibling view) | `uiux/mother-child.md` |
 | `slint/checks/architecture.py` | multiple gateway objects across tree | `uiux/state-flow.md` |
+| `slint/checks/scanner_installed.py` | **TREE-LEVEL** project must have `slintscanners::scan_project()` in a build.rs — ERROR if missing (AI removal guard) | `slint/build/scanner-required` |
 | `js/checks/modules.py` | require/CJS, mutable exports | `js/modules.md` |
 | `js/checks/safety.py` | eval, layer violation, promise, console.log | `js/safety.md` |
 | `js/checks/validation.py` | JSON.parse/fetch without schema | `js/validation.md` |
