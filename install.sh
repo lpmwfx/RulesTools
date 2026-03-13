@@ -82,6 +82,9 @@ else
     echo "  installing file_size, nesting, secrets ..."
     cargo install --quiet --git "$GITHUB/RustScanners" --bins 2>&1 \
         | grep -E "Installed|Installing|Compiling|Finished" | tail -5 || true
+    echo "  installing rustdocumenter, rustdoc-viewer ..."
+    cargo install --quiet --git "$GITHUB/RustDocumenter" --bins 2>&1 \
+        | grep -E "Installed|Installing|Compiling|Finished" | tail -5 || true
     echo "  [ok] Rust binaries installed"
 fi
 
@@ -124,7 +127,7 @@ echo ""
 echo "Done."
 echo ""
 echo "  Python: rulestools  rulestools-mcp  rules-mcp"
-echo "  Rust:   file_size   nesting         secrets"
+echo "  Rust:   file_size   nesting         secrets   rustdocumenter  rustdoc-viewer"
 echo ""
 if [ "$MODE" = "update" ]; then
     echo "All components updated from GitHub."

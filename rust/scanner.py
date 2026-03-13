@@ -28,6 +28,7 @@ from rust.checks.adapter import check as check_adapter
 from rust.checks.core_purity import check as check_core_purity
 from rust.checks.pal_isolation import check as check_pal_isolation
 from rust.checks.scanner_installed import check_tree as check_scanner_installed
+from rust.checks.doc_required import check as check_doc_required
 
 # Rust: impl body = depth 2 (mod + impl), fn body = depth 1–2
 # Flag at absolute brace depth >= 5 (impl + fn + 3 logic levels)
@@ -65,6 +66,7 @@ def scan_file(path: Path) -> list[Issue]:
     issues.extend(check_hardcoded_paths(path, lines))
     issues.extend(check_topology(path, lines))
     issues.extend(check_imports(path, lines))
+    issues.extend(check_doc_required(path, lines))
     return issues
 
 
