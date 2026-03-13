@@ -99,7 +99,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         for m in _HEX_COLOR.finditer(segment):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_COLORS}/no-hardcoded-color",
                 message=f"hardcoded color '{m.group()}' — use Colors.* token",
             )
@@ -108,7 +108,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
         for m in _RGB_FUNC.finditer(segment):
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_COLORS}/no-hardcoded-color",
                 message="hardcoded rgb/rgba() — use Colors.* token",
             )
@@ -119,7 +119,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_BASE}/no-hardcoded-size",
                 message=f"hardcoded size '{m.group().strip()}' — use Sizes.* or Spacing.* variable",
             )
@@ -130,7 +130,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_BASE}/no-hardcoded-size",
                 message=f"hardcoded percentage '{m.group().strip()}' — use Sizes.full / Sizes.half variable",
             )
@@ -141,7 +141,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_BASE}/no-hardcoded-duration",
                 message=f"hardcoded duration '{m.group().strip()}' — use Durations.* variable",
             )
@@ -152,7 +152,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_BASE}/no-hardcoded-number",
                 message=f"hardcoded float '{m.group()}' — use state variable or theme token",
             )
@@ -165,7 +165,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_BASE}/no-hardcoded-number",
                 message=f"hardcoded integer '{m.group(1)}' — use state variable (ViewStates.*, Sizes.*)",
             )

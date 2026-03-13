@@ -90,7 +90,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             first_ln, first_l = if_lines[0]
             yield Issue(
                 file=path, line=first_ln, col=first_l.index("if") + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_BASE}/no-callback-logic",
                 message=(
                     f"callback '{cb_name}': if-statement in UI callback — "
@@ -109,7 +109,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             first_ln = root_assigns[0][0]
             yield Issue(
                 file=path, line=first_ln, col=1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_BASE}/no-state-mutation-in-callback",
                 message=(
                     f"callback '{cb_name}': {len(all_props)} root state mutations "

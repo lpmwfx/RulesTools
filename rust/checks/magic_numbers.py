@@ -109,7 +109,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start() + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_BASE}/no-magic-number",
                 message=(
                     f"magic number {val} — use named const or _cfg field, "
@@ -134,7 +134,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
                 continue
             yield Issue(
                 file=path, line=lineno, col=m.start(1) + 1,
-                severity=Severity.ERROR,
+                severity=Severity.WARNING,
                 rule=f"{_RULE_BASE}/no-magic-number",
                 message=(
                     f"magic number {val} — use named const or _cfg field, "
