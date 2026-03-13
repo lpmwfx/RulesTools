@@ -83,7 +83,9 @@ else
     cargo install --quiet --git "$GITHUB/RustScanners" --bins 2>&1 \
         | grep -E "Installed|Installing|Compiling|Finished" | tail -5 || true
     echo "  installing rustdocumenter, rustdoc-viewer ..."
-    cargo install --quiet --git "$GITHUB/RustDocumenter" --bins 2>&1 \
+    cargo install --quiet --force --git "$GITHUB/RustDocumenter" rustdocumenter 2>&1 \
+        | grep -E "Installed|Installing|Compiling|Finished" | tail -5 || true
+    cargo install --quiet --force --git "$GITHUB/RustDocumenter" rustdoc-viewer 2>&1 \
         | grep -E "Installed|Installing|Compiling|Finished" | tail -5 || true
 
     # Install rustman wrapper scripts into ~/.cargo/bin/
