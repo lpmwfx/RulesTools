@@ -14,6 +14,7 @@ from common.import_direction import check as check_imports
 from rust.checks.errors import check as check_errors
 from rust.checks.naming import check as check_naming
 from rust.checks.modules import check as check_modules
+from rust.checks.child_module_size import check as check_child_module_size
 from rust.checks.types import check as check_types
 from rust.checks.threading import check as check_threading
 from rust.checks.coupling import check as check_coupling
@@ -51,6 +52,7 @@ def scan_file(path: Path) -> list[Issue]:
     issues.extend(check_errors(path, lines))
     issues.extend(check_naming(path, lines))
     issues.extend(check_modules(path, lines))
+    issues.extend(check_child_module_size(path, lines))
     issues.extend(check_types(path, lines))
     issues.extend(check_threading(path, lines))
     issues.extend(check_coupling(path, lines))
