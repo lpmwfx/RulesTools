@@ -1,0 +1,9 @@
+[package]
+name = "slintscan"
+version.workspace = true
+edition.workspace = true
+description = "Unified Slint scanner wrapper — delegates to slintscanners"
+repository = "https://github.com/lpmwfx/RulesTools"
+
+[dependencies]
+slintscanners = { git = "https://github.com/lpmwfx/SlintScanners" }
