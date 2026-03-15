@@ -19,6 +19,8 @@ _UNWRAP     = re.compile(r"\.\s*unwrap\s*\(\s*\)")
 _EXPECT     = re.compile(r"\.\s*expect\s*\(")
 _PANIC      = re.compile(r"\bpanic!\s*\(")
 _BOX_DYN    = re.compile(r"Box\s*<\s*dyn\s+Error")
+# Regex::new(...).unwrap() inside LazyLock — panics on invalid pattern (developer error, caught at startup)
+_REGEX_INIT = re.compile(r"\bRegex(?:Set)?::new\s*\(")
 
 
 def _is_test_context(lines: list[str], lineno: int) -> bool:
@@ -59,6 +61,8 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
 
         if not in_test:
             for m in _UNWRAP.finditer(raw):
+                if _REGEX_INIT.search(raw):
+                    continue  # Regex::new(...).unwrap() — invalid pattern is a developer error caught at startup
                 yield Issue(
                     file=path, line=lineno, col=m.start() + 1,
                     severity=Severity.ERROR,

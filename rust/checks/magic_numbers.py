@@ -78,14 +78,36 @@ def _is_test_context(lines: list[str], lineno: int) -> bool:
     return False
 
 
-def _is_format_macro_line(raw: str) -> bool:
-    """Check if the line is inside a format/log/assert macro."""
-    return bool(_FORMAT_MACRO.search(raw))
+def _find_format_macro_spans(lines: list[str]) -> set[int]:
+    """Return 1-based line numbers inside multi-line format/log/assert macro calls.
+
+    Handles both single-line and multi-line invocations so that string continuation
+    lines (e.g. the second line of a multi-line format!()) are also skipped.
+    """
+    in_macro = False
+    depth = 0
+    spans: set[int] = set()
+    for lineno, raw in enumerate(lines, start=1):
+        if not in_macro:
+            if _FORMAT_MACRO.search(raw):
+                in_macro = True
+                depth = raw.count('(') - raw.count(')')
+                spans.add(lineno)
+                if depth <= 0:
+                    in_macro = False
+        else:
+            depth += raw.count('(') - raw.count(')')
+            spans.add(lineno)
+            if depth <= 0:
+                in_macro = False
+    return spans
 
 
 def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     if _is_test_file(path):
         return
+
+    format_spans = _find_format_macro_spans(lines)
 
     for lineno, raw in enumerate(lines, start=1):
         stripped = raw.lstrip()
@@ -97,7 +119,7 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
             continue
         if _is_test_context(lines, lineno):
             continue
-        if _is_format_macro_line(raw):
+        if lineno in format_spans:
             continue
 
         clean = _strip_strings(raw)

@@ -30,7 +30,7 @@ _TOOL_FN_ATTR = re.compile(r"^\s*#\[tool[\s(,\]]")
 
 _IMPL_LINE = re.compile(r"^\s*(?:pub\s+)?(?:unsafe\s+)?impl\b")
 
-_STATIC = re.compile(r"^\s*(?:pub(?:\([^)]+\))?\s+)?static\s+(?:mut\s+)?[A-Z_]")
+_STATIC = re.compile(r"^\s*(?:pub(?:\([^)]+\))?\s+)?static\s+mut\s+[A-Z_]")
 _LAZY_STATIC = re.compile(r"\blazy_static\s*!")
 _THREAD_LOCAL = re.compile(r"\bthread_local\s*!")
 _ONCE = re.compile(r"\b(?:OnceLock|OnceCell|Lazy)\s*::\s*new\s*\(")
