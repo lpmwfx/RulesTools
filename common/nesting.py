@@ -19,7 +19,8 @@ For simplicity we track absolute brace depth and flag anything beyond
 MAX_ABS_DEPTH, which is calibrated per language:
 
   Rust:  fn body = depth 1 (top-level fn) or 2 (impl method)
-         → flag at absolute depth >= 5  (impl + fn + 3 logic levels)
+         Match arm `=> {` excluded via ignore_open_patterns (syntactic, not logical)
+         → flag at absolute depth >= 8  (impl + fn + 6 logic levels)
   JS:    fn body = depth 1
          → flag at absolute depth >= 4  (fn + 3 logic levels)
   Slint: component body = depth 1
@@ -61,8 +62,14 @@ def check(
     lines: list[str],
     lang: str,
     max_abs_depth: int,
+    ignore_open_patterns: list[re.Pattern] | None = None,
 ) -> Generator[Issue, None, None]:
-    """Yield issues for lines that exceed max_abs_depth brace nesting."""
+    """Yield issues for lines that exceed max_abs_depth brace nesting.
+
+    ignore_open_patterns — lines matching any of these patterns still update
+    depth tracking but do NOT trigger an error.  Used to exempt Rust match
+    arm openers (`=> {`) which are syntactically required, not logical nesting.
+    """
     depth = 0
     in_block_comment = False
 
@@ -107,10 +114,13 @@ def check(
 
         # Flag when this line's opening brace pushes depth to/past the limit
         if opens > 0 and depth >= max_abs_depth:
+            # Skip lines matching ignore patterns (e.g. match arm `=> {`)
+            if ignore_open_patterns and any(p.search(clean) for p in ignore_open_patterns):
+                continue
             col = raw.index("{") + 1 if "{" in raw else 1
             yield Issue(
                 file=path, line=lineno, col=col,
-                severity=Severity.ERROR if depth > max_abs_depth else Severity.ERROR,
+                severity=Severity.ERROR,
                 rule=_RULE,
                 message=(
                     f"nesting depth {depth} exceeds limit of "

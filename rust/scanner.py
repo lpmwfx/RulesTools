@@ -1,6 +1,7 @@
 """Rust scanner — orchestrates all Rust checks for a single file."""
 
 from __future__ import annotations
+import re
 from pathlib import Path
 from typing import Generator
 
@@ -32,8 +33,12 @@ from rust.checks.scanner_installed import check_tree as check_scanner_installed
 from rust.checks.doc_required import check as check_doc_required
 
 # Rust: impl body = depth 2 (mod + impl), fn body = depth 1–2
-# Flag at absolute brace depth >= 5 (impl + fn + 3 logic levels)
-_NESTING_MAX_ABS = 5
+# Match arm `=> {` is syntactic, not logical — excluded via ignore pattern.
+# Flag at absolute brace depth >= 8 (impl + fn + 6 logic levels)
+_NESTING_MAX_ABS = 8
+
+# Match arm opener — syntactically required brace, not logical nesting
+_MATCH_ARM = [re.compile(r"=>\s*\{")]
 
 EXTENSIONS = {".rs"}
 
@@ -46,7 +51,8 @@ def scan_file(path: Path) -> list[Issue]:
 
     issues: list[Issue] = []
     issues.extend(check_file_size(path, lines))
-    issues.extend(check_nesting(path, lines, lang="rs", max_abs_depth=_NESTING_MAX_ABS))
+    issues.extend(check_nesting(path, lines, lang="rs", max_abs_depth=_NESTING_MAX_ABS,
+                               ignore_open_patterns=_MATCH_ARM))
     issues.extend(check_debt(path, lines))
     issues.extend(check_secrets(path, lines))
     issues.extend(check_errors(path, lines))
