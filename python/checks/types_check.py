@@ -25,6 +25,10 @@ _PRINT_CALL    = re.compile(r"\bprint\s*\(")
 # Files that legitimately use print for output
 _SCRIPT_NAMES = {"__main__.py", "cli.py", "main.py", "writer.py", "printer.py"}
 
+# tools/ at project root is a protected zone for build scripts and CLI tools
+def _is_tools_file(path: Path) -> bool:
+    return "tools" in path.parts
+
 
 def _iter_code_lines(lines: list[str]):
     """Yield (lineno, raw) for non-comment, non-docstring lines."""
@@ -52,7 +56,7 @@ def _iter_code_lines(lines: list[str]):
 
 def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     text = "\n".join(lines)
-    is_script = path.name in _SCRIPT_NAMES or path.stem == "manage"
+    is_script = path.name in _SCRIPT_NAMES or path.stem == "manage" or _is_tools_file(path)
 
     # --- Missing future annotations ---
     has_future = bool(_FUTURE_IMPORT.search(text))

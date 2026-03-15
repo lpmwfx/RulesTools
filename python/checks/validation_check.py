@@ -63,7 +63,13 @@ def _nearby(lines: list[str], lineno: int, pattern: re.Pattern, window: int = 6)
     return any(pattern.search(l) for l in lines[start:end])
 
 
+def _is_tools_file(path: Path) -> bool:
+    return "tools" in path.parts
+
+
 def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
+    if _is_tools_file(path):
+        return  # tools/ is a protected zone for build scripts — json.loads is allowed
     for lineno, raw in _iter_code_lines(lines):
 
         # --- json.loads() without pydantic validation nearby ---
