@@ -79,8 +79,11 @@ if ! command -v cargo &>/dev/null; then
     echo "    Install from https://rustup.rs/" >&2
 else
     echo "[Rust] $(cargo --version)"
-    echo "  installing file_size, nesting, secrets ..."
-    cargo install --quiet --git "$GITHUB/RustScanners" --bins 2>&1 \
+    echo "  installing rustscanners, file_size, nesting, secrets ..."
+    cargo install --quiet --force --git "$GITHUB/RustScanners" --bins 2>&1 \
+        | grep -E "Installed|Installing|Compiling|Finished" | tail -5 || true
+    echo "  installing slintscanners ..."
+    cargo install --quiet --force --git "$GITHUB/SlintScanners" --bins 2>&1 \
         | grep -E "Installed|Installing|Compiling|Finished" | tail -5 || true
     echo "  installing rustdocumenter, rustdoc-viewer ..."
     cargo install --quiet --force --git "$GITHUB/RustDocumenter" rustdocumenter 2>&1 \
@@ -140,7 +143,7 @@ echo ""
 echo "Done."
 echo ""
 echo "  Python: rulestools  rulestools-mcp  rules-mcp"
-echo "  Rust:   file_size   nesting         secrets   rustdocumenter  rustdoc-viewer  rustman  slintman"
+echo "  Rust:   rustscanners  slintscanners  file_size  nesting  secrets  rustdocumenter  rustdoc-viewer  rustman  slintman"
 echo ""
 if [ "$MODE" = "update" ]; then
     echo "All components updated from GitHub."
