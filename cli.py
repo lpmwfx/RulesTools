@@ -164,6 +164,15 @@ def init(path: str) -> None:
             "set -euo pipefail\n"
             f'PYTHONPATH="{rt_str}" \\\n'
             f'  "{py_str}" "{cli_str}" scan --pre-commit "$(git rev-parse --show-toplevel)"\n'
+            "\n"
+            "# Rust: block commit if public items lack /// doc comments\n"
+            'ROOT="$(git rev-parse --show-toplevel)"\n'
+            'if [ -f "$ROOT/Cargo.toml" ] && command -v rustdocumenter &>/dev/null; then\n'
+            '  rustdocumenter check "$ROOT" || {\n'
+            '    echo "Run \'rustdocumenter\' to auto-generate missing /// doc comments." >&2\n'
+            "    exit 1\n"
+            "  }\n"
+            "fi\n"
         )
         if hook_dst.exists():
             click.echo(f"  skipped (exists): {hook_dst}")
