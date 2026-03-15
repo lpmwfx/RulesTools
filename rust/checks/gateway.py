@@ -72,6 +72,10 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     if "test" in parts_lower or path.stem.endswith("_test") or path.stem == "tests":
         return
 
+    # Skip standalone CLI binaries — they are entry points, not library code
+    if "bin" in parts_lower:
+        return
+
     for lineno, raw in enumerate(lines, start=1):
         stripped = raw.lstrip()
         if stripped.startswith("//"):

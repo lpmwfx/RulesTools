@@ -137,8 +137,15 @@ def _count_unique_callees(
     return len(callees)
 
 
+def _is_bin_file(path: Path) -> bool:
+    """True for src/bin/*.rs — standalone CLI entry points, not library modules."""
+    return "bin" in [p.lower() for p in path.parts]
+
+
 def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     if _is_test_file(path):
+        return
+    if _is_bin_file(path):
         return
 
     for name, start, end in _parse_fn_extents(lines):

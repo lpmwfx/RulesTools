@@ -28,8 +28,14 @@ def _is_fn_param(raw: str, match: re.Match) -> bool:
     return "fn " in before or "(" in before
 
 
+def _is_bin_file(path: Path) -> bool:
+    """True for src/bin/*.rs — standalone CLI binaries, not library code."""
+    parts = [p.lower() for p in path.parts]
+    return "bin" in parts
+
+
 def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
-    is_main = path.name == "main.rs"
+    is_main = path.name == "main.rs" or _is_bin_file(path)
     in_test = False
 
     for lineno, raw in enumerate(lines, start=1):
