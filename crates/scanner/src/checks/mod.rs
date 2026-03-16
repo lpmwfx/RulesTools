@@ -14,6 +14,14 @@ pub mod doc_required;
 pub mod string_states;
 pub mod naming;
 pub mod modules;
+pub mod hardcoded_paths;
+pub mod hardcoded_durations;
+pub mod hardcoded_urls;
+pub mod clone_spam;
+pub mod coupling;
+pub mod threading;
+pub mod mother_child;
+pub mod shared_discovery;
 
 /// Per-file check function signature.
 pub type PerFileCheckFn = fn(
@@ -89,6 +97,14 @@ pub fn registry() -> Vec<CheckEntry> {
         CheckEntry::per_file("rust/types/no-string-match", vec![Language::Rust], string_states::check),
         CheckEntry::per_file("rust/naming/no-noise-names", vec![Language::Rust], naming::check),
         CheckEntry::per_file("rust/modules/no-utils", vec![Language::Rust], modules::check),
+        CheckEntry::per_file("rust/constants/no-hardcoded-path", vec![Language::Rust], hardcoded_paths::check),
+        CheckEntry::per_file("rust/constants/no-hardcoded-duration", vec![Language::Rust], hardcoded_durations::check),
+        CheckEntry::per_file("rust/constants/no-hardcoded-url", vec![Language::Rust], hardcoded_urls::check),
+        CheckEntry::per_file("rust/ownership/clone-spam", vec![Language::Rust], clone_spam::check),
+        CheckEntry::per_file("rust/modules/no-sibling-coupling", vec![Language::Rust], coupling::check),
+        CheckEntry::per_file("rust/threading/no-static-mut", vec![Language::Rust], threading::check),
+        CheckEntry::per_file("uiux/mother-child/mother-too-many-fns", vec![Language::Rust], mother_child::check),
+        CheckEntry::cross_file("rust/modules/shared-candidate", vec![Language::Rust], shared_discovery::check),
     ]
 }
 

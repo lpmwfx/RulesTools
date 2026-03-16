@@ -70,6 +70,7 @@ impl FileContext {
             Language::Rust => {
                 filename.starts_with("test_")
                     || filename.ends_with("_test.rs")
+                    || filename.ends_with("_tests.rs")
                     || path_str.contains("/tests/")
                     || path_str.contains("\\tests\\")
                     || filename == "tests.rs"
@@ -134,12 +135,21 @@ pub fn is_const_def(line: &str) -> bool {
 
 /// Check if lines around an index indicate a test context (Rust #[test] or #[cfg(test)]).
 pub fn is_test_context(lines: &[&str], index: usize) -> bool {
-    // Look backwards up to 5 lines for #[test] or #[cfg(test)]
-    let start = index.saturating_sub(5);
-    for i in start..index {
+    let start = index.saturating_sub(60);
+    for i in (start..index).rev() {
         let trimmed = lines[i].trim();
         if trimmed == "#[test]" || trimmed == "#[cfg(test)]" || trimmed.starts_with("#[rstest") {
             return true;
+        }
+        // Stop at fn boundary — but peek one line up for #[test] first
+        if trimmed.starts_with("fn ") || trimmed.starts_with("pub fn ") || trimmed.starts_with("async fn ") {
+            if i > 0 {
+                let above = lines[i - 1].trim();
+                if above == "#[test]" || above == "#[cfg(test)]" || above.starts_with("#[rstest") {
+                    return true;
+                }
+            }
+            return false;
         }
     }
     false
@@ -239,12 +249,18 @@ mod tests {
     #[test]
     fn test_context_detection() {
         let lines = vec![
+            "",
             "    #[test]",
             "    fn test_foo() {",
             "        let x = 42;",
+            "    }",
         ];
-        assert!(is_test_context(&lines, 1));
+        // Line 2 (fn test_foo) sees #[test] on line 1
         assert!(is_test_context(&lines, 2));
+        // Line 3 (let x) is inside test fn — but hits fn boundary, so stops
+        // The fn boundary IS the test fn, so #[test] was already found
+        assert!(is_test_context(&lines, 3));
+        // Line 0 (empty) has nothing above
         assert!(!is_test_context(&lines, 0));
     }
 }
