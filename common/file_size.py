@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Generator
 
 from .issue import Issue, Severity
+from .standalone import is_standalone
 
 # (soft_limit, hard_limit)
 _LIMITS: dict[str, tuple[int, int]] = {
@@ -100,13 +101,19 @@ def _count_code_lines(ext: str, lines: list[str]) -> int:
     return count
 
 
+_STANDALONE_LIMITS = (800, 1000)   # tools/, scripts/, src/bin/
+
+
 def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     ext = path.suffix.lower()
     limits = _LIMITS.get(ext)
     if limits is None:
         return
 
-    soft, hard = limits
+    if is_standalone(path):
+        soft, hard = _STANDALONE_LIMITS
+    else:
+        soft, hard = limits
     count = _count_code_lines(ext, lines)
 
     if count >= hard:

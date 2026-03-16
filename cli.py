@@ -203,6 +203,14 @@ def init(path: str) -> None:
 
 @cli.command()
 @click.argument("path", default=".", type=click.Path(exists=True, file_okay=False))
+def check(path: str) -> None:
+    """Pre-commit check: scan staged files, unstage those with errors."""
+    from common.precommit import run_check
+    run_check(path)
+
+
+@cli.command()
+@click.argument("path", default=".", type=click.Path(exists=True, file_okay=False))
 def selfcheck(path: str) -> None:
     """Scan the RulesTools/RulesMCP source for local drive-path references.
 
