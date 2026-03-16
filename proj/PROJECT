@@ -1,0 +1,51 @@
+# RulesTools — PROJECT
+
+## Identity
+
+- **Name:** RulesTools
+- **Package:** `rulestools` (PyPI/GitHub)
+- **Purpose:** Static code scanner enforcing Rules repo conventions across 7 languages
+- **GitHub:** github.com/lpmwfx/RulesTools
+
+## Current Stack
+
+- Python 3.11+ (click, watchdog)
+- CLI entry: `rulestools` → `cli.py`
+
+## Migration Plan
+
+RulesTools will be ported from Python to **Rust + rust-script** over time.
+
+### Why
+
+- Python scanners are fast enough for small projects but slow on large codebases
+- Rust gives native binary distribution — no Python runtime dependency
+- rust-script allows individual check files to remain standalone and editable (like current `.py` checks)
+- Aligns with the Rust-first ecosystem (rustscanners, slintscanners, rustdocumenter already Rust)
+
+### Strategy
+
+- Incremental port — one scanner module at a time, not a big-bang rewrite
+- Python CLI remains functional during migration (both can coexist)
+- Common checks (`common/`) port first — they are shared by all languages
+- Language-specific checks port per language, starting with Rust checks (dogfooding)
+- CLI (`cli.py`) ports last — after all scanners are Rust-native
+- rust-script for individual check files (quick iteration, no full compile cycle)
+- Final binary: single `rulestools` executable, zero runtime dependencies
+
+### Phases
+
+1. **Coexistence** — Rust checks alongside Python, CLI dispatches to both
+2. **Parity** — All checks available in Rust, Python checks deprecated
+3. **Native** — Pure Rust CLI, Python removed
+
+## Architecture
+
+See CLAUDE.md for scanner table, CLI commands, and rule ID mapping.
+
+## Constraints
+
+- Must install from GitHub — never from local D: paths
+- Output format (VSCode problem-matcher) must stay identical during migration
+- `proj/ISSUES` format is a contract — no breaking changes
+- Pre-commit hook integration must work throughout migration
