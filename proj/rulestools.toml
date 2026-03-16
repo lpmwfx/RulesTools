@@ -1,5 +1,5 @@
 [scan]
-languages = ["python", "rust"]
+languages = ["rust"]
 
 [project]
-topology = "tool"
+kind = "tool"
