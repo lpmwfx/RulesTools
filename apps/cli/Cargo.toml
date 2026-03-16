@@ -11,4 +11,5 @@ path = "src/main.rs"
 
 [dependencies]
 rulestools-scanner = { path = "../../crates/scanner" }
+rulestools-documenter = { path = "../../crates/documenter" }
 clap = { workspace = true }

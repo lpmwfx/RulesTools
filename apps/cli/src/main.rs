@@ -77,6 +77,20 @@ enum Commands {
         #[arg(default_value = ".")]
         path: PathBuf,
     },
+
+    /// Generate man/ documentation for a project.
+    #[command(long_about = "Generate man/ documentation directory.\n\n\
+        Scans all .rs and .slint files for pub items and their /// doc comments.\n\
+        Writes JSON + Markdown to man/ with MANIFEST.\n\
+        \n\
+        Examples:\n  \
+        rulestools gen .                    # generate for current directory\n  \
+        rulestools gen /path/to/project     # generate for specific project")]
+    Gen {
+        /// Path to the project root.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+    },
 }
 
 fn main() {
@@ -87,6 +101,7 @@ fn main() {
         Commands::Check { path } => cmd_scan(&path, true),
         Commands::List { path } => cmd_list(&path),
         Commands::Detect { path } => cmd_detect(&path),
+        Commands::Gen { path } => cmd_gen(&path),
     }
 }
 
@@ -154,6 +169,16 @@ fn cmd_list(path: &PathBuf) {
         let status = if active { "enabled" } else { "disabled" };
         println!("{:<40} {:<20} {}", entry.id, lang_str, status);
     }
+}
+
+fn cmd_gen(path: &PathBuf) {
+    let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.clone());
+    let project_name = root
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("project");
+    rulestools_documenter::generate_docs(&root, project_name);
+    println!("rulestools: man/ generated for {project_name}");
 }
 
 fn cmd_detect(path: &PathBuf) {
