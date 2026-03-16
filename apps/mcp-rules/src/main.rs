@@ -1,7 +1,11 @@
+mod protocol;
+mod rules;
+
 /// MCP server for AI rule lookup.
 ///
-/// Stub — implementation migrated from RulesMCP in next phase.
+/// Replaces the Python rules-mcp package.
+/// Communicates via JSON-RPC over stdio (MCP protocol).
 fn main() {
-    eprintln!("mcp-rules: not yet implemented — see ARCHIVE/RulesMCP for reference");
-    std::process::exit(1);
+    let tool_defs = rules::definitions();
+    protocol::run_server("rules", tool_defs, rules::handle);
 }

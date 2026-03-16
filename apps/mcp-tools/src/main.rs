@@ -1,7 +1,11 @@
+mod protocol;
+mod tools;
+
 /// MCP server for scan, setup, init, security scan.
 ///
-/// Stub — implementation migrated from RulesToolsMCP in next phase.
+/// Replaces the Python rulestools-mcp package.
+/// Communicates via JSON-RPC over stdio (MCP protocol).
 fn main() {
-    eprintln!("mcp-tools: not yet implemented — see ARCHIVE/RulesToolsMCP for reference");
-    std::process::exit(1);
+    let tool_defs = tools::definitions();
+    protocol::run_server(tool_defs, tools::handle);
 }
