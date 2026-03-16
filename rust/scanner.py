@@ -31,6 +31,7 @@ from rust.checks.core_purity import check as check_core_purity
 from rust.checks.pal_isolation import check as check_pal_isolation
 from rust.checks.scanner_installed import check_tree as check_scanner_installed
 from rust.checks.doc_required import check as check_doc_required
+from common.stray_files import check_tree as check_stray_files
 
 # Rust: impl body = depth 2 (mod + impl), fn body = depth 1–2
 # Match arm `=> {` is syntactic, not logical — excluded via ignore pattern.
@@ -87,3 +88,5 @@ def scan_tree(root: Path) -> Generator[Issue, None, None]:
         yield from scan_file(path)
     # Project-level: verify rustscanners is wired into build.rs
     yield from check_scanner_installed(root)
+    # Project-level: flag .rs files outside recognized project areas
+    yield from check_stray_files(root, extensions={".rs"})

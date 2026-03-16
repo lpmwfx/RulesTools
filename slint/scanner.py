@@ -23,6 +23,7 @@ from slint.checks.mother_child import check as check_mother_child
 from slint.checks.string_states import check as check_string_states
 from slint.checks.architecture import check_tree as check_architecture
 from slint.checks.scanner_installed import check_tree as check_scanner_installed
+from common.stray_files import check_tree as check_stray_files
 
 # Slint: component (1) + layout (2) + nested layout (3) + if/for (4) + widget (5) = normal
 # Flag at 6: warning at exactly 6, error at 7+
@@ -71,3 +72,5 @@ def scan_tree(root: Path) -> Generator[Issue, None, None]:
     yield from check_architecture(all_paths)
     # Project-level: verify slintscanners is wired into build.rs
     yield from check_scanner_installed(root)
+    # Project-level: flag .slint files outside recognized project areas
+    yield from check_stray_files(root, extensions={".slint"})
