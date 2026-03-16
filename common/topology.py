@@ -18,6 +18,7 @@ from typing import Generator
 import re
 
 from common.issue import Issue, Severity
+from common.standalone import is_standalone
 
 _RULE = "global/topology"
 
@@ -85,6 +86,9 @@ def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
     pattern = _TYPE_RE.get(lang)
     if pattern is None:
         return
+
+    if is_standalone(path):
+        return  # Standalone tools/scripts — no topology enforcement
 
     expected = _expected_tag(path)
     if expected is None:

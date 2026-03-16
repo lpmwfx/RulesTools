@@ -17,6 +17,7 @@ from typing import Callable, Generator
 import re
 
 from common.issue import Issue, Severity
+from common.standalone import is_standalone, check_no_import as check_standalone_import
 
 _RULE = "global/topology/import-direction"
 
@@ -138,7 +139,14 @@ def _is_test_context(lines: list[str], lineno: int) -> bool:
 
 
 def check(path: Path, lines: list[str]) -> Generator[Issue, None, None]:
+    if is_standalone(path):
+        return  # Standalone tools/scripts — no topology enforcement
+
     file_layer = _file_layer(path)
+
+    # Check: project code must not import from standalone dirs
+    yield from check_standalone_import(path, lines)
+
     if file_layer is None:
         return
 
