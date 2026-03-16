@@ -1,0 +1,9 @@
+[package]
+name = "rulestools-documenter"
+description = "Auto-documentation generator for Rust projects"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+rulestools-scanner = { path = "../scanner" }

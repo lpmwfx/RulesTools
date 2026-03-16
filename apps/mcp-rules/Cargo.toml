@@ -1,0 +1,14 @@
+[package]
+name = "mcp-rules"
+description = "MCP server for AI rule lookup (replaces rules-mcp Python package)"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "mcp-rules"
+path = "src/main.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }

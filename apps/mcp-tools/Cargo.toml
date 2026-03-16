@@ -1,0 +1,15 @@
+[package]
+name = "mcp-tools"
+description = "MCP server for scan, setup, init, security scan (replaces rulestools-mcp Python package)"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "mcp-tools"
+path = "src/main.rs"
+
+[dependencies]
+rulestools-scanner = { path = "../../crates/scanner" }
+serde = { workspace = true }
+serde_json = { workspace = true }

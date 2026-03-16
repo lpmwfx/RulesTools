@@ -1,0 +1,14 @@
+[package]
+name = "rulestools"
+description = "Unified static code scanner CLI — enforces Rules repo conventions"
+version.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "rulestools"
+path = "src/main.rs"
+
+[dependencies]
+rulestools-scanner = { path = "../../crates/scanner" }
+clap = { workspace = true }

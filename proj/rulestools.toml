@@ -1,1 +1,5 @@
-languages = ["python"]
+[scan]
+languages = ["python", "rust"]
+
+[project]
+topology = "tool"
