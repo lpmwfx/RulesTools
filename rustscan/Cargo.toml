@@ -1,9 +1,0 @@
-[package]
-name = "rustscan"
-version.workspace = true
-edition.workspace = true
-description = "Unified Rust scanner wrapper — delegates to rustscanners"
-repository = "https://github.com/lpmwfx/RulesTools"
-
-[dependencies]
-rustscanners = { git = "https://github.com/lpmwfx/RustScanners" }
