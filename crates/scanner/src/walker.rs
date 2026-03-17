@@ -85,6 +85,23 @@ pub fn is_source_extension(ext: &str) -> bool {
     SOURCE_EXTENSIONS.contains(&ext)
 }
 
+/// Directories that contain metadata/docs, not source code.
+const METADATA_DIRS: &[&str] = &["proj", "doc", "docs", "man"];
+
+/// Check if a path is inside a metadata directory (proj/, doc/, man/).
+/// Files in these dirs should not have code checks run on them,
+/// but placement checks should still verify no code files exist there.
+pub fn is_metadata_path(path: &Path) -> bool {
+    let normalized = path.to_string_lossy().replace('\\', "/");
+    for dir in METADATA_DIRS {
+        let pattern = format!("/{dir}/");
+        if normalized.contains(&pattern) {
+            return true;
+        }
+    }
+    false
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

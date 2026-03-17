@@ -292,6 +292,7 @@ fn tool_setup(args: &Value) -> ToolResult {
             rulestools_scanner::project::ProjectKind::CliApp => "cli",
             rulestools_scanner::project::ProjectKind::Library => "library",
             rulestools_scanner::project::ProjectKind::Tool => "tool",
+            rulestools_scanner::project::ProjectKind::Super => "super",
         };
         let content = format!("[project]\nkind = \"{kind_str}\"\n");
         let _ = std::fs::write(&toml_path, content);

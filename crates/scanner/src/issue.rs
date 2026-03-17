@@ -5,25 +5,31 @@ use std::path::{Path, PathBuf};
 /// Severity level for scan issues.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Severity {
-    Info,
-    Warning,
+    Critical,
     Error,
+    Warning,
+    Info,
+    Skip,
 }
 
 impl Severity {
     fn rank(self) -> u8 {
         match self {
-            Severity::Error => 0,
-            Severity::Warning => 1,
-            Severity::Info => 2,
+            Severity::Critical => 0,
+            Severity::Error => 1,
+            Severity::Warning => 2,
+            Severity::Info => 3,
+            Severity::Skip => 4,
         }
     }
 
     pub fn label(self) -> &'static str {
         match self {
-            Severity::Info => "info",
-            Severity::Warning => "warning",
+            Severity::Critical => "critical",
             Severity::Error => "error",
+            Severity::Warning => "warning",
+            Severity::Info => "info",
+            Severity::Skip => "skip",
         }
     }
 }
@@ -135,14 +141,15 @@ mod tests {
     }
 
     #[test]
-    fn sort_order_errors_first() {
+    fn sort_order_critical_first() {
+        let crit = Issue::new("a.rs", 1, 1, Severity::Critical, "r0", "c");
         let err = Issue::new("a.rs", 1, 1, Severity::Error, "r1", "e");
         let warn = Issue::new("a.rs", 1, 1, Severity::Warning, "r2", "w");
         let info = Issue::new("a.rs", 1, 1, Severity::Info, "r3", "i");
 
-        let mut issues = vec![info.clone(), err.clone(), warn.clone()];
+        let mut issues = vec![info.clone(), err.clone(), warn.clone(), crit.clone()];
         issues.sort();
-        assert_eq!(issues, vec![err, warn, info]);
+        assert_eq!(issues, vec![crit, err, warn, info]);
     }
 
     #[test]
@@ -167,8 +174,10 @@ mod tests {
 
     #[test]
     fn severity_labels() {
-        assert_eq!(Severity::Info.label(), "info");
-        assert_eq!(Severity::Warning.label(), "warning");
+        assert_eq!(Severity::Critical.label(), "critical");
         assert_eq!(Severity::Error.label(), "error");
+        assert_eq!(Severity::Warning.label(), "warning");
+        assert_eq!(Severity::Info.label(), "info");
+        assert_eq!(Severity::Skip.label(), "skip");
     }
 }

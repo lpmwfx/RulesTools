@@ -72,8 +72,13 @@ pub fn write_issues_file(issues: &[Issue], project_root: &Path) -> std::io::Resu
     Ok(new_count)
 }
 
-/// Check if build should be denied (any Error-severity issues and deny=true).
+/// Check if build should be denied.
+/// Critical issues always deny. Error issues deny when deny=true.
 pub fn should_deny(issues: &[Issue], deny: bool) -> bool {
+    // Critical always blocks
+    if issues.iter().any(|i| i.severity == crate::issue::Severity::Critical) {
+        return true;
+    }
     if !deny {
         return false;
     }

@@ -22,6 +22,10 @@ pub mod coupling;
 pub mod threading;
 pub mod mother_child;
 pub mod shared_discovery;
+pub mod placement;
+pub mod shared_guard;
+pub mod unsafe_comment;
+pub mod layer_violation;
 
 /// Per-file check function signature.
 pub type PerFileCheckFn = fn(
@@ -105,6 +109,11 @@ pub fn registry() -> Vec<CheckEntry> {
         CheckEntry::per_file("rust/threading/no-static-mut", vec![Language::Rust], threading::check),
         CheckEntry::per_file("uiux/mother-child/mother-too-many-fns", vec![Language::Rust], mother_child::check),
         CheckEntry::cross_file("rust/modules/shared-candidate", vec![Language::Rust], shared_discovery::check),
+        // Topology checks
+        CheckEntry::per_file("topology/placement", vec![], placement::check),
+        CheckEntry::per_file("rust/modules/shared-guard", vec![Language::Rust], shared_guard::check),
+        CheckEntry::per_file("rust/safety/unsafe-needs-comment", vec![Language::Rust], unsafe_comment::check),
+        CheckEntry::cross_file("topology/layer-violation", vec![Language::Rust], layer_violation::check),
     ]
 }
 

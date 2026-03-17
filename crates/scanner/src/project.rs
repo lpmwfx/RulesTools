@@ -7,10 +7,12 @@ pub enum ProjectKind {
     SlintApp,
     /// Rust CLI binary — no gateway/mother-child/UI checks.
     CliApp,
-    /// Standalone reusable crate (MCP servers, scanner-lib, documenter) — self-contained, no topology.
+    /// Standalone reusable crate — grows organically, topology when needed.
     Library,
-    /// Scripts and tooling within a project (build helpers, dev scripts) — most relaxed.
+    /// Scripts and tooling within a project — most relaxed.
     Tool,
+    /// Multi-repo superprojekt — contains multiple sub-repos, each with own config.
+    Super,
 }
 
 /// Project layout — single crate or Cargo workspace.
@@ -115,6 +117,7 @@ impl ProjectKind {
             "cli" | "cli-app" | "cli_app" => Some(ProjectKind::CliApp),
             "library" | "lib" => Some(ProjectKind::Library),
             "tool" => Some(ProjectKind::Tool),
+            "super" | "super-project" => Some(ProjectKind::Super),
             _ => None,
         }
     }
@@ -141,6 +144,7 @@ impl ProjectKind {
                 "rust/types/no-println",
                 "rust/constants/no-hardcoded-path",
             ],
+            ProjectKind::Super => &[], // super delegates to sub-repos
         }
     }
 
@@ -206,6 +210,7 @@ mod tests {
         assert_eq!(ProjectKind::from_str("library"), Some(ProjectKind::Library));
         assert_eq!(ProjectKind::from_str("lib"), Some(ProjectKind::Library));
         assert_eq!(ProjectKind::from_str("tool"), Some(ProjectKind::Tool));
+        assert_eq!(ProjectKind::from_str("super"), Some(ProjectKind::Super));
         assert_eq!(ProjectKind::from_str("unknown"), None);
     }
 

@@ -12,6 +12,8 @@ pub mod output;
 pub mod checks;
 /// Auto-detection of project kind and layout.
 pub mod project;
+/// Severity resolver — maps check severity per ProjectKind.
+pub mod severity;
 
 use std::path::Path;
 
@@ -63,6 +65,7 @@ pub fn scan_at(root: &Path) -> (Vec<Issue>, usize) {
 pub fn run_scan(root: &Path) -> Vec<Issue> {
     let cfg = Config::load(root);
     let identity = ProjectIdentity::detect(root);
+    let resolver = severity::SeverityResolver::for_kind(identity.kind);
     let files = walker::collect_files(root, &[]);
     let registry = checks::registry();
 
@@ -82,6 +85,7 @@ pub fn run_scan(root: &Path) -> Vec<Issue> {
             Some(c) => c,
             None => continue,
         };
+        let is_metadata = walker::is_metadata_path(path);
         let lines: Vec<&str> = content.lines().collect();
         for check in &registry {
             if !check.applies_to(file_ctx.language) {
@@ -90,19 +94,28 @@ pub fn run_scan(root: &Path) -> Vec<Issue> {
             if !cfg.is_enabled(&check.id) || !identity.kind.allows_check(&check.id) {
                 continue;
             }
+            // Skip code checks on metadata paths (but placement check runs everywhere)
+            if is_metadata && check.id != "topology/placement" {
+                continue;
+            }
             if let checks::CheckKind::PerFile(func) = &check.kind {
                 func(&file_ctx, &lines, &cfg, &mut issues, path);
             }
         }
     }
 
-    // Cross-file checks
+    // Cross-file checks (exclude metadata files from analysis)
+    let code_contents: Vec<_> = file_contents
+        .iter()
+        .filter(|(p, _)| !walker::is_metadata_path(p))
+        .map(|(p, c)| (p.clone(), c.clone()))
+        .collect();
     for check in &registry {
         if !cfg.is_enabled(&check.id) || !identity.kind.allows_check(&check.id) {
             continue;
         }
         if let checks::CheckKind::CrossFile(func) = &check.kind {
-            func(&file_contents, &cfg, &mut issues);
+            func(&code_contents, &cfg, &mut issues);
         }
     }
 
@@ -116,6 +129,16 @@ pub fn run_scan(root: &Path) -> Vec<Issue> {
             func(&all_paths, &cfg, &mut issues);
         }
     }
+
+    // Apply severity resolver — remap and filter
+    issues = issues
+        .into_iter()
+        .map(|mut issue| {
+            issue.severity = resolver.resolve(&issue.rule_id, issue.severity);
+            issue
+        })
+        .filter(|issue| issue.severity != issue::Severity::Skip)
+        .collect();
 
     issues
 }
