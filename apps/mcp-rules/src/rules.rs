@@ -125,7 +125,10 @@ fn tool_help() -> ToolResult {
         - search_rules(query)    — keyword search across all rules\n\
         - list_rules(category?)  — browse available rules\n\
         - get_context(languages) — all rules for given languages\n\n\
-        Categories: global, rust, slint, python, js, css, kotlin, csharp, uiux, project-files\n\n\
+        Categories: global, rust, slint, python, js, css, kotlin, csharp, uiux, project-files, catalog\n\n\
+        Libraries:\n\
+        - slint-ui-templates: UI + adapter foundation for Slint apps (crates.io/crates/slint-ui-templates)\n\
+          get_rule(\"catalog/slint-ui-templates.md\") for full docs\n\n\
         Example: get_rule(\"global/startup.md\")"
     )
 }
