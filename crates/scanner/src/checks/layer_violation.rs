@@ -116,6 +116,11 @@ pub fn check(
                 continue; // can't determine layer — skip
             }
 
+            // Same-layer imports are always OK (internal organization)
+            if target_layer == source_layer {
+                continue;
+            }
+
             if !allowed.contains(&target_layer) {
                 issues.push(Issue::new(
                     path,

@@ -10,6 +10,5 @@ name = "mcp-tools"
 path = "src/main.rs"
 
 [dependencies]
-rulestools-scanner = { path = "../../crates/scanner" }
 serde = { workspace = true }
 serde_json = { workspace = true }

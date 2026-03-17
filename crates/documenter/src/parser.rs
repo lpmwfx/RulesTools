@@ -31,7 +31,7 @@ static ATTR_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*#\[").unwrap
 static PUB_USE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*pub(?:\([^)]+\))?\s+use\s+").unwrap());
 
 /// Parse a Rust source file for public items and their doc comments.
-pub fn parse_rs(path: &Path, content: &str) -> Vec<DocItem> {
+pub fn parse_rs(_path: &Path, content: &str) -> Vec<DocItem> {
     let lines: Vec<&str> = content.lines().collect();
     let mut items = Vec::new();
     let mut doc_buf: Vec<String> = Vec::new();
@@ -77,7 +77,7 @@ pub fn parse_rs(path: &Path, content: &str) -> Vec<DocItem> {
 }
 
 /// Parse a Slint source file for exported items and their doc comments.
-pub fn parse_slint(path: &Path, content: &str) -> Vec<DocItem> {
+pub fn parse_slint(_path: &Path, content: &str) -> Vec<DocItem> {
     let lines: Vec<&str> = content.lines().collect();
     let mut items = Vec::new();
     let mut doc_buf: Vec<String> = Vec::new();

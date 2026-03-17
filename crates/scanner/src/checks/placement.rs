@@ -21,7 +21,7 @@ pub fn check(
 
     let normalized = path.to_string_lossy().replace('\\', "/");
 
-    if contains_segment(&normalized, "proj") {
+    if is_toplevel_metadata(&normalized, "proj") {
         issues.push(Issue::new(
             path, 0, 0, Severity::Error,
             "topology/placement",
@@ -29,7 +29,7 @@ pub fn check(
         ));
     }
 
-    if (contains_segment(&normalized, "doc") || contains_segment(&normalized, "docs"))
+    if (is_toplevel_metadata(&normalized, "doc") || is_toplevel_metadata(&normalized, "docs"))
         && !normalized.contains("/examples/")
     {
         issues.push(Issue::new(
@@ -39,7 +39,7 @@ pub fn check(
         ));
     }
 
-    if contains_segment(&normalized, "man") {
+    if is_toplevel_metadata(&normalized, "man") {
         issues.push(Issue::new(
             path, 0, 0, Severity::Error,
             "topology/placement",
@@ -48,10 +48,25 @@ pub fn check(
     }
 }
 
-/// Check if a normalized path contains a directory segment with the given name.
-fn contains_segment(path: &str, segment: &str) -> bool {
-    let with_slashes = format!("/{segment}/");
-    path.contains(&with_slashes)
+/// Check if a path has a top-level metadata directory (not nested inside src/, ui/, etc.).
+fn is_toplevel_metadata(path: &str, segment: &str) -> bool {
+    // Split path into segments
+    let parts: Vec<&str> = path.split('/').collect();
+
+    // Find position of the segment in path
+    let seg_idx = match parts.iter().position(|&p| p == segment) {
+        Some(i) => i,
+        None => return false,
+    };
+
+    // If segment is preceded by any code directory, it's nested — not metadata
+    let code_dirs = ["src", "ui", "crates", "examples", "lib"];
+    for i in 0..seg_idx {
+        if code_dirs.contains(&parts[i]) {
+            return false;
+        }
+    }
+    true
 }
 
 #[cfg(test)]
@@ -121,6 +136,37 @@ mod tests {
         };
         let mut issues = Vec::new();
         check(&ctx, &[], &Config::default(), &mut issues, Path::new("x/doc/widget.slint"));
+        assert_eq!(issues.len(), 1);
+    }
+
+    #[test]
+    fn nested_docs_in_src_ok() {
+        let ctx = make_ctx();
+        let mut issues = Vec::new();
+        // src/docs/ is a code module, not a metadata folder
+        check(&ctx, &[], &Config::default(), &mut issues, Path::new("src/docs/mod.rs"));
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn nested_docs_in_ui_ok() {
+        let ctx = FileContext {
+            language: Language::Slint,
+            is_test_file: false,
+            is_mother_file: false,
+            is_definition_file: false,
+        };
+        let mut issues = Vec::new();
+        // ui/docs/ is a UI component folder, not metadata
+        check(&ctx, &[], &Config::default(), &mut issues, Path::new("ui/docs/markdown-view.slint"));
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn toplevel_doc_still_error() {
+        let ctx = make_ctx();
+        let mut issues = Vec::new();
+        check(&ctx, &[], &Config::default(), &mut issues, Path::new("doc/snippet.rs"));
         assert_eq!(issues.len(), 1);
     }
 }

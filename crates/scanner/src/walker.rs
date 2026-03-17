@@ -11,7 +11,7 @@ const SOURCE_EXTENSIONS: &[&str] = &[
 const EXCLUDE_DIRS: &[&str] = &[
     "target", "node_modules", ".git", "__pycache__", "dist", "build",
     ".venv", "venv", ".tox", ".mypy_cache", ".pytest_cache",
-    "bin", "obj", ".gradle",
+    "bin", "obj", ".gradle", "vendor", "third_party", "external",
 ];
 
 /// Find the workspace root by walking up from `start` looking for Cargo.toml

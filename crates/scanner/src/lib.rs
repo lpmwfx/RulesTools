@@ -53,8 +53,22 @@ pub fn scan_project() {
 /// Scan a project from CLI/MCP — returns issues and writes `proj/ISSUES`.
 ///
 /// Returns `(all_issues, new_count)`.
+/// If the project has no `proj/rulestools.toml` with `[project].kind`,
+/// returns a single Info issue with a registration suggestion.
 pub fn scan_at(root: &Path) -> (Vec<Issue>, usize) {
     let mut issues = run_scan(root);
+
+    // Add registration suggestion if project is not explicitly registered
+    if !ProjectIdentity::is_registered(root) {
+        let suggestion = ProjectIdentity::suggest(root);
+        issues.insert(0, Issue::new(
+            root.join("proj").join("rulestools.toml"),
+            0, 0,
+            issue::Severity::Info,
+            "topology/unregistered",
+            &format!("No [project].kind in rulestools.toml — {suggestion}"),
+        ));
+    }
     issues.sort();
 
     let new_count = output::write_issues_file(&issues, root).unwrap_or(0);

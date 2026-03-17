@@ -33,6 +33,20 @@ pub fn document_project() {
             result.generated
         );
     }
+
+    // Check for undocumented pub items — error mode
+    let docs = parser::collect_docs(&root);
+    let undoc_count: usize = docs.iter()
+        .flat_map(|sd| &sd.items)
+        .filter(|item| item.doc.is_empty())
+        .count();
+    if undoc_count > 0 {
+        println!(
+            "cargo:warning=rustdocumenter: ERROR: {} pub item(s) missing /// doc comment",
+            undoc_count
+        );
+        std::process::exit(1);
+    }
 }
 
 /// Generate `man/` directory for a project.

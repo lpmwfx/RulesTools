@@ -1,57 +1,65 @@
-# 55 issues
+# 63 issues
 
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\errors.rs:58:1: error rust/errors/no-expect: expect() in non-test code — use ? or return a typed error
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\errors.rs:65:1: error rust/errors/no-panic: panic!() for recoverable error — return Err(...) instead
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mother_child.rs:68:1: error rust/types/no-string-compare: stringly-typed comparison "main" — discriminators must be enums or named consts
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:81:1: error global/secrets: hardcoded credential — use environment variable or secret manager
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:90:1: error global/secrets: embedded private key — never commit keys to source
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:99:1: error global/secrets: hardcoded credential — use environment variable or secret manager
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:107:1: error global/secrets: hardcoded credential — use environment variable or secret manager
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\unsafe_comment.rs:21:1: error rust/naming/unsafe-comment: unsafe block/fn requires a `// SAFETY:` comment
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\unsafe_comment.rs:22:1: error rust/naming/unsafe-comment: unsafe block/fn requires a `// SAFETY:` comment
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\unsafe_comment.rs:23:1: error rust/naming/unsafe-comment: unsafe block/fn requires a `// SAFETY:` comment
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\config.rs:50:1: error rust/types/no-string-compare: stringly-typed comparison "deny" — discriminators must be enums or named consts
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:141:1: error rust/types/no-string-compare: stringly-typed comparison "#[test]" — discriminators must be enums or named consts
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:141:1: error rust/types/no-string-compare: stringly-typed comparison "#[cfg(test)]" — discriminators must be enums or named consts
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:148:1: error rust/types/no-string-compare: stringly-typed comparison "#[test]" — discriminators must be enums or named consts
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:148:1: error rust/types/no-string-compare: stringly-typed comparison "#[cfg(test)]" — discriminators must be enums or named consts
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\project.rs:80:1: error rust/types/no-string-compare: stringly-typed comparison "slint" — discriminators must be enums or named consts
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\apps\mcp-rules\src\protocol.rs:1:1: warning rust/modules/shared-candidate: pub fn `error` exists in 2 sibling files (protocol.rs, protocol.rs) — extract to shared/
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\apps\mcp-tools\src\protocol.rs:1:1: warning rust/modules/shared-candidate: pub fn `error` exists in 2 sibling files (protocol.rs, protocol.rs) — extract to shared/
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\documenter\src\parser.rs:175:1: warning rust/modules/no-inline-mod: inline mod `tests` (37 lines) — extract to tests.rs
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\clone_spam.rs:1:1: warning rust/modules/shared-candidate: pub fn `check` exists in 20 sibling files (clone_spam.rs, coupling.rs, debt.rs, doc_required.rs, errors.rs, file_size.rs, hardcoded_durations.rs, hardcoded_paths.rs, hardcoded_urls.rs, layer_violation.rs, magic_numbers.rs, modules.rs, mother_child.rs, naming.rs, nesting.rs, placement.rs, secrets.rs, string_states.rs, threading.rs, unsafe_comment.rs) — extract to shared/
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\clone_spam.rs:80:1: warning rust/modules/no-inline-mod: inline mod `tests` (36 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\coupling.rs:47:1: warning rust/modules/no-pub-super: pub(super) creates tight coupling — use pub(crate) or restructure
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\coupling.rs:54:1: warning rust/modules/no-inline-mod: inline mod `tests` (31 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\coupling.rs:82:1: warning rust/modules/no-pub-super: pub(super) creates tight coupling — use pub(crate) or restructure
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\debt.rs:42:1: warning rust/modules/no-inline-mod: inline mod `tests` (37 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\doc_required.rs:74:1: warning rust/modules/no-inline-mod: inline mod `tests` (40 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\errors.rs:79:1: warning rust/modules/no-inline-mod: inline mod `tests` (39 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\file_size.rs:18:1: warning rust/naming/bool-prefix: bool `in_block_comment` should have is_/has_/can_/should_ prefix
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\file_size.rs:96:1: warning rust/modules/no-inline-mod: inline mod `tests` (38 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\hardcoded_durations.rs:53:1: warning rust/modules/no-inline-mod: inline mod `tests` (28 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\hardcoded_paths.rs:51:1: warning rust/modules/no-inline-mod: inline mod `tests` (21 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\hardcoded_urls.rs:50:1: warning rust/modules/no-inline-mod: inline mod `tests` (21 lines) — extract to tests.rs
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\layer_violation.rs:164:1: warning rust/naming/bool-prefix: fn `contains_layer_segment` -> bool should have is_/has_/can_/should_ prefix
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\layer_violation.rs:180:1: warning rust/modules/no-inline-mod: inline mod `tests` (127 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\magic_numbers.rs:101:1: warning rust/modules/no-inline-mod: inline mod `tests` (57 lines) — extract to tests.rs
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mod.rs:84:1: warning rust/naming/bool-prefix: fn `applies_to` -> bool should have is_/has_/can_/should_ prefix
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mod.rs:121:1: warning rust/modules/no-inline-mod: inline mod `tests` (32 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\modules.rs:67:1: warning rust/modules/no-inline-mod: inline mod `tests` (35 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mother_child.rs:47:1: warning rust/naming/bool-prefix: bool `in_impl` should have is_/has_/can_/should_ prefix
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mother_child.rs:123:1: warning rust/modules/no-inline-mod: inline mod `tests` (77 lines) — extract to tests.rs
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\placement.rs:52:1: warning rust/naming/bool-prefix: fn `contains_segment` -> bool should have is_/has_/can_/should_ prefix
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\placement.rs:58:1: warning rust/modules/no-inline-mod: inline mod `tests` (68 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:65:1: warning rust/modules/no-inline-mod: inline mod `tests` (46 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\shared_discovery.rs:119:1: warning rust/modules/no-inline-mod: inline mod `tests` (48 lines) — extract to tests.rs
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\shared_guard.rs:48:1: warning rust/modules/no-inline-mod: inline mod `tests` (74 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\threading.rs:69:1: warning rust/modules/no-inline-mod: inline mod `tests` (29 lines) — extract to tests.rs
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\unsafe_comment.rs:52:1: warning rust/modules/no-inline-mod: inline mod `tests` (80 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\config.rs:144:1: warning rust/modules/no-inline-mod: inline mod `tests` (96 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:1:1: warning rust/modules/shared-candidate: pub fn `from_path` exists in 2 sibling files (context.rs, context.rs) — extract to shared/
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:159:1: warning rust/modules/no-inline-mod: inline mod `tests` (107 lines) — extract to tests.rs
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\issue.rs:131:1: warning rust/modules/no-inline-mod: inline mod `tests` (52 lines) — extract to tests.rs
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\project.rs:148:1: warning rust/naming/bool-prefix: fn `allows_check` -> bool should have is_/has_/can_/should_ prefix
-[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\project.rs:159:1: warning rust/modules/no-inline-mod: inline mod `tests` (60 lines) — extract to tests.rs
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\severity.rs:103:1: warning rust/modules/no-inline-mod: inline mod `tests` (58 lines) — extract to tests.rs
-[NEW] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\walker.rs:106:1: warning rust/modules/no-inline-mod: inline mod `tests` (44 lines) — extract to tests.rs
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\apps\cli\src\main.rs:321:1: error rust/types/no-string-compare: stringly-typed comparison "json" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\errors.rs:58:1: error rust/errors/no-expect: expect() in non-test code — use ? or return a typed error [rust/errors.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\errors.rs:65:1: error rust/errors/no-panic: panic!() for recoverable error — return Err(...) instead [rust/errors.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mother_child.rs:68:1: error rust/types/no-string-compare: stringly-typed comparison "main" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\nesting.rs:209:1: error rust/types/no-string-compare: stringly-typed comparison "root" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:81:1: error global/secrets: hardcoded credential — use environment variable or secret manager [global/secrets.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:90:1: error global/secrets: embedded private key — never commit keys to source [global/secrets.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:99:1: error global/secrets: hardcoded credential — use environment variable or secret manager [global/secrets.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:107:1: error global/secrets: hardcoded credential — use environment variable or secret manager [global/secrets.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\sibling_import.rs:70:1: error rust/types/no-string-compare: stringly-typed comparison "self" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\unsafe_comment.rs:26:1: error rust/naming/unsafe-comment: unsafe block/fn requires a `// SAFETY:` comment [rust/naming.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\unsafe_comment.rs:27:1: error rust/naming/unsafe-comment: unsafe block/fn requires a `// SAFETY:` comment [rust/naming.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\unsafe_comment.rs:28:1: error rust/naming/unsafe-comment: unsafe block/fn requires a `// SAFETY:` comment [rust/naming.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\config.rs:50:1: error rust/types/no-string-compare: stringly-typed comparison "deny" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:141:1: error rust/types/no-string-compare: stringly-typed comparison "#[test]" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:141:1: error rust/types/no-string-compare: stringly-typed comparison "#[cfg(test)]" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:148:1: error rust/types/no-string-compare: stringly-typed comparison "#[test]" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:148:1: error rust/types/no-string-compare: stringly-typed comparison "#[cfg(test)]" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\project.rs:106:1: error rust/types/no-string-compare: stringly-typed comparison "slint" — discriminators must be enums or named consts [rust/types.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\apps\mcp-rules\src\protocol.rs:1:1: warning rust/modules/shared-candidate: pub fn `error` exists in 2 sibling files (protocol.rs, protocol.rs) — extract to shared/ [global/mother-tree.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\apps\mcp-tools\src\protocol.rs:1:1: warning rust/modules/shared-candidate: pub fn `error` exists in 2 sibling files (protocol.rs, protocol.rs) — extract to shared/ [global/mother-tree.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\documenter\src\parser.rs:175:1: warning rust/modules/no-inline-mod: inline mod `tests` (37 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\clone_spam.rs:1:1: warning rust/modules/shared-candidate: pub fn `check` exists in 24 sibling files (clone_spam.rs, coupling.rs, debt.rs, doc_required.rs, errors.rs, file_size.rs, hardcoded_durations.rs, hardcoded_paths.rs, hardcoded_urls.rs, layer_violation.rs, magic_numbers.rs, modules.rs, mother_child.rs, naming.rs, nesting.rs, placement.rs, secrets.rs, sibling_import.rs, slint_gateway.rs, slint_mother_child.rs, string_states.rs, threading.rs, topology_naming.rs, unsafe_comment.rs) — extract to shared/ [global/mother-tree.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\clone_spam.rs:80:1: warning rust/modules/no-inline-mod: inline mod `tests` (36 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\coupling.rs:47:1: warning rust/modules/no-pub-super: pub(super) creates tight coupling — use pub(crate) or restructure [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\coupling.rs:54:1: warning rust/modules/no-inline-mod: inline mod `tests` (31 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\coupling.rs:82:1: warning rust/modules/no-pub-super: pub(super) creates tight coupling — use pub(crate) or restructure [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\debt.rs:42:1: warning rust/modules/no-inline-mod: inline mod `tests` (37 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\doc_required.rs:74:1: warning rust/modules/no-inline-mod: inline mod `tests` (40 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\errors.rs:79:1: warning rust/modules/no-inline-mod: inline mod `tests` (39 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\file_size.rs:18:1: warning rust/naming/bool-prefix: bool `in_block_comment` should have is_/has_/can_/should_ prefix [rust/naming.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\file_size.rs:96:1: warning rust/modules/no-inline-mod: inline mod `tests` (38 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\hardcoded_durations.rs:53:1: warning rust/modules/no-inline-mod: inline mod `tests` (28 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\hardcoded_paths.rs:51:1: warning rust/modules/no-inline-mod: inline mod `tests` (21 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\hardcoded_urls.rs:50:1: warning rust/modules/no-inline-mod: inline mod `tests` (21 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\layer_violation.rs:169:1: warning rust/naming/bool-prefix: fn `contains_layer_segment` -> bool should have is_/has_/can_/should_ prefix [rust/naming.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\layer_violation.rs:185:1: warning rust/modules/no-inline-mod: inline mod `tests` (127 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\magic_numbers.rs:101:1: warning rust/modules/no-inline-mod: inline mod `tests` (57 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mod.rs:88:1: warning rust/naming/bool-prefix: fn `applies_to` -> bool should have is_/has_/can_/should_ prefix [rust/naming.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mod.rs:131:1: warning rust/modules/no-inline-mod: inline mod `tests` (32 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\modules.rs:67:1: warning rust/modules/no-inline-mod: inline mod `tests` (35 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mother_child.rs:47:1: warning rust/naming/bool-prefix: bool `in_impl` should have is_/has_/can_/should_ prefix [rust/naming.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\mother_child.rs:123:1: warning rust/modules/no-inline-mod: inline mod `tests` (77 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\nesting.rs:150:1: warning rust/modules/no-pub-super: pub(super) creates tight coupling — use pub(crate) or restructure [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\placement.rs:73:1: warning rust/modules/no-inline-mod: inline mod `tests` (99 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\secrets.rs:65:1: warning rust/modules/no-inline-mod: inline mod `tests` (46 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\shared_discovery.rs:119:1: warning rust/modules/no-inline-mod: inline mod `tests` (48 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\shared_guard.rs:48:1: warning rust/modules/no-inline-mod: inline mod `tests` (74 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\sibling_import.rs:115:1: warning rust/modules/no-inline-mod: inline mod `tests` (88 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\slint_gateway.rs:78:1: warning rust/naming/bool-prefix: bool `in_callback` should have is_/has_/can_/should_ prefix [rust/naming.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\slint_gateway.rs:150:1: warning rust/modules/no-inline-mod: inline mod `tests` (32 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\slint_mother_child.rs:110:1: warning rust/modules/no-inline-mod: inline mod `tests` (127 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\threading.rs:69:1: warning rust/modules/no-inline-mod: inline mod `tests` (29 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\topology_naming.rs:115:1: warning rust/modules/no-inline-mod: inline mod `tests` (95 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\checks\unsafe_comment.rs:57:1: warning rust/modules/no-inline-mod: inline mod `tests` (80 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\config.rs:144:1: warning rust/modules/no-inline-mod: inline mod `tests` (96 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:1:1: warning rust/modules/shared-candidate: pub fn `from_path` exists in 2 sibling files (context.rs, context.rs) — extract to shared/ [global/mother-tree.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\context.rs:159:1: warning rust/modules/no-inline-mod: inline mod `tests` (107 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\issue.rs:175:1: warning rust/modules/no-inline-mod: inline mod `tests` (64 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\project.rs:176:1: warning rust/naming/bool-prefix: fn `allows_check` -> bool should have is_/has_/can_/should_ prefix [rust/naming.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\project.rs:187:1: warning rust/modules/no-inline-mod: inline mod `tests` (61 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\severity.rs:103:1: warning rust/modules/no-inline-mod: inline mod `tests` (58 lines) — extract to tests.rs [rust/modules.md]
+[KNOWN] \\?\D:\REPO\Rules-dev\RulesTools\crates\scanner\src\walker.rs:106:1: warning rust/modules/no-inline-mod: inline mod `tests` (44 lines) — extract to tests.rs [rust/modules.md]

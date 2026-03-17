@@ -70,6 +70,36 @@ impl Issue {
         }
     }
 
+    /// The Rules file that documents this check.
+    /// Maps rule_id prefix to the .md file an AI should read.
+    pub fn rule_ref(&self) -> &'static str {
+        match self.rule_id.as_str() {
+            id if id.starts_with("global/file-limits") => "global/file-limits.md",
+            id if id.starts_with("global/nesting") => "global/nesting.md",
+            id if id.starts_with("global/tech-debt") => "global/tech-debt.md",
+            id if id.starts_with("global/secrets") => "global/secrets.md",
+            id if id.starts_with("rust/constants") => "rust/constants.md",
+            id if id.starts_with("rust/errors") => "rust/errors.md",
+            id if id.starts_with("rust/docs") => "rust/docs.md",
+            id if id.starts_with("rust/types") => "rust/types.md",
+            id if id.starts_with("rust/naming") => "rust/naming.md",
+            id if id.starts_with("rust/modules/shared-guard") => "global/stereotypes.md",
+            id if id.starts_with("rust/modules/shared-candidate") => "global/mother-tree.md",
+            id if id.starts_with("rust/modules/no-sibling-import") => "global/mother-tree.md",
+            id if id.starts_with("rust/modules") => "rust/modules.md",
+            id if id.starts_with("rust/ownership") => "rust/ownership.md",
+            id if id.starts_with("rust/safety") => "rust/safety.md",
+            id if id.starts_with("rust/threading") => "rust/threading.md",
+            id if id.starts_with("topology/layer") => "global/topology.md",
+            id if id.starts_with("topology/placement") => "global/topology.md",
+            id if id.starts_with("topology/naming") => "global/naming-suffix.md",
+            id if id.starts_with("topology/unregistered") => "global/topology.md",
+            id if id.starts_with("uiux/mother-child") => "uiux/mother-child.md",
+            id if id.starts_with("uiux/state-flow") => "uiux/state-flow.md",
+            _ => "",
+        }
+    }
+
     /// Key used to identify this issue across scans (for [NEW]/[KNOWN] delta).
     pub fn identity_key(&self) -> String {
         format!(
@@ -83,15 +113,29 @@ impl Issue {
 
     /// Format as VSCode problem-matcher compatible line.
     pub fn display_line(&self) -> String {
-        format!(
-            "{}:{}:{}: {} {}: {}",
-            self.path.display(),
-            self.line,
-            self.col,
-            self.severity,
-            self.rule_id,
-            self.message,
-        )
+        let rule_ref = self.rule_ref();
+        if rule_ref.is_empty() {
+            format!(
+                "{}:{}:{}: {} {}: {}",
+                self.path.display(),
+                self.line,
+                self.col,
+                self.severity,
+                self.rule_id,
+                self.message,
+            )
+        } else {
+            format!(
+                "{}:{}:{}: {} {}: {} [{}]",
+                self.path.display(),
+                self.line,
+                self.col,
+                self.severity,
+                self.rule_id,
+                self.message,
+                rule_ref,
+            )
+        }
     }
 
     /// Returns the relative path if possible, otherwise the original.
@@ -136,8 +180,20 @@ mod tests {
         let issue = Issue::new("src/main.rs", 42, 5, Severity::Error, "rust/errors/no-unwrap", "unwrap() in non-test code");
         assert_eq!(
             issue.to_string(),
-            "src/main.rs:42:5: error rust/errors/no-unwrap: unwrap() in non-test code"
+            "src/main.rs:42:5: error rust/errors/no-unwrap: unwrap() in non-test code [rust/errors.md]"
         );
+    }
+
+    #[test]
+    fn rule_ref_maps_correctly() {
+        let issue = Issue::new("x.rs", 1, 1, Severity::Error, "rust/safety/unsafe-needs-comment", "m");
+        assert_eq!(issue.rule_ref(), "rust/safety.md");
+
+        let issue = Issue::new("x.rs", 1, 1, Severity::Error, "topology/layer-violation", "m");
+        assert_eq!(issue.rule_ref(), "global/topology.md");
+
+        let issue = Issue::new("x.rs", 1, 1, Severity::Error, "rust/modules/shared-guard", "m");
+        assert_eq!(issue.rule_ref(), "global/stereotypes.md");
     }
 
     #[test]

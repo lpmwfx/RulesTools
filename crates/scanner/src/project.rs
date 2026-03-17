@@ -39,6 +39,30 @@ impl ProjectIdentity {
         let kind = read_explicit_kind(root).unwrap_or_else(|| detect_kind(root));
         Self { kind, layout }
     }
+
+    /// Check if project has explicit registration (proj/rulestools.toml with [project].kind).
+    pub fn is_registered(root: &Path) -> bool {
+        read_explicit_kind(root).is_some()
+    }
+
+    /// Suggest the best matching ProjectKind for an unregistered project.
+    pub fn suggest(root: &Path) -> String {
+        let kind = detect_kind(root);
+        let layout = detect_layout(root);
+        let kind_str = match kind {
+            ProjectKind::SlintApp => "slint-app",
+            ProjectKind::CliApp => "cli",
+            ProjectKind::Library => "library",
+            ProjectKind::Tool => "tool",
+            ProjectKind::Super => "super",
+        };
+        format!(
+            "Project looks like {} ({}). Register with:\n  [project]\n  kind = \"{}\"",
+            kind_str,
+            match layout { Layout::Workspace => "workspace", Layout::Single => "single crate" },
+            kind_str,
+        )
+    }
 }
 
 /// Detect workspace vs single crate from Cargo.toml.

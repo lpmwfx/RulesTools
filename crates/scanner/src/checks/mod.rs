@@ -26,6 +26,10 @@ pub mod placement;
 pub mod shared_guard;
 pub mod unsafe_comment;
 pub mod layer_violation;
+pub mod sibling_import;
+pub mod slint_gateway;
+pub mod slint_mother_child;
+pub mod topology_naming;
 
 /// Per-file check function signature.
 pub type PerFileCheckFn = fn(
@@ -114,6 +118,12 @@ pub fn registry() -> Vec<CheckEntry> {
         CheckEntry::per_file("rust/modules/shared-guard", vec![Language::Rust], shared_guard::check),
         CheckEntry::per_file("rust/safety/unsafe-needs-comment", vec![Language::Rust], unsafe_comment::check),
         CheckEntry::cross_file("topology/layer-violation", vec![Language::Rust], layer_violation::check),
+        CheckEntry::cross_file("rust/modules/no-sibling-import", vec![Language::Rust], sibling_import::check),
+        // Slint checks
+        CheckEntry::tree("uiux/state-flow/single-gateway", vec![Language::Slint], slint_gateway::check),
+        CheckEntry::per_file("uiux/mother-child/child-has-state", vec![Language::Slint], slint_mother_child::check),
+        // Topology naming (Level 1: folder names)
+        CheckEntry::tree("topology/naming", vec![], topology_naming::check),
     ]
 }
 
