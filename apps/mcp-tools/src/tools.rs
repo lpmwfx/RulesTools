@@ -77,6 +77,42 @@ pub fn definitions() -> Vec<ToolDef> {
                 "required": ["path", "languages"]
             }),
         },
+        ToolDef {
+            name: "report_issue".into(),
+            description: "Report an issue to Forgejo issue tracker.\n\nAlways adds 'ai-reported' label. Use component labels (scanner, documenter, mcp-rules, mcp-tools, rules, man-viewer) and type labels (bug, debt, architecture, security).".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "title": { "type": "string", "description": "Issue title" },
+                    "body": { "type": "string", "description": "Issue description" },
+                    "labels": { "type": "string", "description": "Comma-separated labels (e.g. 'bug,scanner'). 'ai-reported' is always added." }
+                },
+                "required": ["title"]
+            }),
+        },
+        ToolDef {
+            name: "list_issues".into(),
+            description: "List issues from Forgejo issue tracker.\n\nFilter by state and labels. Use before reporting to check for duplicates.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "state": { "type": "string", "description": "Filter: open, closed, all", "default": "open" },
+                    "labels": { "type": "string", "description": "Filter by labels (comma-separated)" }
+                }
+            }),
+        },
+        ToolDef {
+            name: "close_issue".into(),
+            description: "Close an issue on Forgejo by number.\n\nOptionally add a closing comment.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "number": { "type": "integer", "description": "Issue number to close" },
+                    "comment": { "type": "string", "description": "Optional closing comment" }
+                },
+                "required": ["number"]
+            }),
+        },
     ]
 }
 
@@ -89,6 +125,9 @@ pub fn handle(name: &str, args: &Value) -> ToolResult {
         "setup" => tool_setup(args),
         "security_scan" => tool_security_scan(args),
         "init_project" => tool_init_project(args),
+        "report_issue" => tool_report_issue(args),
+        "list_issues" => tool_list_issues(args),
+        "close_issue" => tool_close_issue(args),
         _ => ToolResult::error(format!("Unknown tool: {name}")),
     }
 }
@@ -276,4 +315,68 @@ fn tool_init_project(args: &Value) -> ToolResult {
         "Project initialized:\n- proj/PROJECT\n- proj/TODO\n- proj/RULES\n- proj/FIXES\n- proj/rulestools.toml ({kind})\n\n{}",
         setup_result.content.first().map(|c| c.text.as_str()).unwrap_or("")
     ))
+}
+
+fn tool_report_issue(args: &Value) -> ToolResult {
+    let title = match args.get("title").and_then(|v| v.as_str()) {
+        Some(t) => t,
+        None => return ToolResult::error("Missing required parameter: title"),
+    };
+    let body = args.get("body").and_then(|v| v.as_str()).unwrap_or("");
+    let user_labels = args.get("labels").and_then(|v| v.as_str()).unwrap_or("");
+
+    // Always include ai-reported
+    let labels = if user_labels.is_empty() {
+        "ai-reported".to_string()
+    } else if user_labels.contains("ai-reported") {
+        user_labels.to_string()
+    } else {
+        format!("ai-reported,{user_labels}")
+    };
+
+    let mut cmd_args = vec!["issue", "report", "--title", title, "--labels", &labels];
+    if !body.is_empty() {
+        cmd_args.push("--body");
+        cmd_args.push(body);
+    }
+
+    match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_list_issues(args: &Value) -> ToolResult {
+    let state = args.get("state").and_then(|v| v.as_str()).unwrap_or("open");
+    let labels = args.get("labels").and_then(|v| v.as_str()).unwrap_or("");
+
+    let mut cmd_args = vec!["issue", "list", "--state", state];
+    if !labels.is_empty() {
+        cmd_args.push("--labels");
+        cmd_args.push(labels);
+    }
+
+    match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_close_issue(args: &Value) -> ToolResult {
+    let number = match args.get("number").and_then(|v| v.as_u64()) {
+        Some(n) => n.to_string(),
+        None => return ToolResult::error("Missing required parameter: number"),
+    };
+    let comment = args.get("comment").and_then(|v| v.as_str()).unwrap_or("");
+
+    let mut cmd_args = vec!["issue", "close", &number];
+    if !comment.is_empty() {
+        cmd_args.push("--comment");
+        cmd_args.push(comment);
+    }
+
+    match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
 }
