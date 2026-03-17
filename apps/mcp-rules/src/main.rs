@@ -1,4 +1,5 @@
 mod protocol;
+mod registry;
 mod rules;
 
 /// MCP server for AI rule lookup.
