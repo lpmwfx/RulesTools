@@ -139,6 +139,14 @@ enum IssueCmd {
         #[arg(long, default_value = "")]
         comment: String,
     },
+    /// Add a label to an existing issue.
+    #[command(name = "add-label")]
+    AddLabel {
+        /// Issue number.
+        number: u64,
+        /// Label name to add.
+        label: String,
+    },
 }
 
 fn main() {
@@ -375,6 +383,7 @@ fn cmd_issue(cmd: IssueCmd) {
         IssueCmd::Report { title, body, labels } => cmd_issue_report(&title, &body, &labels),
         IssueCmd::List { state, labels } => cmd_issue_list(&state, &labels),
         IssueCmd::Close { number, comment } => cmd_issue_close(number, &comment),
+        IssueCmd::AddLabel { number, label } => cmd_issue_add_label(number, &label),
     }
 }
 
@@ -477,6 +486,29 @@ fn cmd_issue_close(number: u64, comment: &str) {
     {
         Ok(_) => println!("Issue #{number} closed"),
         Err(e) => { eprintln!("Failed to close issue: {e}"); std::process::exit(1); }
+    }
+}
+
+fn cmd_issue_add_label(number: u64, label: &str) {
+    let token = match forgejo_token() {
+        Ok(t) => t,
+        Err(e) => { eprintln!("{e}"); std::process::exit(1); }
+    };
+
+    let label_ids = match resolve_label_ids(&token, &[label]) {
+        Ok(ids) if !ids.is_empty() => ids,
+        Ok(_) => { eprintln!("Label not found: {label}"); std::process::exit(1); }
+        Err(e) => { eprintln!("{e}"); std::process::exit(1); }
+    };
+
+    let payload = serde_json::json!({ "labels": label_ids });
+    match ureq::post(&format!("{FORGEJO_API}/issues/{number}/labels"))
+        .set("Authorization", &format!("token {token}"))
+        .set("Content-Type", "application/json")
+        .send_string(&payload.to_string())
+    {
+        Ok(_) => println!("Label '{label}' added to issue #{number}"),
+        Err(e) => { eprintln!("Failed to add label: {e}"); std::process::exit(1); }
     }
 }
 

@@ -102,6 +102,18 @@ pub fn definitions() -> Vec<ToolDef> {
             }),
         },
         ToolDef {
+            name: "add_label".into(),
+            description: "Add a label to an existing issue on Forgejo.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "number": { "type": "integer", "description": "Issue number" },
+                    "label": { "type": "string", "description": "Label name to add (e.g. 'bug', 'scanner', 'security')" }
+                },
+                "required": ["number", "label"]
+            }),
+        },
+        ToolDef {
             name: "close_issue".into(),
             description: "Close an issue on Forgejo by number.\n\nOptionally add a closing comment.".into(),
             input_schema: serde_json::json!({
@@ -127,6 +139,7 @@ pub fn handle(name: &str, args: &Value) -> ToolResult {
         "init_project" => tool_init_project(args),
         "report_issue" => tool_report_issue(args),
         "list_issues" => tool_list_issues(args),
+        "add_label" => tool_add_label(args),
         "close_issue" => tool_close_issue(args),
         _ => ToolResult::error(format!("Unknown tool: {name}")),
     }
@@ -357,6 +370,22 @@ fn tool_list_issues(args: &Value) -> ToolResult {
     }
 
     match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_add_label(args: &Value) -> ToolResult {
+    let number = match args.get("number").and_then(|v| v.as_u64()) {
+        Some(n) => n.to_string(),
+        None => return ToolResult::error("Missing required parameter: number"),
+    };
+    let label = match args.get("label").and_then(|v| v.as_str()) {
+        Some(l) => l,
+        None => return ToolResult::error("Missing required parameter: label"),
+    };
+
+    match run_rulestools(&["issue", "add-label", &number, label]) {
         Ok(output) => ToolResult::text(output),
         Err(e) => ToolResult::error(e),
     }
