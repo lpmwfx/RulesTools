@@ -114,6 +114,39 @@ pub fn definitions() -> Vec<ToolDef> {
             }),
         },
         ToolDef {
+            name: "list_labels".into(),
+            description: "List all available labels in the Forgejo issue tracker.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {}
+            }),
+        },
+        ToolDef {
+            name: "comment_issue".into(),
+            description: "Add a comment to an existing issue on Forgejo.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "number": { "type": "integer", "description": "Issue number" },
+                    "body": { "type": "string", "description": "Comment text" }
+                },
+                "required": ["number", "body"]
+            }),
+        },
+        ToolDef {
+            name: "create_label".into(),
+            description: "Create a new label in the Forgejo issue tracker.\n\nUse this before add_label if the label doesn't exist yet.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string", "description": "Label name (e.g. 'slint-ui-templates')" },
+                    "color": { "type": "string", "description": "Hex color without # (e.g. '0075ca')", "default": "0075ca" },
+                    "description": { "type": "string", "description": "Label description" }
+                },
+                "required": ["name"]
+            }),
+        },
+        ToolDef {
             name: "close_issue".into(),
             description: "Close an issue on Forgejo by number.\n\nOptionally add a closing comment.".into(),
             input_schema: serde_json::json!({
@@ -140,6 +173,9 @@ pub fn handle(name: &str, args: &Value) -> ToolResult {
         "report_issue" => tool_report_issue(args),
         "list_issues" => tool_list_issues(args),
         "add_label" => tool_add_label(args),
+        "list_labels" => tool_list_labels(args),
+        "comment_issue" => tool_comment_issue(args),
+        "create_label" => tool_create_label(args),
         "close_issue" => tool_close_issue(args),
         _ => ToolResult::error(format!("Unknown tool: {name}")),
     }
@@ -386,6 +422,49 @@ fn tool_add_label(args: &Value) -> ToolResult {
     };
 
     match run_rulestools(&["issue", "add-label", &number, label]) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_list_labels(_args: &Value) -> ToolResult {
+    match run_rulestools(&["issue", "list-labels"]) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_comment_issue(args: &Value) -> ToolResult {
+    let number = match args.get("number").and_then(|v| v.as_u64()) {
+        Some(n) => n.to_string(),
+        None => return ToolResult::error("Missing required parameter: number"),
+    };
+    let body = match args.get("body").and_then(|v| v.as_str()) {
+        Some(b) => b,
+        None => return ToolResult::error("Missing required parameter: body"),
+    };
+
+    match run_rulestools(&["issue", "comment", &number, body]) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_create_label(args: &Value) -> ToolResult {
+    let name = match args.get("name").and_then(|v| v.as_str()) {
+        Some(n) => n,
+        None => return ToolResult::error("Missing required parameter: name"),
+    };
+    let color = args.get("color").and_then(|v| v.as_str()).unwrap_or("0075ca");
+    let desc = args.get("description").and_then(|v| v.as_str()).unwrap_or("");
+
+    let mut cmd_args = vec!["issue", "create-label", name, "--color", color];
+    if !desc.is_empty() {
+        cmd_args.push("--description");
+        cmd_args.push(desc);
+    }
+
+    match run_rulestools(&cmd_args) {
         Ok(output) => ToolResult::text(output),
         Err(e) => ToolResult::error(e),
     }

@@ -147,6 +147,28 @@ enum IssueCmd {
         /// Label name to add.
         label: String,
     },
+    /// Create a new label in the Forgejo repo.
+    #[command(name = "create-label")]
+    CreateLabel {
+        /// Label name.
+        name: String,
+        /// Label color (hex without #, e.g. "e11d48").
+        #[arg(long, default_value = "0075ca")]
+        color: String,
+        /// Label description.
+        #[arg(long, default_value = "")]
+        description: String,
+    },
+    /// List all available labels in the Forgejo repo.
+    #[command(name = "list-labels")]
+    ListLabels,
+    /// Add a comment to an existing issue.
+    Comment {
+        /// Issue number.
+        number: u64,
+        /// Comment body.
+        body: String,
+    },
 }
 
 fn main() {
@@ -384,6 +406,9 @@ fn cmd_issue(cmd: IssueCmd) {
         IssueCmd::List { state, labels } => cmd_issue_list(&state, &labels),
         IssueCmd::Close { number, comment } => cmd_issue_close(number, &comment),
         IssueCmd::AddLabel { number, label } => cmd_issue_add_label(number, &label),
+        IssueCmd::CreateLabel { name, color, description } => cmd_issue_create_label(&name, &color, &description),
+        IssueCmd::ListLabels => cmd_issue_list_labels(),
+        IssueCmd::Comment { number, body } => cmd_issue_comment(number, &body),
     }
 }
 
@@ -509,6 +534,84 @@ fn cmd_issue_add_label(number: u64, label: &str) {
     {
         Ok(_) => println!("Label '{label}' added to issue #{number}"),
         Err(e) => { eprintln!("Failed to add label: {e}"); std::process::exit(1); }
+    }
+}
+
+fn cmd_issue_create_label(name: &str, color: &str, description: &str) {
+    let token = match forgejo_token() {
+        Ok(t) => t,
+        Err(e) => { eprintln!("{e}"); std::process::exit(1); }
+    };
+
+    let payload = serde_json::json!({
+        "name": name,
+        "color": format!("#{color}"),
+        "description": description,
+    });
+
+    match ureq::post(&format!("{FORGEJO_API}/labels"))
+        .set("Authorization", &format!("token {token}"))
+        .set("Content-Type", "application/json")
+        .send_string(&payload.to_string())
+    {
+        Ok(resp) => {
+            if let Ok(json) = resp.into_string().and_then(|s| Ok(serde_json::from_str::<serde_json::Value>(&s).unwrap_or_default())) {
+                let id = json.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+                println!("Label '{name}' created (id: {id})");
+            }
+        }
+        Err(e) => { eprintln!("Failed to create label: {e}"); std::process::exit(1); }
+    }
+}
+
+fn cmd_issue_list_labels() {
+    let token = match forgejo_token() {
+        Ok(t) => t,
+        Err(e) => { eprintln!("{e}"); std::process::exit(1); }
+    };
+
+    match ureq::get(&format!("{FORGEJO_API}/labels?limit=50"))
+        .set("Authorization", &format!("token {token}"))
+        .call()
+    {
+        Ok(resp) => {
+            if let Ok(body) = resp.into_string() {
+                if let Ok(labels) = serde_json::from_str::<Vec<serde_json::Value>>(&body) {
+                    if labels.is_empty() {
+                        println!("No labels found");
+                        return;
+                    }
+                    for label in &labels {
+                        let name = label.get("name").and_then(|v| v.as_str()).unwrap_or("?");
+                        let color = label.get("color").and_then(|v| v.as_str()).unwrap_or("");
+                        let desc = label.get("description").and_then(|v| v.as_str()).unwrap_or("");
+                        if desc.is_empty() {
+                            println!("{name}  ({color})");
+                        } else {
+                            println!("{name}  ({color}) — {desc}");
+                        }
+                    }
+                }
+            }
+        }
+        Err(e) => { eprintln!("Failed to list labels: {e}"); std::process::exit(1); }
+    }
+}
+
+fn cmd_issue_comment(number: u64, body: &str) {
+    let token = match forgejo_token() {
+        Ok(t) => t,
+        Err(e) => { eprintln!("{e}"); std::process::exit(1); }
+    };
+
+    let payload = serde_json::json!({ "body": body });
+    match ureq::post(&format!("{FORGEJO_API}/issues/{number}/comments"))
+        .set("Authorization", &format!("token {token}"))
+        .set("Content-Type", "application/json")
+        .send_string(&payload.to_string())
+    {
+        Ok(_) => println!("Comment added to issue #{number}"),
+        Err(e) => { eprintln!("Failed to add comment: {e}"); std::process::exit(1); }
     }
 }
 
