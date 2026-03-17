@@ -14,6 +14,33 @@
 
 Ét kald = fuld integration. Ingen manuelle Cargo.toml/build.rs ændringer.
 
+### Scanner self-scan: false positives ved scanning af eget workspace
+
+Scanneren producerer 25 false-positive errors når den scanner sig selv.
+Tre root causes:
+
+**1. Bug: `no-string-compare` mangler i severity-systemet**
+`string_states.rs` bruger to rule_id'er: `rust/types/no-string-match` (match arms)
+og `rust/types/no-string-compare` (equality). Kun den første er i `TOOL_SKIP`/`CLI_WARN`
+i `severity.rs`. Den anden passerer severity-resolver uændret → ERROR.
+Fix: Tilføj `"rust/types/no-string-compare"` til `TOOL_SKIP` og `CLI_WARN`.
+Alternativ: Brug ét fælles rule_id for begge.
+
+**2. Designhul: `global/secrets` ignorerer test-kontekst**
+`secrets` checken er hardcoded til altid at returnere Error (`severity.rs:46`).
+Men scannerens egne test-fixtures i `checks/secrets.rs` (linje 81-107, inde i
+`#[cfg(test)]`) indeholder intentionelt fake credentials. Checken ser ikke på
+`is_test_context()`.
+Fix: `global/secrets` skal respektere `is_test_context()` — test-fixtures er ikke
+rigtige secrets.
+
+**3. Designhul: `unsafe-needs-comment` flagger test-fixtures**
+`checks/unsafe_comment.rs` linje 26-28 har eksempler på unsafe blocks som
+test-referencedata. Samme problem som secrets.
+Fix: Respektér `is_test_context()`.
+
+Samlet: Fix #1 fjerner 16/25 errors. Fix #2+#3 fjerner de resterende 9.
+
 ### ManViewer
 Erstat installeret `rustdoc-viewer` med ny `man-viewer` fra `D:/REPO/Rules-dev/ManViewer/`.
 Test med gui-mcp projektet (generer man/ → åbn viewer).

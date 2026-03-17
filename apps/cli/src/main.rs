@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
+mod publish;
 mod scaffold;
 
 /// Unified static code scanner — enforces Rules repo conventions across all languages.
@@ -136,9 +137,243 @@ enum Commands {
         name: Option<String>,
     },
 
+    /// Create a new project with full scaffolding and options.
+    #[command(long_about = "Create a new project with full scaffolding and options.\n\n\
+        Like `init` but with extra options: platforms, themes, MCP crate, extras.\n\
+        Supports --preview to see what would be created without writing.\n\
+        Supports --format json for machine-readable output.\n\
+        \n\
+        Kinds:\n  \
+        tool       — minimal (src/main.rs, proj/)\n  \
+        cli        — CLI app with clap (src/main.rs, src/shared/, doc/)\n  \
+        library    — library crate (src/lib.rs)\n  \
+        website    — web project (index.html, package.json, src/)\n  \
+        slint-app  — Slint GUI with topology folders\n  \
+        workspace  — Cargo workspace with crates/{app,core,adapter,gateway,pal,ui}\n\
+        \n\
+        Examples:\n  \
+        rulestools new /path --kind slint-app --platforms desktop,mobile\n  \
+        rulestools new /path --kind workspace --mcp --extras doc,shared\n  \
+        rulestools new /path --kind cli --preview --format json")]
+    New {
+        /// Path to the project root directory.
+        path: PathBuf,
+
+        /// Project kind: tool, cli, library, website, slint-app, workspace.
+        #[arg(long)]
+        kind: String,
+
+        /// Project name (default: directory name).
+        #[arg(long)]
+        name: Option<String>,
+
+        /// Target platforms (comma-separated): desktop, mobile, small.
+        #[arg(long, default_value = "")]
+        platforms: String,
+
+        /// Theme names (comma-separated), e.g. win3ui-fluent,macos.
+        #[arg(long, default_value = "")]
+        themes: String,
+
+        /// Add MCP server crate (workspace only).
+        #[arg(long)]
+        mcp: bool,
+
+        /// Extra folders/crates (comma-separated): lib, shared, doc.
+        #[arg(long, default_value = "")]
+        extras: String,
+
+        /// Preview mode — show what would be created without writing.
+        #[arg(long)]
+        preview: bool,
+
+        /// Output format: text or json.
+        #[arg(long, default_value = "text")]
+        format: String,
+    },
+
+    /// Add features to an existing project (within current kind).
+    #[command(long_about = "Add features to an existing project without changing its kind.\n\n\
+        Detects current project kind and adds platforms, themes, crates, or folders.\n\
+        Existing files are never overwritten.\n\
+        \n\
+        Examples:\n  \
+        rulestools update . --add-platform mobile\n  \
+        rulestools update . --add-theme macos --preview\n  \
+        rulestools update . --add-crate mcp --add-folder doc")]
+    Update {
+        /// Path to the project root.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+
+        /// Add platforms (comma-separated): desktop, mobile, small.
+        #[arg(long, default_value = "")]
+        add_platform: String,
+
+        /// Add themes (comma-separated), e.g. win3ui-fluent,macos.
+        #[arg(long, default_value = "")]
+        add_theme: String,
+
+        /// Add a workspace crate by name.
+        #[arg(long)]
+        add_crate: Option<String>,
+
+        /// Add folders (comma-separated): lib, shared, doc.
+        #[arg(long, default_value = "")]
+        add_folder: String,
+
+        /// Preview mode — show what would be created without writing.
+        #[arg(long)]
+        preview: bool,
+
+        /// Output format: text or json.
+        #[arg(long, default_value = "text")]
+        format: String,
+    },
+
+    /// Upgrade a project to a higher kind (structural transformation).
+    #[command(long_about = "Upgrade a project to a higher kind.\n\n\
+        Changes ProjectKind upward (never down). Scaffolds new structure\n\
+        and provides move guidance for existing files.\n\
+        \n\
+        Upgrade order: tool < library/website < cli < slint-app < workspace\n\
+        \n\
+        Examples:\n  \
+        rulestools upgrade . --to cli\n  \
+        rulestools upgrade . --to slint-app --preview\n  \
+        rulestools upgrade . --to workspace --format json")]
+    Upgrade {
+        /// Path to the project root.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+
+        /// Target kind to upgrade to.
+        #[arg(long)]
+        to: String,
+
+        /// Preview mode — show what would change without writing.
+        #[arg(long)]
+        preview: bool,
+
+        /// Output format: text or json.
+        #[arg(long, default_value = "text")]
+        format: String,
+    },
+
+    /// Publish, distribute, and sync projects.
+    #[command(subcommand)]
+    Publish(PublishCmd),
+
     /// Report, list, or close issues on Forgejo.
     #[command(subcommand)]
     Issue(IssueCmd),
+}
+
+#[derive(Subcommand)]
+enum PublishCmd {
+    /// Analyze project and show publish targets, version, pre-checks.
+    #[command(long_about = "Analyze project and show publish targets, version, pre-checks.\n\n\
+        Reads [publish] config from proj/rulestools.toml, checks git state,\n\
+        scanner status, and lists configured targets with version info.\n\
+        \n\
+        Examples:\n  \
+        rulestools publish plan .                # show publish plan\n  \
+        rulestools publish plan . --format json  # JSON output for MCP")]
+    Plan {
+        /// Path to the project root.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+        /// Output format: text or json.
+        #[arg(long, default_value = "text")]
+        format: String,
+    },
+
+    /// Execute publish to a target (github/forgejo/archive).
+    #[command(long_about = "Execute publish to a specific target.\n\n\
+        Runs pre-publish checks (scanner, tests, clean git tree, token),\n\
+        then builds, tags, and creates a release on the target.\n\
+        Use --preview to see checks without publishing.\n\
+        \n\
+        Examples:\n  \
+        rulestools publish run . --target github           # publish to GitHub\n  \
+        rulestools publish run . --target archive          # create local archive\n  \
+        rulestools publish run . --target github --preview # dry run")]
+    Run {
+        /// Path to the project root.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+        /// Target: github, forgejo, archive.
+        #[arg(long)]
+        target: String,
+        /// Preview mode — run checks without publishing.
+        #[arg(long)]
+        preview: bool,
+    },
+
+    /// Show what is published where.
+    #[command(long_about = "Show published versions for each configured target.\n\n\
+        Queries GitHub/Forgejo APIs for latest release info.\n\
+        Shows version, date, and URL per target.\n\
+        \n\
+        Examples:\n  \
+        rulestools publish status .                # show status\n  \
+        rulestools publish status . --format json  # JSON output")]
+    Status {
+        /// Path to the project root.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+        /// Output format: text or json.
+        #[arg(long, default_value = "text")]
+        format: String,
+    },
+
+    /// Initialize a pub-repo and configure sync.
+    #[command(long_about = "Initialize a pub-repo for dev/pub separation.\n\n\
+        Creates ../{name}-pub/ directory, initializes git, adds remote,\n\
+        and writes [publish.repo] config to proj/rulestools.toml.\n\
+        Runs initial sync in preview mode.\n\
+        \n\
+        Examples:\n  \
+        rulestools publish init . --remote git@github.com:user/repo.git")]
+    Init {
+        /// Path to the project root.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+        /// Remote URL for the pub-repo.
+        #[arg(long)]
+        remote: String,
+    },
+
+    /// Sync dev-repo to pub-repo (whitelist copy).
+    #[command(long_about = "Sync files from dev-repo to pub-repo based on include/exclude config.\n\n\
+        Only whitelisted files/dirs are copied. Excluded patterns are NEVER copied.\n\
+        Hardcoded safety: proj/, .claude/, target/, .git/, .env*, *.key always excluded.\n\
+        \n\
+        Examples:\n  \
+        rulestools publish sync .            # sync now\n  \
+        rulestools publish sync . --preview  # show what would be synced")]
+    Sync {
+        /// Path to the project root.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+        /// Preview mode — show what would be synced without writing.
+        #[arg(long)]
+        preview: bool,
+    },
+
+    /// Validate pub-repo for leaks and sync status.
+    #[command(long_about = "Check pub-repo for leaked files and sync status.\n\n\
+        Walks all files in pub-repo and checks:\n  \
+        - Leaked: files that should be excluded but are present\n  \
+        - Out-of-sync: files that differ from dev-repo\n\
+        \n\
+        Examples:\n  \
+        rulestools publish check .")]
+    Check {
+        /// Path to the project root.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+    },
 }
 
 #[derive(Subcommand)]
@@ -215,6 +450,16 @@ fn main() {
         Commands::Gen { path } => cmd_gen(&path),
         Commands::ScanFile { file, format } => cmd_scan_file(&file, &format),
         Commands::Init { path, kind, name } => cmd_init(&path, &kind, name.as_deref()),
+        Commands::New {
+            path, kind, name, platforms, themes, mcp, extras, preview, format,
+        } => cmd_new(&path, &kind, name.as_deref(), &platforms, &themes, mcp, &extras, preview, &format),
+        Commands::Update {
+            path, add_platform, add_theme, add_crate, add_folder, preview, format,
+        } => cmd_update(&path, &add_platform, &add_theme, add_crate.as_deref(), &add_folder, preview, &format),
+        Commands::Upgrade {
+            path, to, preview, format,
+        } => cmd_upgrade(&path, &to, preview, &format),
+        Commands::Publish(cmd) => cmd_publish(cmd),
         Commands::Issue(cmd) => cmd_issue(cmd),
     }
 }
@@ -251,6 +496,311 @@ fn cmd_init(path: &PathBuf, kind_str: &str, name: Option<&str>) {
         Err(e) => {
             eprintln!("Scaffold failed: {e}");
             std::process::exit(1);
+        }
+    }
+}
+
+fn cmd_new(
+    path: &PathBuf,
+    kind_str: &str,
+    name: Option<&str>,
+    platforms_str: &str,
+    themes_str: &str,
+    mcp: bool,
+    extras_str: &str,
+    preview: bool,
+    format: &str,
+) {
+    let root = if path.exists() {
+        std::fs::canonicalize(path).unwrap_or_else(|_| path.clone())
+    } else {
+        std::fs::create_dir_all(path).unwrap_or_else(|e| {
+            eprintln!("Cannot create directory: {e}");
+            std::process::exit(1);
+        });
+        std::fs::canonicalize(path).unwrap_or_else(|_| path.clone())
+    };
+
+    let kind = match rulestools_scanner::project::ProjectKind::from_str(kind_str) {
+        Some(k) => k,
+        None => {
+            eprintln!(
+                "Unknown kind: {kind_str}\nValid kinds: tool, cli, library, website, slint-app, workspace"
+            );
+            std::process::exit(1);
+        }
+    };
+
+    let project_name = name
+        .map(String::from)
+        .unwrap_or_else(|| {
+            root.file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("project")
+                .to_string()
+        });
+
+    let platforms: Vec<scaffold::Platform> = platforms_str
+        .split(',')
+        .filter(|s| !s.trim().is_empty())
+        .filter_map(|s| scaffold::Platform::from_str(s))
+        .collect();
+
+    let themes: Vec<String> = themes_str
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+
+    let extras: Vec<scaffold::Extra> = extras_str
+        .split(',')
+        .filter(|s| !s.trim().is_empty())
+        .filter_map(|s| scaffold::Extra::from_str(s))
+        .collect();
+
+    let opts = scaffold::ScaffoldOptions {
+        name: project_name.clone(),
+        kind,
+        platforms,
+        themes,
+        mcp,
+        extras,
+        preview,
+    };
+
+    match scaffold::scaffold_with_options(&root, &opts) {
+        Ok(result) => {
+            if format == "json" {
+                let tree = scaffold::render_tree(&project_name, &result.created);
+                let json = serde_json::json!({
+                    "name": project_name,
+                    "kind": kind_str,
+                    "preview": preview,
+                    "created": result.created,
+                    "skipped": result.skipped,
+                    "tree": tree,
+                });
+                println!("{}", serde_json::to_string_pretty(&json).unwrap_or_default());
+            } else {
+                println!("{}", result.summary);
+                for path in &result.created {
+                    println!("  {path}");
+                }
+                if !result.skipped.is_empty() {
+                    println!("\nSkipped:");
+                    for s in &result.skipped {
+                        println!("  {s}");
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!("Scaffold failed: {e}");
+            std::process::exit(1);
+        }
+    }
+}
+
+fn cmd_update(
+    path: &PathBuf,
+    platforms_str: &str,
+    themes_str: &str,
+    crate_name: Option<&str>,
+    folders_str: &str,
+    preview: bool,
+    format: &str,
+) {
+    let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.clone());
+
+    let platforms: Vec<scaffold::Platform> = platforms_str
+        .split(',')
+        .filter(|s| !s.trim().is_empty())
+        .filter_map(|s| scaffold::Platform::from_str(s))
+        .collect();
+
+    let themes: Vec<String> = themes_str
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+
+    let folders: Vec<scaffold::Extra> = folders_str
+        .split(',')
+        .filter(|s| !s.trim().is_empty())
+        .filter_map(|s| scaffold::Extra::from_str(s))
+        .collect();
+
+    let opts = scaffold::UpdateOptions {
+        platforms,
+        themes,
+        crate_name: crate_name.map(String::from),
+        folders,
+        preview,
+    };
+
+    match scaffold::update_project(&root, &opts) {
+        Ok(result) => {
+            if format == "json" {
+                let json = serde_json::json!({
+                    "preview": preview,
+                    "created": result.created,
+                    "skipped": result.skipped,
+                });
+                println!("{}", serde_json::to_string_pretty(&json).unwrap_or_default());
+            } else {
+                println!("{}", result.summary);
+                for path in &result.created {
+                    println!("  {path}");
+                }
+                if !result.skipped.is_empty() {
+                    println!("\nSkipped:");
+                    for s in &result.skipped {
+                        println!("  {s}");
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!("Update failed: {e}");
+            std::process::exit(1);
+        }
+    }
+}
+
+fn cmd_upgrade(path: &PathBuf, to_str: &str, preview: bool, format: &str) {
+    let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.clone());
+
+    let to_kind = match rulestools_scanner::project::ProjectKind::from_str(to_str) {
+        Some(k) => k,
+        None => {
+            eprintln!(
+                "Unknown kind: {to_str}\nValid kinds: tool, cli, library, website, slint-app, workspace"
+            );
+            std::process::exit(1);
+        }
+    };
+
+    match scaffold::upgrade_project(&root, to_kind, preview) {
+        Ok(result) => {
+            if format == "json" {
+                let guidance: Vec<serde_json::Value> = result
+                    .move_guidance
+                    .iter()
+                    .map(|g| {
+                        serde_json::json!({
+                            "from": g.from,
+                            "to": g.to,
+                            "reason": g.reason,
+                        })
+                    })
+                    .collect();
+                let json = serde_json::json!({
+                    "from": result.from_kind.as_str(),
+                    "to": result.to_kind.as_str(),
+                    "preview": preview,
+                    "created": result.created,
+                    "move_guidance": guidance,
+                    "manual_steps": result.manual_steps,
+                });
+                println!("{}", serde_json::to_string_pretty(&json).unwrap_or_default());
+            } else {
+                let label = if preview { "Preview" } else { "Upgraded" };
+                println!(
+                    "{}: {:?} -> {:?}",
+                    label, result.from_kind, result.to_kind
+                );
+
+                if !result.created.is_empty() {
+                    println!("\nCreated:");
+                    for path in &result.created {
+                        println!("  {path}");
+                    }
+                }
+
+                if !result.move_guidance.is_empty() {
+                    println!("\nMove guidance:");
+                    for g in &result.move_guidance {
+                        println!("  {} -> {}", g.from, g.to);
+                        println!("    {}", g.reason);
+                    }
+                }
+
+                if !result.manual_steps.is_empty() {
+                    println!("\nManual steps:");
+                    for step in &result.manual_steps {
+                        println!("  - {step}");
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!("Upgrade failed: {e}");
+            std::process::exit(1);
+        }
+    }
+}
+
+fn cmd_publish(cmd: PublishCmd) {
+    match cmd {
+        PublishCmd::Plan { path, format } => {
+            let root = std::fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+            match publish::publish_plan(&root, &format) {
+                Ok(output) => print!("{output}"),
+                Err(e) => {
+                    eprintln!("{e}");
+                    std::process::exit(1);
+                }
+            }
+        }
+        PublishCmd::Run { path, target, preview } => {
+            let root = std::fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+            match publish::publish_run(&root, &target, preview) {
+                Ok(output) => println!("{output}"),
+                Err(e) => {
+                    eprintln!("{e}");
+                    std::process::exit(1);
+                }
+            }
+        }
+        PublishCmd::Status { path, format } => {
+            let root = std::fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+            match publish::publish_status(&root, &format) {
+                Ok(output) => print!("{output}"),
+                Err(e) => {
+                    eprintln!("{e}");
+                    std::process::exit(1);
+                }
+            }
+        }
+        PublishCmd::Init { path, remote } => {
+            let root = std::fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+            match publish::publish_init(&root, &remote) {
+                Ok(output) => println!("{output}"),
+                Err(e) => {
+                    eprintln!("{e}");
+                    std::process::exit(1);
+                }
+            }
+        }
+        PublishCmd::Sync { path, preview } => {
+            let root = std::fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+            match publish::publish_sync(&root, preview) {
+                Ok(output) => print!("{output}"),
+                Err(e) => {
+                    eprintln!("{e}");
+                    std::process::exit(1);
+                }
+            }
+        }
+        PublishCmd::Check { path } => {
+            let root = std::fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+            match publish::publish_check(&root) {
+                Ok(output) => print!("{output}"),
+                Err(e) => {
+                    eprintln!("{e}");
+                    std::process::exit(1);
+                }
+            }
         }
     }
 }

@@ -193,6 +193,31 @@ impl ProjectKind {
         }
     }
 
+    /// Numeric ordering for upgrade validation.
+    /// Higher values = more complex project kind.
+    pub fn upgrade_ord(&self) -> u8 {
+        match self {
+            ProjectKind::Tool => 0,
+            ProjectKind::Library => 1,
+            ProjectKind::Website => 1,
+            ProjectKind::CliApp => 2,
+            ProjectKind::SlintApp => 3,
+            ProjectKind::Super => 4,
+        }
+    }
+
+    /// Human-readable kind string for config files and display.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ProjectKind::SlintApp => "slint-app",
+            ProjectKind::CliApp => "cli",
+            ProjectKind::Library => "library",
+            ProjectKind::Website => "website",
+            ProjectKind::Tool => "tool",
+            ProjectKind::Super => "super",
+        }
+    }
+
     /// Whether a check ID should run for this project kind.
     pub fn allows_check(&self, check_id: &str) -> bool {
         for prefix in self.skipped_categories() {
@@ -268,6 +293,22 @@ mod tests {
         assert_eq!(ProjectKind::Library.skipped_categories().len(), 4);
         assert_eq!(ProjectKind::Website.skipped_categories().len(), 5);
         assert_eq!(ProjectKind::Tool.skipped_categories().len(), 5);
+    }
+
+    #[test]
+    fn upgrade_ord_ordering() {
+        assert!(ProjectKind::Tool.upgrade_ord() < ProjectKind::CliApp.upgrade_ord());
+        assert!(ProjectKind::CliApp.upgrade_ord() < ProjectKind::SlintApp.upgrade_ord());
+        assert!(ProjectKind::SlintApp.upgrade_ord() < ProjectKind::Super.upgrade_ord());
+        assert_eq!(ProjectKind::Library.upgrade_ord(), ProjectKind::Website.upgrade_ord());
+    }
+
+    #[test]
+    fn as_str_roundtrip() {
+        for kind in &[ProjectKind::Tool, ProjectKind::CliApp, ProjectKind::Library,
+                      ProjectKind::Website, ProjectKind::SlintApp, ProjectKind::Super] {
+            assert_eq!(ProjectKind::from_str(kind.as_str()), Some(*kind));
+        }
     }
 
     #[test]

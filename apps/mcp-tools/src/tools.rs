@@ -151,6 +151,94 @@ pub fn definitions() -> Vec<ToolDef> {
             }),
         },
         ToolDef {
+            name: "new_project".into(),
+            description: "Create a new project with full scaffolding and options.\n\n\
+                Creates directory structure, stub source files, Cargo.toml, proj/ files.\n\
+                Supports platforms, themes, MCP crate, extras, and preview mode.\n\
+                Kinds: tool, cli, library, website, slint-app, workspace.\n\
+                Existing files are never overwritten.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" },
+                    "kind": {
+                        "type": "string",
+                        "description": "Project kind",
+                        "enum": ["tool", "cli", "library", "website", "slint-app", "workspace"]
+                    },
+                    "name": { "type": "string", "description": "Project name (default: directory name)" },
+                    "platforms": {
+                        "type": "array",
+                        "items": { "type": "string", "enum": ["desktop", "mobile", "small"] },
+                        "description": "Target platforms (SlintApp/Super only)"
+                    },
+                    "themes": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "Theme names (SlintApp/Super only)"
+                    },
+                    "mcp": { "type": "boolean", "description": "Add MCP server crate (workspace only)" },
+                    "extras": {
+                        "type": "array",
+                        "items": { "type": "string", "enum": ["lib", "shared", "doc"] },
+                        "description": "Extra folders/crates to add"
+                    },
+                    "preview": { "type": "boolean", "description": "Preview only — show what would be created" }
+                },
+                "required": ["path", "kind"]
+            }),
+        },
+        ToolDef {
+            name: "update_project".into(),
+            description: "Add features to an existing project without changing its kind.\n\n\
+                Detects current project kind and adds platforms, themes, crates, or folders.\n\
+                Existing files are never overwritten. Kind is never changed.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" },
+                    "platforms": {
+                        "type": "array",
+                        "items": { "type": "string", "enum": ["desktop", "mobile", "small"] },
+                        "description": "Platforms to add (SlintApp/Super only)"
+                    },
+                    "themes": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "Themes to add (SlintApp/Super only)"
+                    },
+                    "crate_name": { "type": "string", "description": "Crate name to add (workspace only)" },
+                    "folders": {
+                        "type": "array",
+                        "items": { "type": "string", "enum": ["lib", "shared", "doc"] },
+                        "description": "Extra folders to add"
+                    },
+                    "preview": { "type": "boolean", "description": "Preview only" }
+                },
+                "required": ["path"]
+            }),
+        },
+        ToolDef {
+            name: "upgrade_project".into(),
+            description: "Upgrade a project to a higher kind (structural transformation).\n\n\
+                Changes ProjectKind upward (never down). Scaffolds new structure\n\
+                and provides move guidance for existing files.\n\
+                Order: tool < library/website < cli < slint-app < workspace".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" },
+                    "to": {
+                        "type": "string",
+                        "description": "Target kind to upgrade to",
+                        "enum": ["tool", "cli", "library", "website", "slint-app", "workspace"]
+                    },
+                    "preview": { "type": "boolean", "description": "Preview only" }
+                },
+                "required": ["path", "to"]
+            }),
+        },
+        ToolDef {
             name: "close_issue".into(),
             description: "Close an issue on Forgejo by number.\n\nOptionally add a closing comment.".into(),
             input_schema: serde_json::json!({
@@ -160,6 +248,94 @@ pub fn definitions() -> Vec<ToolDef> {
                     "comment": { "type": "string", "description": "Optional closing comment" }
                 },
                 "required": ["number"]
+            }),
+        },
+        ToolDef {
+            name: "publish_plan".into(),
+            description: "Analyze project and show publish targets, version, and pre-checks.\n\n\
+                Reads [publish] config, checks git state, scanner status.\n\
+                Returns targets with version info and changelog.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" }
+                },
+                "required": ["path"]
+            }),
+        },
+        ToolDef {
+            name: "publish_run".into(),
+            description: "Execute publish to a target (github/forgejo/archive).\n\n\
+                Runs pre-publish checks (scanner, tests, clean git, token),\n\
+                then builds, tags, and creates release. Use preview for dry run.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" },
+                    "target": {
+                        "type": "string",
+                        "description": "Publish target",
+                        "enum": ["github", "forgejo", "archive"]
+                    },
+                    "preview": { "type": "boolean", "description": "Preview only — run checks without publishing" }
+                },
+                "required": ["path", "target"]
+            }),
+        },
+        ToolDef {
+            name: "publish_status".into(),
+            description: "Show what is published where.\n\n\
+                Queries GitHub/Forgejo APIs for latest release info.\n\
+                Shows version, date, and URL per configured target.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" }
+                },
+                "required": ["path"]
+            }),
+        },
+        ToolDef {
+            name: "publish_init".into(),
+            description: "Initialize a pub-repo for dev/pub separation.\n\n\
+                Creates ../{name}-pub/ directory, git init, adds remote,\n\
+                writes [publish.repo] config to proj/rulestools.toml.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" },
+                    "remote": { "type": "string", "description": "Remote URL for the pub-repo (e.g. git@github.com:user/repo.git)" }
+                },
+                "required": ["path", "remote"]
+            }),
+        },
+        ToolDef {
+            name: "publish_sync".into(),
+            description: "Sync dev-repo to pub-repo (whitelist copy).\n\n\
+                Only whitelisted files/dirs are copied. Excluded patterns never copied.\n\
+                Hardcoded safety: proj/, .claude/, target/, .env*, *.key always excluded.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" },
+                    "preview": { "type": "boolean", "description": "Preview only — show what would be synced" }
+                },
+                "required": ["path"]
+            }),
+        },
+        ToolDef {
+            name: "publish_check".into(),
+            description: "Validate pub-repo for leaks and sync status.\n\n\
+                Walks pub-repo files and reports:\n\
+                - LEAKED: excluded files found in pub-repo\n\
+                - OUT-OF-SYNC: files that differ from dev-repo\n\
+                - CLEAN: all checks pass".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" }
+                },
+                "required": ["path"]
             }),
         },
     ]
@@ -174,6 +350,9 @@ pub fn handle(name: &str, args: &Value) -> ToolResult {
         "setup" => tool_setup(args),
         "security_scan" => tool_security_scan(args),
         "init_project" => tool_init_project(args),
+        "new_project" => tool_new_project(args),
+        "update_project" => tool_update_project(args),
+        "upgrade_project" => tool_upgrade_project(args),
         "report_issue" => tool_report_issue(args),
         "list_issues" => tool_list_issues(args),
         "add_label" => tool_add_label(args),
@@ -181,6 +360,12 @@ pub fn handle(name: &str, args: &Value) -> ToolResult {
         "comment_issue" => tool_comment_issue(args),
         "create_label" => tool_create_label(args),
         "close_issue" => tool_close_issue(args),
+        "publish_plan" => tool_publish_plan(args),
+        "publish_run" => tool_publish_run(args),
+        "publish_status" => tool_publish_status(args),
+        "publish_init" => tool_publish_init(args),
+        "publish_sync" => tool_publish_sync(args),
+        "publish_check" => tool_publish_check(args),
         _ => ToolResult::error(format!("Unknown tool: {name}")),
     }
 }
@@ -351,6 +536,151 @@ fn tool_init_project(args: &Value) -> ToolResult {
     }
 }
 
+fn tool_new_project(args: &Value) -> ToolResult {
+    let root = match get_path(args) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+
+    let kind = match args.get("kind").and_then(|v| v.as_str()) {
+        Some(k) => k,
+        None => return ToolResult::error("Missing required parameter: kind"),
+    };
+
+    let root_str = root.to_string_lossy().to_string();
+    let mut cmd_args = vec!["new", &root_str, "--kind", kind, "--format", "json"];
+
+    let name_str;
+    if let Some(name) = args.get("name").and_then(|v| v.as_str()) {
+        name_str = name.to_string();
+        cmd_args.push("--name");
+        cmd_args.push(&name_str);
+    }
+
+    let platforms_str;
+    if let Some(platforms) = args.get("platforms").and_then(|v| v.as_array()) {
+        let items: Vec<&str> = platforms.iter().filter_map(|v| v.as_str()).collect();
+        if !items.is_empty() {
+            platforms_str = items.join(",");
+            cmd_args.push("--platforms");
+            cmd_args.push(&platforms_str);
+        }
+    }
+
+    let themes_str;
+    if let Some(themes) = args.get("themes").and_then(|v| v.as_array()) {
+        let items: Vec<&str> = themes.iter().filter_map(|v| v.as_str()).collect();
+        if !items.is_empty() {
+            themes_str = items.join(",");
+            cmd_args.push("--themes");
+            cmd_args.push(&themes_str);
+        }
+    }
+
+    if args.get("mcp").and_then(|v| v.as_bool()).unwrap_or(false) {
+        cmd_args.push("--mcp");
+    }
+
+    let extras_str;
+    if let Some(extras) = args.get("extras").and_then(|v| v.as_array()) {
+        let items: Vec<&str> = extras.iter().filter_map(|v| v.as_str()).collect();
+        if !items.is_empty() {
+            extras_str = items.join(",");
+            cmd_args.push("--extras");
+            cmd_args.push(&extras_str);
+        }
+    }
+
+    if args.get("preview").and_then(|v| v.as_bool()).unwrap_or(false) {
+        cmd_args.push("--preview");
+    }
+
+    match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_update_project(args: &Value) -> ToolResult {
+    let root = match get_path(args) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+
+    let root_str = root.to_string_lossy().to_string();
+    let mut cmd_args = vec!["update", &root_str, "--format", "json"];
+
+    let platforms_str;
+    if let Some(platforms) = args.get("platforms").and_then(|v| v.as_array()) {
+        let items: Vec<&str> = platforms.iter().filter_map(|v| v.as_str()).collect();
+        if !items.is_empty() {
+            platforms_str = items.join(",");
+            cmd_args.push("--add-platform");
+            cmd_args.push(&platforms_str);
+        }
+    }
+
+    let themes_str;
+    if let Some(themes) = args.get("themes").and_then(|v| v.as_array()) {
+        let items: Vec<&str> = themes.iter().filter_map(|v| v.as_str()).collect();
+        if !items.is_empty() {
+            themes_str = items.join(",");
+            cmd_args.push("--add-theme");
+            cmd_args.push(&themes_str);
+        }
+    }
+
+    let crate_str;
+    if let Some(crate_name) = args.get("crate_name").and_then(|v| v.as_str()) {
+        crate_str = crate_name.to_string();
+        cmd_args.push("--add-crate");
+        cmd_args.push(&crate_str);
+    }
+
+    let folders_str;
+    if let Some(folders) = args.get("folders").and_then(|v| v.as_array()) {
+        let items: Vec<&str> = folders.iter().filter_map(|v| v.as_str()).collect();
+        if !items.is_empty() {
+            folders_str = items.join(",");
+            cmd_args.push("--add-folder");
+            cmd_args.push(&folders_str);
+        }
+    }
+
+    if args.get("preview").and_then(|v| v.as_bool()).unwrap_or(false) {
+        cmd_args.push("--preview");
+    }
+
+    match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_upgrade_project(args: &Value) -> ToolResult {
+    let root = match get_path(args) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+
+    let to = match args.get("to").and_then(|v| v.as_str()) {
+        Some(t) => t,
+        None => return ToolResult::error("Missing required parameter: to"),
+    };
+
+    let root_str = root.to_string_lossy().to_string();
+    let mut cmd_args = vec!["upgrade", &root_str, "--to", to, "--format", "json"];
+
+    if args.get("preview").and_then(|v| v.as_bool()).unwrap_or(false) {
+        cmd_args.push("--preview");
+    }
+
+    match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
 fn tool_report_issue(args: &Value) -> ToolResult {
     let title = match args.get("title").and_then(|v| v.as_str()) {
         Some(t) => t,
@@ -469,6 +799,94 @@ fn tool_close_issue(args: &Value) -> ToolResult {
     }
 
     match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_publish_plan(args: &Value) -> ToolResult {
+    let root = match get_path(args) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    let root_str = root.to_string_lossy().to_string();
+    match run_rulestools(&["publish", "plan", &root_str, "--format", "json"]) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_publish_run(args: &Value) -> ToolResult {
+    let root = match get_path(args) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    let target = match args.get("target").and_then(|v| v.as_str()) {
+        Some(t) => t,
+        None => return ToolResult::error("Missing required parameter: target"),
+    };
+    let root_str = root.to_string_lossy().to_string();
+    let mut cmd_args = vec!["publish", "run", &root_str, "--target", target];
+    if args.get("preview").and_then(|v| v.as_bool()).unwrap_or(false) {
+        cmd_args.push("--preview");
+    }
+    match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_publish_status(args: &Value) -> ToolResult {
+    let root = match get_path(args) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    let root_str = root.to_string_lossy().to_string();
+    match run_rulestools(&["publish", "status", &root_str, "--format", "json"]) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_publish_init(args: &Value) -> ToolResult {
+    let root = match get_path(args) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    let remote = match args.get("remote").and_then(|v| v.as_str()) {
+        Some(r) => r,
+        None => return ToolResult::error("Missing required parameter: remote"),
+    };
+    let root_str = root.to_string_lossy().to_string();
+    match run_rulestools(&["publish", "init", &root_str, "--remote", remote]) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_publish_sync(args: &Value) -> ToolResult {
+    let root = match get_path(args) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    let root_str = root.to_string_lossy().to_string();
+    let mut cmd_args = vec!["publish", "sync", &root_str];
+    if args.get("preview").and_then(|v| v.as_bool()).unwrap_or(false) {
+        cmd_args.push("--preview");
+    }
+    match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+fn tool_publish_check(args: &Value) -> ToolResult {
+    let root = match get_path(args) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    let root_str = root.to_string_lossy().to_string();
+    match run_rulestools(&["publish", "check", &root_str]) {
         Ok(output) => ToolResult::text(output),
         Err(e) => ToolResult::error(e),
     }
