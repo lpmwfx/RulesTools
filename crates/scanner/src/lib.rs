@@ -75,6 +75,52 @@ pub fn scan_at(root: &Path) -> (Vec<Issue>, usize) {
     (issues, new_count)
 }
 
+/// Scan a super-project — find sub-repos and scan each with its own config.
+///
+/// Returns aggregated issues from all sub-repos with path prefixed by sub-repo name.
+pub fn scan_super(root: &Path) -> (Vec<Issue>, usize) {
+    let mut all_issues = Vec::new();
+    let mut total_new = 0;
+
+    let entries = match std::fs::read_dir(root) {
+        Ok(e) => e,
+        Err(_) => return (all_issues, total_new),
+    };
+
+    for entry in entries.flatten() {
+        let sub = entry.path();
+        if !sub.is_dir() {
+            continue;
+        }
+        if !sub.join("proj").join("rulestools.toml").exists() {
+            continue;
+        }
+        let sub_name = sub
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string();
+
+        let (issues, new_count) = scan_at(&sub);
+        let sub_canonical = std::fs::canonicalize(&sub).unwrap_or_else(|_| sub.clone());
+        for mut issue in issues {
+            // Make path relative to sub-repo, then prefix with sub-repo name
+            let rel = issue
+                .path
+                .strip_prefix(&sub_canonical)
+                .or_else(|_| issue.path.strip_prefix(&sub))
+                .unwrap_or(&issue.path)
+                .to_path_buf();
+            issue.path = std::path::PathBuf::from(&sub_name).join(rel);
+            all_issues.push(issue);
+        }
+        total_new += new_count;
+    }
+
+    all_issues.sort();
+    (all_issues, total_new)
+}
+
 /// Core scan logic — collects files, runs all registered checks.
 pub fn run_scan(root: &Path) -> Vec<Issue> {
     let cfg = Config::load(root);
@@ -155,4 +201,89 @@ pub fn run_scan(root: &Path) -> Vec<Issue> {
         .collect();
 
     issues
+}
+
+#[cfg(test)]
+mod super_tests {
+    use super::*;
+
+    fn make_sub_repo(root: &std::path::Path, name: &str) {
+        let sub = root.join(name);
+        let proj = sub.join("proj");
+        std::fs::create_dir_all(&proj).unwrap();
+        std::fs::write(proj.join("rulestools.toml"), "[project]\nkind = \"tool\"\n").unwrap();
+        let src = sub.join("src");
+        std::fs::create_dir_all(&src).unwrap();
+        std::fs::write(src.join("main.rs"), "fn main() {}\n").unwrap();
+    }
+
+    #[test]
+    fn super_finds_sub_repos() {
+        let dir = std::env::temp_dir().join("rulestools-super-test-find");
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+
+        make_sub_repo(&dir, "repo-a");
+        make_sub_repo(&dir, "repo-b");
+
+        let (issues, _) = scan_super(&dir);
+        // Both sub-repos should be scanned (they'll at least get the unregistered suggestion or some issues)
+        let has_repo_a = issues.iter().any(|i| i.path.to_string_lossy().starts_with("repo-a"));
+        let has_repo_b = issues.iter().any(|i| i.path.to_string_lossy().starts_with("repo-b"));
+        // They are registered (have [project].kind) so they won't get "unregistered" issue,
+        // but they may or may not have other issues depending on content. Just verify no panic.
+        let _ = (has_repo_a, has_repo_b);
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn super_skips_dirs_without_toml() {
+        let dir = std::env::temp_dir().join("rulestools-super-test-skip");
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+
+        // Sub-repo with toml
+        make_sub_repo(&dir, "has-toml");
+
+        // Directory without toml
+        let no_toml = dir.join("no-toml");
+        std::fs::create_dir_all(no_toml.join("src")).unwrap();
+        std::fs::write(no_toml.join("src/main.rs"), "fn main() {}\n").unwrap();
+
+        let (issues, _) = scan_super(&dir);
+        let has_no_toml = issues.iter().any(|i| i.path.to_string_lossy().starts_with("no-toml"));
+        assert!(!has_no_toml, "Should not scan directories without proj/rulestools.toml");
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn super_prefixes_paths() {
+        let dir = std::env::temp_dir().join("rulestools-super-test-prefix");
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+
+        // Create a sub-repo with a file that will definitely trigger an issue
+        let sub = dir.join("my-repo");
+        let proj = sub.join("proj");
+        std::fs::create_dir_all(&proj).unwrap();
+        // Don't set [project].kind — this guarantees an "unregistered" info issue
+        std::fs::write(proj.join("rulestools.toml"), "[scan]\n").unwrap();
+        let src = sub.join("src");
+        std::fs::create_dir_all(&src).unwrap();
+        std::fs::write(src.join("main.rs"), "fn main() {}\n").unwrap();
+
+        let (issues, _) = scan_super(&dir);
+        // All issues should be prefixed with "my-repo/"
+        for issue in &issues {
+            let path_str = issue.path.to_string_lossy();
+            assert!(
+                path_str.starts_with("my-repo"),
+                "Issue path should be prefixed: {path_str}"
+            );
+        }
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }

@@ -5,6 +5,7 @@ use walkdir::WalkDir;
 const SOURCE_EXTENSIONS: &[&str] = &[
     "rs", "slint", "py", "js", "mjs", "cjs", "jsx", "ts", "tsx",
     "css", "scss", "kt", "kts", "cs",
+    "html", "htm",
 ];
 
 /// Default directories to exclude from scanning.

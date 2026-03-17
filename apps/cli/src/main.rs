@@ -1,6 +1,8 @@
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
+mod scaffold;
+
 /// Unified static code scanner — enforces Rules repo conventions across all languages.
 ///
 /// Scans source files for coding rule violations and writes results to proj/ISSUES.
@@ -103,6 +105,37 @@ enum Commands {
         format: String,
     },
 
+    /// Initialize a new project with full scaffolding.
+    #[command(long_about = "Initialize a new project with full scaffolding.\n\n\
+        Creates directory structure, stub source files, Cargo.toml,\n\
+        proj/ files, and .gitignore based on the chosen project kind.\n\
+        Existing files are never overwritten.\n\
+        \n\
+        Kinds:\n  \
+        tool       — minimal (src/main.rs, proj/)\n  \
+        cli        — CLI app with clap (src/main.rs, src/shared/, doc/)\n  \
+        library    — library crate (src/lib.rs)\n  \
+        slint-app  — Slint GUI with topology folders\n  \
+        workspace  — Cargo workspace with crates/{app,core,adapter,gateway,pal,ui}\n\
+        \n\
+        Examples:\n  \
+        rulestools init /path/to/project --kind tool\n  \
+        rulestools init . --kind cli --name my-app\n  \
+        rulestools init /path/to/project --kind workspace")]
+    Init {
+        /// Path to the project root directory.
+        #[arg(default_value = ".")]
+        path: PathBuf,
+
+        /// Project kind: tool, cli, library, slint-app, workspace.
+        #[arg(long)]
+        kind: String,
+
+        /// Project name (default: directory name).
+        #[arg(long)]
+        name: Option<String>,
+    },
+
     /// Report, list, or close issues on Forgejo.
     #[command(subcommand)]
     Issue(IssueCmd),
@@ -181,7 +214,44 @@ fn main() {
         Commands::Detect { path } => cmd_detect(&path),
         Commands::Gen { path } => cmd_gen(&path),
         Commands::ScanFile { file, format } => cmd_scan_file(&file, &format),
+        Commands::Init { path, kind, name } => cmd_init(&path, &kind, name.as_deref()),
         Commands::Issue(cmd) => cmd_issue(cmd),
+    }
+}
+
+fn cmd_init(path: &PathBuf, kind_str: &str, name: Option<&str>) {
+    let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.clone());
+
+    let kind = match rulestools_scanner::project::ProjectKind::from_str(kind_str) {
+        Some(k) => k,
+        None => {
+            eprintln!(
+                "Unknown kind: {kind_str}\nValid kinds: tool, cli, library, website, slint-app, workspace"
+            );
+            std::process::exit(1);
+        }
+    };
+
+    // Map "workspace" input to Super kind (workspace = scaffold, super = scan behavior)
+    let project_name = name
+        .map(String::from)
+        .unwrap_or_else(|| {
+            root.file_name()
+                .and_then(|n| n.to_str())
+                .unwrap_or("project")
+                .to_string()
+        });
+
+    match scaffold::scaffold_project(&root, kind, &project_name) {
+        Ok(summary) => {
+            println!("{summary}");
+            println!();
+            cmd_detect(path);
+        }
+        Err(e) => {
+            eprintln!("Scaffold failed: {e}");
+            std::process::exit(1);
+        }
     }
 }
 
@@ -191,7 +261,11 @@ fn cmd_scan(path: &PathBuf, deny: bool) {
 
     println!("rulestools: {:?} / {:?}", identity.kind, identity.layout);
 
-    let (issues, new_count) = rulestools_scanner::scan_at(&root);
+    let (issues, new_count) = if identity.kind == rulestools_scanner::project::ProjectKind::Super {
+        rulestools_scanner::scan_super(&root)
+    } else {
+        rulestools_scanner::scan_at(&root)
+    };
 
     let error_count = issues
         .iter()

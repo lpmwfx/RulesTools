@@ -11,6 +11,8 @@ pub enum ProjectKind {
     Library,
     /// Scripts and tooling within a project — most relaxed.
     Tool,
+    /// Website / web app — JS/TS/HTML/CSS, no Rust topology.
+    Website,
     /// Multi-repo superprojekt — contains multiple sub-repos, each with own config.
     Super,
 }
@@ -53,6 +55,7 @@ impl ProjectIdentity {
             ProjectKind::SlintApp => "slint-app",
             ProjectKind::CliApp => "cli",
             ProjectKind::Library => "library",
+            ProjectKind::Website => "website",
             ProjectKind::Tool => "tool",
             ProjectKind::Super => "super",
         };
@@ -90,6 +93,9 @@ fn detect_kind(root: &Path) -> ProjectKind {
     if has_slint_files(root) {
         return ProjectKind::SlintApp;
     }
+    if has_website_signals(root) {
+        return ProjectKind::Website;
+    }
     if has_binary_entry(root) {
         return ProjectKind::CliApp;
     }
@@ -119,6 +125,12 @@ fn has_slint_files(root: &Path) -> bool {
     false
 }
 
+/// Check for web project signals (package.json or index.html).
+fn has_website_signals(root: &Path) -> bool {
+    root.join("package.json").exists()
+        || root.join("index.html").exists()
+}
+
 /// Check for src/main.rs or [[bin]] in Cargo.toml.
 fn has_binary_entry(root: &Path) -> bool {
     if root.join("src").join("main.rs").exists() {
@@ -141,7 +153,9 @@ impl ProjectKind {
             "cli" | "cli-app" | "cli_app" => Some(ProjectKind::CliApp),
             "library" | "lib" => Some(ProjectKind::Library),
             "tool" => Some(ProjectKind::Tool),
+            "website" | "web" => Some(ProjectKind::Website),
             "super" | "super-project" => Some(ProjectKind::Super),
+            "workspace" => Some(ProjectKind::Super),
             _ => None,
         }
     }
@@ -160,6 +174,13 @@ impl ProjectKind {
                 "uiux/",
                 "slint/",
                 "rust/types/no-println",
+            ],
+            ProjectKind::Website => &[
+                "gateway/",
+                "uiux/",
+                "slint/",
+                "rust/",
+                "topology/",
             ],
             ProjectKind::Tool => &[
                 "gateway/",
@@ -233,6 +254,8 @@ mod tests {
         assert_eq!(ProjectKind::from_str("cli"), Some(ProjectKind::CliApp));
         assert_eq!(ProjectKind::from_str("library"), Some(ProjectKind::Library));
         assert_eq!(ProjectKind::from_str("lib"), Some(ProjectKind::Library));
+        assert_eq!(ProjectKind::from_str("website"), Some(ProjectKind::Website));
+        assert_eq!(ProjectKind::from_str("web"), Some(ProjectKind::Website));
         assert_eq!(ProjectKind::from_str("tool"), Some(ProjectKind::Tool));
         assert_eq!(ProjectKind::from_str("super"), Some(ProjectKind::Super));
         assert_eq!(ProjectKind::from_str("unknown"), None);
@@ -243,6 +266,21 @@ mod tests {
         assert_eq!(ProjectKind::SlintApp.skipped_categories().len(), 0);
         assert_eq!(ProjectKind::CliApp.skipped_categories().len(), 3);
         assert_eq!(ProjectKind::Library.skipped_categories().len(), 4);
+        assert_eq!(ProjectKind::Website.skipped_categories().len(), 5);
         assert_eq!(ProjectKind::Tool.skipped_categories().len(), 5);
+    }
+
+    #[test]
+    fn website_skips_rust_and_topology() {
+        let kind = ProjectKind::Website;
+        assert!(!kind.allows_check("rust/errors/no-unwrap"));
+        assert!(!kind.allows_check("rust/constants/no-magic-number"));
+        assert!(!kind.allows_check("topology/layer-violation"));
+        assert!(!kind.allows_check("slint/tokens"));
+        assert!(!kind.allows_check("gateway/io/layer-violation"));
+        assert!(!kind.allows_check("uiux/mother-child/extract-orchestrator"));
+        assert!(kind.allows_check("global/nesting"));
+        assert!(kind.allows_check("global/secrets"));
+        assert!(kind.allows_check("global/file-limits"));
     }
 }

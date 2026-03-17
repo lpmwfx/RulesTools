@@ -23,7 +23,7 @@ impl SeverityResolver {
                     overrides.insert(id.to_string(), Severity::Skip);
                 }
             }
-            ProjectKind::CliApp | ProjectKind::Library => {
+            ProjectKind::CliApp | ProjectKind::Library | ProjectKind::Website => {
                 // Warn on code quality, skip topology
                 for id in CLI_WARN {
                     overrides.insert(id.to_string(), Severity::Warning);
@@ -69,9 +69,13 @@ const TOOL_SKIP: &[&str] = &[
     "topology/layer-violation",
     "topology/placement",
     "topology/naming",
+    "topology/suffix",
     "global/nesting",
     "global/file-limits",
     "global/tech-debt",
+    "js/safety/no-var",
+    "js/safety/no-console-log",
+    "js/safety/no-eval",
 ];
 
 const CLI_WARN: &[&str] = &[
@@ -92,11 +96,14 @@ const CLI_WARN: &[&str] = &[
     "global/nesting",
     "global/file-limits",
     "global/tech-debt",
+    "js/safety/no-var",
+    "js/safety/no-console-log",
 ];
 
 const CLI_SKIP: &[&str] = &[
     "topology/layer-violation",
     "topology/naming",
+    "topology/suffix",
 ];
 
 #[cfg(test)]

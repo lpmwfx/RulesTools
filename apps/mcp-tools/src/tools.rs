@@ -63,18 +63,22 @@ pub fn definitions() -> Vec<ToolDef> {
         },
         ToolDef {
             name: "init_project".into(),
-            description: "Initialize a new project with RulesTools.\n\nCreates proj/ structure and installs hooks.".into(),
+            description: "Initialize a new project with full scaffolding.\n\n\
+                Creates directory structure, stub source files, Cargo.toml, proj/ files, and .gitignore.\n\
+                Kinds: tool, cli, library, slint-app, workspace.\n\
+                Existing files are never overwritten.".into(),
             input_schema: serde_json::json!({
                 "type": "object",
                 "properties": {
                     "path": { "type": "string", "description": "Absolute path to project root" },
-                    "languages": {
-                        "type": "array",
-                        "items": { "type": "string" },
-                        "description": "Languages used in the project"
-                    }
+                    "kind": {
+                        "type": "string",
+                        "description": "Project kind: tool, cli, library, slint-app, workspace",
+                        "enum": ["tool", "cli", "library", "slint-app", "workspace"]
+                    },
+                    "name": { "type": "string", "description": "Project name (default: directory name)" }
                 },
-                "required": ["path", "languages"]
+                "required": ["path", "kind"]
             }),
         },
         ToolDef {
@@ -327,43 +331,24 @@ fn tool_init_project(args: &Value) -> ToolResult {
         Err(e) => return e,
     };
 
-    let languages: Vec<String> = args.get("languages")
-        .and_then(|v| v.as_array())
-        .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
-        .unwrap_or_default();
+    let kind = match args.get("kind").and_then(|v| v.as_str()) {
+        Some(k) => k,
+        None => return ToolResult::error("Missing required parameter: kind"),
+    };
 
-    let proj_dir = root.join("proj");
-    let _ = std::fs::create_dir_all(&proj_dir);
+    let root_str = root.to_string_lossy().to_string();
+    let mut cmd_args = vec!["init", &root_str, "--kind", kind];
+    let name_str;
+    if let Some(name) = args.get("name").and_then(|v| v.as_str()) {
+        name_str = name.to_string();
+        cmd_args.push("--name");
+        cmd_args.push(&name_str);
+    }
 
-    let project_content = format!(
-        "# PROJECT\n\n## Identity\n\n- **Languages:** {}\n\n## Current\n\n- **Phase:** 1\n- **Status:** setup\n",
-        languages.join(", ")
-    );
-    let _ = std::fs::write(proj_dir.join("PROJECT"), &project_content);
-    let _ = std::fs::write(proj_dir.join("TODO"), "# TODO\n\n(empty — add tasks here)\n");
-    let _ = std::fs::write(proj_dir.join("RULES"), "# RULES\n\nRun `mcp__rules__get_context` for active rules.\n");
-    let _ = std::fs::write(proj_dir.join("FIXES"), "# FIXES\n\n(no known issues)\n");
-
-    // Detect and write rulestools.toml
-    let detect_output = run_rulestools(&["detect", &root.to_string_lossy()])
-        .unwrap_or_default();
-    let kind = detect_output.lines()
-        .find(|l| l.starts_with("Kind:"))
-        .and_then(|l| l.split_whitespace().last())
-        .unwrap_or("tool")
-        .to_lowercase();
-    let toml_content = format!(
-        "[project]\nkind = \"{kind}\"\n\n[scan]\nlanguages = [{}]\n",
-        languages.iter().map(|l| format!("\"{l}\"")).collect::<Vec<_>>().join(", ")
-    );
-    let _ = std::fs::write(proj_dir.join("rulestools.toml"), &toml_content);
-
-    let setup_result = tool_setup(args);
-
-    ToolResult::text(format!(
-        "Project initialized:\n- proj/PROJECT\n- proj/TODO\n- proj/RULES\n- proj/FIXES\n- proj/rulestools.toml ({kind})\n\n{}",
-        setup_result.content.first().map(|c| c.text.as_str()).unwrap_or("")
-    ))
+    match run_rulestools(&cmd_args) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
 }
 
 fn tool_report_issue(args: &Value) -> ToolResult {

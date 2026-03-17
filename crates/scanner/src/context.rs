@@ -11,6 +11,7 @@ pub enum Language {
     Css,
     Kotlin,
     CSharp,
+    Html,
 }
 
 impl Language {
@@ -25,6 +26,7 @@ impl Language {
             "css" | "scss" => Some(Language::Css),
             "kt" | "kts" => Some(Language::Kotlin),
             "cs" => Some(Language::CSharp),
+            "html" | "htm" => Some(Language::Html),
             _ => None,
         }
     }
@@ -46,6 +48,7 @@ impl Language {
             Language::Css => "css",
             Language::Kotlin => "kotlin",
             Language::CSharp => "csharp",
+            Language::Html => "html",
         }
     }
 }
@@ -123,6 +126,7 @@ pub fn is_comment(line: &str, lang: Language) -> bool {
         | Language::Kotlin | Language::CSharp | Language::Css => {
             trimmed.starts_with("//") || trimmed.starts_with("/*") || trimmed.starts_with('*')
         }
+        Language::Html => trimmed.starts_with("<!--"),
         Language::Python => trimmed.starts_with('#'),
     }
 }
@@ -173,6 +177,8 @@ mod tests {
         assert_eq!(Language::from_extension("scss"), Some(Language::Css));
         assert_eq!(Language::from_extension("kt"), Some(Language::Kotlin));
         assert_eq!(Language::from_extension("cs"), Some(Language::CSharp));
+        assert_eq!(Language::from_extension("html"), Some(Language::Html));
+        assert_eq!(Language::from_extension("htm"), Some(Language::Html));
         assert_eq!(Language::from_extension("txt"), None);
         assert_eq!(Language::from_extension("md"), None);
     }

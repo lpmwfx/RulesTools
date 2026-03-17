@@ -9,6 +9,7 @@ fn max_depth(lang: Language) -> usize {
     match lang {
         Language::Rust => 5,
         Language::JavaScript | Language::TypeScript | Language::Css => 4,
+        Language::Html => 4,
         Language::Slint | Language::Kotlin => 6,
         Language::CSharp => 7,
         Language::Python => 8,
@@ -321,8 +322,6 @@ fn count_closes(line: &str, lang: Language) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
-
     fn make_ctx(lang: Language) -> FileContext {
         FileContext {
             language: lang,

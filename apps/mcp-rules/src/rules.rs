@@ -120,6 +120,10 @@ pub fn handle(name: &str, args: &Value) -> ToolResult {
 fn tool_help() -> ToolResult {
     ToolResult::text(
         "AI coding rules lookup — Python, JS, CSS, C++, Rust, Kotlin standards.\n\n\
+        Quick-start:\n\
+        1. get_rule(\"global/startup.md\")     — mandatory session checklist\n\
+        2. get_context([\"global\"])            — architecture + project rules\n\
+        3. get_context([\"rust\", \"js\", ...]) — language-specific rules\n\n\
         Tools:\n\
         - get_rule(file)         — full markdown of one rule\n\
         - search_rules(query)    — keyword search across all rules\n\
@@ -127,9 +131,8 @@ fn tool_help() -> ToolResult {
         - get_context(languages) — all rules for given languages\n\n\
         Categories: global, rust, slint, python, js, css, kotlin, csharp, uiux, project-files, catalog\n\n\
         Libraries:\n\
-        - slint-ui-templates: UI + adapter foundation for Slint apps (crates.io/crates/slint-ui-templates)\n\
-          get_rule(\"catalog/slint-ui-templates.md\") for full docs\n\n\
-        Example: get_rule(\"global/startup.md\")"
+        - slint-ui-templates: UI + adapter foundation for Slint apps\n\
+          get_rule(\"catalog/slint-ui-templates.md\") for full docs"
     )
 }
 

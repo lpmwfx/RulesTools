@@ -30,6 +30,8 @@ pub mod sibling_import;
 pub mod slint_gateway;
 pub mod slint_mother_child;
 pub mod topology_naming;
+pub mod topology_suffix;
+pub mod js_safety;
 
 /// Per-file check function signature.
 pub type PerFileCheckFn = fn(
@@ -124,6 +126,12 @@ pub fn registry() -> Vec<CheckEntry> {
         CheckEntry::per_file("uiux/mother-child/child-has-state", vec![Language::Slint], slint_mother_child::check),
         // Topology naming (Level 1: folder names)
         CheckEntry::tree("topology/naming", vec![], topology_naming::check),
+        // Topology suffix (Level 3: public type suffixes)
+        CheckEntry::per_file("topology/suffix", vec![Language::Rust], topology_suffix::check),
+        // JS safety checks
+        CheckEntry::per_file("js/safety/no-var", vec![Language::JavaScript, Language::TypeScript], js_safety::check_no_var),
+        CheckEntry::per_file("js/safety/no-console-log", vec![Language::JavaScript, Language::TypeScript], js_safety::check_no_console_log),
+        CheckEntry::per_file("js/safety/no-eval", vec![Language::JavaScript, Language::TypeScript], js_safety::check_no_eval),
     ]
 }
 
