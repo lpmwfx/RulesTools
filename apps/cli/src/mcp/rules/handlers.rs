@@ -141,6 +141,11 @@ pub fn get_context(repo: &Path, args: &Value) -> ToolResult {
         .map(|arr| arr.iter().filter_map(|v| v.as_str().map(|s| s.to_lowercase())).collect())
         .unwrap_or_default();
 
+    let quick_ref = args
+        .get("quick_ref")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+
     let reg = match get_registry(repo) {
         Ok(r) => r,
         Err(e) => return ToolResult::error(e),
@@ -153,14 +158,32 @@ pub fn get_context(repo: &Path, args: &Value) -> ToolResult {
     let mut matched: Vec<&RuleEntry> = Vec::new();
     for entry in reg.list(None) {
         let cat = entry.category.to_lowercase();
-        if lang_set.contains(&cat) {
-            matched.push(entry);
-        } else if !topic_set.is_empty() {
+        let is_quick_ref = entry.file.ends_with("quick-ref.md");
+
+        if quick_ref {
+            // Quick-ref mode: only quick-ref files from requested languages + global
+            if is_quick_ref && (lang_set.contains(&cat) || cat == "global") {
+                matched.push(entry);
+            }
+        } else if topic_set.is_empty() {
+            // No topics: include all files from requested languages
+            if lang_set.contains(&cat) {
+                matched.push(entry);
+            }
+        } else {
+            // Topics specified: filter by topic match within scope
             let concepts: std::collections::HashSet<String> =
                 entry.concepts.iter().map(|c| c.to_lowercase()).collect();
             let tags: std::collections::HashSet<String> =
                 entry.tags.iter().map(|t| t.to_lowercase()).collect();
-            if !concepts.is_disjoint(&topic_set) || !tags.is_disjoint(&topic_set) {
+            let has_topic =
+                !concepts.is_disjoint(&topic_set) || !tags.is_disjoint(&topic_set);
+
+            if lang_set.contains(&cat) && has_topic {
+                // Language file matching topic
+                matched.push(entry);
+            } else if cat == "global" && has_topic {
+                // Global foundation matching topic
                 matched.push(entry);
             }
         }

@@ -90,7 +90,7 @@ fn definitions() -> Vec<ToolDef> {
         },
         ToolDef {
             name: "get_context".into(),
-            description: "Get combined rules context for given languages and optional topics.\n\nArgs:\n    languages: Language categories (e.g. [\"python\", \"js\"])\n    topics: Optional concept/tag filter (e.g. [\"types\", \"testing\"])".into(),
+            description: "Get combined rules context for given languages and optional topics.\n\nArgs:\n    languages: Language categories (e.g. [\"rust\", \"slint\"])\n    topics: Optional concept/tag filter — returns only files matching these topics\n    quick_ref: If true, return only quick-ref files (compact onboarding). Default: false\n\nExamples:\n    get_context([\"rust\", \"slint\"])                    → all rust + slint rules\n    get_context([\"rust\"], topics: [\"workspace\"])       → rust files about workspace + matching global\n    get_context([\"rust\", \"slint\"], quick_ref: true)    → 3 files: global + rust + slint quick-ref".into(),
             input_schema: serde_json::json!({
                 "type": "object",
                 "properties": {
@@ -103,6 +103,10 @@ fn definitions() -> Vec<ToolDef> {
                         "type": "array",
                         "items": { "type": "string" },
                         "description": "Optional concept/tag filter"
+                    },
+                    "quick_ref": {
+                        "type": "boolean",
+                        "description": "If true, return only quick-ref summary files (compact onboarding)"
                     }
                 },
                 "required": ["languages"]

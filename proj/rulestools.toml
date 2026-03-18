@@ -1,5 +1,0 @@
-[scan]
-languages = ["rust"]
-
-[project]
-kind = "tool"

@@ -34,8 +34,14 @@ pub fn document_project() {
         );
     }
 
-    // Check for undocumented pub items — error mode
+    // Re-collect after docgen may have inserted stubs
     let docs = parser::collect_docs(&root);
+
+    // Generate man/ directory
+    let project_name = std::env::var("CARGO_PKG_NAME").unwrap_or_else(|_| "unknown".into());
+    generator::generate(&root, &project_name, &docs);
+
+    // Check for undocumented pub items — error mode
     let undoc_count: usize = docs.iter()
         .flat_map(|sd| &sd.items)
         .filter(|item| item.doc.is_empty())

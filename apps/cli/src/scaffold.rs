@@ -9,6 +9,12 @@ const DOCUMENTER_BUILD_DEP: &str = "rulestools-documenter = { git = \"https://gi
 const BUILD_RS_SCANNER: &str = "fn main() {\n    rulestools_scanner::scan_project();\n    rulestools_documenter::document_project();\n}\n";
 const BUILD_RS_SCANNER_SLINT: &str = "fn main() {\n    rulestools_scanner::scan_project();\n    rulestools_documenter::document_project();\n    slint_build::compile(\"ui/main.slint\").expect(\"Slint build failed\");\n}\n";
 
+/// CLI topology folders (no UI).
+const CLI_TOPOLOGY: &[&str] = &["core", "adapter", "gateway", "pal", "shared"];
+
+/// GUI topology folders (CLI + app + ui).
+const GUI_TOPOLOGY: &[&str] = &["app", "core", "adapter", "gateway", "pal", "shared", "ui"];
+
 const CLAUDE_SETTINGS: &str = r#"{
   "hooks": {
     "PostToolUse": [
@@ -203,6 +209,10 @@ pub fn scaffold_with_options(root: &Path, opts: &ScaffoldOptions) -> Result<Scaf
 
     // Platform scaffolding (SlintApp/Super only)
     if !opts.platforms.is_empty() {
+        // Workspace + platforms: add Slint UI layer (crates/ui + ui/main.slint)
+        if opts.kind == ProjectKind::Super {
+            scaffold_workspace_ui(&w, root, &opts.name, &mut created)?;
+        }
         scaffold_platforms(&w, root, opts.kind, &opts.platforms, &mut created)?;
     }
 
@@ -1007,23 +1017,23 @@ fn create_proj_files(
     w.ensure_dir(&proj, created)?;
 
     let kind_str = kind.as_str();
-    let is_gui = matches!(kind, ProjectKind::SlintApp | ProjectKind::Super);
+    let is_gui = kind == ProjectKind::SlintApp;
 
     // Determine stack and structure based on kind
     let (stack, structure, method) = match kind {
         ProjectKind::Tool => (
             format!("- Language: Rust 2021\n- Type: CLI tool"),
-            format!("- src: src/\n- proj: proj/"),
+            format!("- src: src/ (topology: core/, adapter/, gateway/, pal/, shared/)\n- proj: proj/"),
             format!("- Workflow: PROJECT → TODO → code → test\n- Testing: cargo test"),
         ),
         ProjectKind::CliApp => (
             format!("- Language: Rust 2021\n- Framework: clap 4\n- Type: CLI application"),
-            format!("- src: src/\n- shared: src/shared/\n- doc: doc/\n- proj: proj/"),
+            format!("- src: src/ (topology: core/, adapter/, gateway/, pal/, shared/)\n- doc: doc/\n- proj: proj/"),
             format!("- Workflow: PROJECT → PHASES → TODO → code → test → DONE\n- Testing: cargo test"),
         ),
         ProjectKind::Library => (
             format!("- Language: Rust 2021\n- Type: Library crate"),
-            format!("- src: src/\n- proj: proj/"),
+            format!("- src: src/ (topology: core/, shared/)\n- proj: proj/"),
             format!("- Workflow: PROJECT → TODO → code → test\n- Testing: cargo test"),
         ),
         ProjectKind::Website => (
@@ -1033,13 +1043,13 @@ fn create_proj_files(
         ),
         ProjectKind::SlintApp => (
             format!("- Language: Rust 2021\n- UI: Slint 1.x\n- Type: GUI application"),
-            format!("- src: src/ (topology: app/, core/, adapter/, gateway/, pal/, ui/)\n- slint: ui/\n- proj: proj/"),
+            format!("- src: src/ (topology: app/, core/, adapter/, gateway/, pal/, shared/, ui/)\n- slint: ui/\n- proj: proj/"),
             format!("- Workflow: PROJECT → PHASES → TODO → code → test → DONE\n- Testing: cargo test\n- UI: Slint previewer"),
         ),
         ProjectKind::Super => (
-            format!("- Language: Rust 2021\n- UI: Slint 1.x\n- Type: Workspace (multi-crate)"),
-            format!("- crates: crates/ (app, core, adapter, gateway, pal, ui)\n- slint: ui/\n- proj: proj/"),
-            format!("- Workflow: PROJECT → PHASES → TODO → code → test → DONE\n- Testing: cargo test\n- UI: Slint previewer"),
+            format!("- Language: Rust 2021\n- Type: Workspace (multi-crate)"),
+            format!("- crates: crates/ (topology: app/, core/, adapter/, gateway/, pal/, shared/)\n- proj: proj/"),
+            format!("- Workflow: PROJECT → PHASES → TODO → code → test → DONE\n- Testing: cargo test"),
         ),
     };
 
@@ -1115,7 +1125,7 @@ fn create_proj_files(
 
     // RULES — list active rules based on kind
     let rules_content = match kind {
-        ProjectKind::SlintApp | ProjectKind::Super => format!(
+        ProjectKind::SlintApp => format!(
             "# RULES — {name}\n\n\
              ## Active Rules\n\n\
              ### Global\n\
@@ -1245,10 +1255,23 @@ fn create_proj_files(
 fn scaffold_tool(w: &Writer, root: &Path, name: &str, created: &mut Vec<String>) -> Result<(), String> {
     let src = root.join("src");
     w.ensure_dir(&src, created)?;
+
+    // Topology folders
+    for folder in CLI_TOPOLOGY {
+        let dir = src.join(folder);
+        w.ensure_dir(&dir, created)?;
+        w.write_if_missing(&dir, "mod.rs", &format!("//! {folder} layer.\n"), created)?;
+    }
+
     w.write_if_missing(
         &src,
         "main.rs",
-        "fn main() {\n    println!(\"Hello, world!\");\n}\n",
+        &format!(
+            "mod core;\nmod adapter;\nmod gateway;\nmod pal;\nmod shared;\n\n\
+             fn main() {{\n\
+                 println!(\"{name} ready\");\n\
+             }}\n"
+        ),
         created,
     )?;
     w.write_if_missing(
@@ -1270,15 +1293,19 @@ fn scaffold_cli(
     let src = root.join("src");
     w.ensure_dir(&src, created)?;
 
-    let shared = src.join("shared");
-    w.ensure_dir(&shared, created)?;
+    // Topology folders
+    for folder in CLI_TOPOLOGY {
+        let dir = src.join(folder);
+        w.ensure_dir(&dir, created)?;
+        w.write_if_missing(&dir, "mod.rs", &format!("//! {folder} layer.\n"), created)?;
+    }
 
     w.write_if_missing(
         &src,
         "main.rs",
         &format!(
             "use clap::Parser;\n\n\
-             mod shared;\n\n\
+             mod core;\nmod adapter;\nmod gateway;\nmod pal;\nmod shared;\n\n\
              #[derive(Parser)]\n\
              #[command(name = \"{name}\", version, about)]\n\
              struct Cli {{\n\
@@ -1290,7 +1317,6 @@ fn scaffold_cli(
         ),
         created,
     )?;
-    w.write_if_missing(&shared, "mod.rs", "// Shared utilities\n", created)?;
 
     let doc = root.join("doc");
     w.ensure_dir(&doc, created)?;
@@ -1315,11 +1341,19 @@ fn scaffold_library(
 ) -> Result<(), String> {
     let src = root.join("src");
     w.ensure_dir(&src, created)?;
+
+    // Topology folders (lib = minimal: core + shared)
+    for folder in &["core", "shared"] {
+        let dir = src.join(folder);
+        w.ensure_dir(&dir, created)?;
+        w.write_if_missing(&dir, "mod.rs", &format!("//! {folder} layer.\n"), created)?;
+    }
+
     w.write_if_missing(
         &src,
         "lib.rs",
         &format!(
-            "//! {name} — library crate.\n\npub fn hello() -> &'static str {{\n    \"{name}\"\n}}\n"
+            "//! {name} — library crate.\n\nmod core;\nmod shared;\n\npub fn hello() -> &'static str {{\n    \"{name}\"\n}}\n"
         ),
         created,
     )?;
@@ -1416,8 +1450,8 @@ fn scaffold_slint_app(
     let src = root.join("src");
     w.ensure_dir(&src, created)?;
 
-    // Topology folders
-    for folder in &["app", "core", "adapter", "gateway", "pal", "ui"] {
+    // Topology folders (GUI: CLI topology + ui)
+    for folder in GUI_TOPOLOGY {
         let dir = src.join(folder);
         w.ensure_dir(&dir, created)?;
         w.write_if_missing(&dir, "mod.rs", &format!("//! {folder} layer.\n"), created)?;
@@ -1427,7 +1461,7 @@ fn scaffold_slint_app(
         &src,
         "main.rs",
         &format!(
-            "mod app;\nmod core;\nmod adapter;\nmod gateway;\nmod pal;\nmod ui;\n\n\
+            "mod app;\nmod core;\nmod adapter;\nmod gateway;\nmod pal;\nmod shared;\nmod ui;\n\n\
              fn main() {{\n\
                  let app = {name}::App::new().unwrap();\n\
                  app.run().unwrap();\n\
@@ -1485,25 +1519,20 @@ fn scaffold_workspace(
         created,
     )?;
 
-    // Workspace crates
+    // Workspace crates = topology
     let crates_dir = root.join("crates");
     w.ensure_dir(&crates_dir, created)?;
 
-    // app crate (binary)
+    // app crate (binary entry point)
     scaffold_workspace_bin(w, &crates_dir, "app", name, created)?;
 
-    // core, adapter, gateway, pal, ui (library crates)
-    for crate_name in &["core", "adapter", "gateway", "pal", "ui"] {
+    // CLI topology: core, adapter, gateway, pal, shared (library crates)
+    for crate_name in CLI_TOPOLOGY {
         scaffold_workspace_lib(w, &crates_dir, crate_name, name, created)?;
     }
 
-    // ui/ slint files
-    let ui_dir = root.join("ui");
-    w.ensure_dir(&ui_dir, created)?;
-    w.write_if_missing(&ui_dir, "main.slint", &slint_main_content(name), created)?;
-
-    // build.rs
-    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER_SLINT, created)?;
+    // build.rs (scanner only — no slint)
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER, created)?;
 
     Ok(())
 }
@@ -1586,6 +1615,61 @@ fn scaffold_workspace_lib(
         &src,
         "lib.rs",
         &format!("//! {project_name}-{crate_name} — {crate_name} layer.\n"),
+        created,
+    )?;
+
+    Ok(())
+}
+
+/// Add Slint UI layer to a workspace (only when platforms specified).
+fn scaffold_workspace_ui(
+    w: &Writer,
+    root: &Path,
+    name: &str,
+    created: &mut Vec<String>,
+) -> Result<(), String> {
+    let crates_dir = root.join("crates");
+
+    // crates/ui/ lib crate
+    scaffold_workspace_lib(w, &crates_dir, "ui", name, created)?;
+
+    // ui/ slint files
+    let ui_dir = root.join("ui");
+    w.ensure_dir(&ui_dir, created)?;
+    w.write_if_missing(&ui_dir, "main.slint", &slint_main_content(name), created)?;
+
+    // Overwrite build.rs to include slint_build
+    let build_rs = root.join("build.rs");
+    if build_rs.exists() {
+        let content = std::fs::read_to_string(&build_rs).unwrap_or_default();
+        if !content.contains("slint_build") {
+            if !w.dry_run {
+                std::fs::write(&build_rs, BUILD_RS_SCANNER_SLINT)
+                    .map_err(|e| format!("Cannot write build.rs: {e}"))?;
+            }
+            created.push(format!("{} (updated)", build_rs.display()));
+        }
+    } else {
+        w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER_SLINT, created)?;
+    }
+
+    // proj/UIUX for workspace with UI
+    let proj = root.join("proj");
+    w.write_if_missing(
+        &proj,
+        "UIUX",
+        &format!(
+            "# UIUX: {name}\n\n\
+             ## Goal\n\n\
+             (Define the UI/UX vision.)\n\n\
+             ## Platform\n\n\
+             - Toolkit: Slint 1.x (workspace)\n\
+             - Entry: ui/main.slint\n\n\
+             ## UI Architecture\n\n\
+             - Entry point: crates/app/ → ui/main.slint\n\
+             - Topology: crates/app → crates/adapter → crates/core, crates/adapter → crates/pal\n\
+             - UI layer: crates/ui/ (Rust) + ui/ (Slint)\n"
+        ),
         created,
     )?;
 
@@ -1995,5 +2079,174 @@ mod tests {
         assert_eq!(to_pascal_case("win3ui-fluent"), "Win3uiFluent");
         assert_eq!(to_pascal_case("macos"), "Macos");
         assert_eq!(to_pascal_case("my-custom-theme"), "MyCustomTheme");
+    }
+
+    // --- Topology validation tests (TODO id:14-18) ---
+
+    #[test]
+    fn test_workspace_creates_crates_topology_no_slint() {
+        let dir = temp_dir("val-ws-no-slint");
+        let opts = ScaffoldOptions {
+            name: "val-ws".into(),
+            kind: ProjectKind::Super,
+            platforms: vec![],
+            themes: vec![],
+            mcp: false,
+            extras: vec![],
+            preview: false,
+        };
+        scaffold_with_options(&dir, &opts).unwrap();
+
+        // All CLI topology crates exist with lib.rs
+        for layer in CLI_TOPOLOGY {
+            assert!(
+                dir.join(format!("crates/{layer}/src/lib.rs")).exists(),
+                "crates/{layer}/src/lib.rs must exist"
+            );
+            assert!(
+                dir.join(format!("crates/{layer}/Cargo.toml")).exists(),
+                "crates/{layer}/Cargo.toml must exist"
+            );
+        }
+        // app crate has main.rs (binary)
+        assert!(dir.join("crates/app/src/main.rs").exists());
+
+        // NO slint files
+        assert!(!dir.join("ui/main.slint").exists(), "bare workspace must NOT have ui/main.slint");
+        assert!(!dir.join("crates/ui").exists(), "bare workspace must NOT have crates/ui/");
+        assert!(!dir.join("proj/UIUX").exists(), "bare workspace must NOT have proj/UIUX");
+
+        // build.rs uses scanner, not slint_build
+        let build_rs = std::fs::read_to_string(dir.join("build.rs")).unwrap();
+        assert!(build_rs.contains("scan_project"), "build.rs must call scan_project");
+        assert!(!build_rs.contains("slint_build"), "build.rs must NOT contain slint_build");
+
+        // Workspace Cargo.toml has workspace members
+        let cargo = std::fs::read_to_string(dir.join("Cargo.toml")).unwrap();
+        assert!(cargo.contains("[workspace]"));
+        assert!(
+            cargo.contains("crates/*") || cargo.contains("crates/app"),
+            "Cargo.toml must reference crates (glob or explicit)"
+        );
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_workspace_with_platforms_creates_slint() {
+        let dir = temp_dir("val-ws-plat");
+        let opts = ScaffoldOptions {
+            name: "val-ws-plat".into(),
+            kind: ProjectKind::Super,
+            platforms: vec![Platform::Desktop],
+            themes: vec![],
+            mcp: false,
+            extras: vec![],
+            preview: false,
+        };
+        scaffold_with_options(&dir, &opts).unwrap();
+
+        // CLI topology crates still exist
+        for layer in CLI_TOPOLOGY {
+            assert!(
+                dir.join(format!("crates/{layer}/src/lib.rs")).exists(),
+                "crates/{layer}/src/lib.rs must exist"
+            );
+        }
+        assert!(dir.join("crates/app/src/main.rs").exists());
+
+        // Slint layers present
+        assert!(dir.join("crates/ui/src/lib.rs").exists(), "workspace+platforms must have crates/ui/");
+        assert!(dir.join("ui/main.slint").exists(), "workspace+platforms must have ui/main.slint");
+        assert!(dir.join("proj/UIUX").exists(), "workspace+platforms must have proj/UIUX");
+
+        // build.rs includes slint_build
+        let build_rs = std::fs::read_to_string(dir.join("build.rs")).unwrap();
+        assert!(build_rs.contains("slint_build"), "build.rs must contain slint_build with platforms");
+
+        // Platform PAL stub
+        assert!(dir.join("crates/pal/src/desktop.rs").exists(), "must have desktop.rs PAL stub");
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_cli_creates_src_topology_with_all_folders() {
+        let dir = temp_dir("val-cli-topo");
+        let result = scaffold_project(&dir, ProjectKind::CliApp, "val-cli");
+        assert!(result.is_ok());
+
+        // All CLI topology folders in src/ with mod.rs
+        for layer in CLI_TOPOLOGY {
+            assert!(
+                dir.join(format!("src/{layer}/mod.rs")).exists(),
+                "src/{layer}/mod.rs must exist for CLI"
+            );
+        }
+
+        // main.rs has mod declarations
+        let main = std::fs::read_to_string(dir.join("src/main.rs")).unwrap();
+        for layer in CLI_TOPOLOGY {
+            assert!(main.contains(&format!("mod {layer};")), "main.rs must declare mod {layer}");
+        }
+
+        // No UIUX
+        assert!(!dir.join("proj/UIUX").exists(), "CLI must NOT have proj/UIUX");
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_tool_creates_src_topology_with_all_folders() {
+        let dir = temp_dir("val-tool-topo");
+        let result = scaffold_project(&dir, ProjectKind::Tool, "val-tool");
+        assert!(result.is_ok());
+
+        // All CLI topology folders in src/ with mod.rs
+        for layer in CLI_TOPOLOGY {
+            assert!(
+                dir.join(format!("src/{layer}/mod.rs")).exists(),
+                "src/{layer}/mod.rs must exist for Tool"
+            );
+        }
+
+        // main.rs has mod declarations
+        let main = std::fs::read_to_string(dir.join("src/main.rs")).unwrap();
+        for layer in CLI_TOPOLOGY {
+            assert!(main.contains(&format!("mod {layer};")), "main.rs must declare mod {layer}");
+        }
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_slint_app_creates_full_gui_topology() {
+        let dir = temp_dir("val-slint-topo");
+        let result = scaffold_project(&dir, ProjectKind::SlintApp, "val-slint");
+        assert!(result.is_ok());
+
+        // All GUI topology folders in src/ with mod.rs
+        for layer in GUI_TOPOLOGY {
+            assert!(
+                dir.join(format!("src/{layer}/mod.rs")).exists(),
+                "src/{layer}/mod.rs must exist for SlintApp"
+            );
+        }
+
+        // main.rs has mod declarations for all layers
+        let main = std::fs::read_to_string(dir.join("src/main.rs")).unwrap();
+        for layer in GUI_TOPOLOGY {
+            assert!(main.contains(&format!("mod {layer};")), "main.rs must declare mod {layer}");
+        }
+
+        // Slint files
+        assert!(dir.join("ui/main.slint").exists(), "SlintApp must have ui/main.slint");
+        assert!(dir.join("proj/UIUX").exists(), "SlintApp must have proj/UIUX");
+
+        // build.rs has slint_build
+        let build_rs = std::fs::read_to_string(dir.join("build.rs")).unwrap();
+        assert!(build_rs.contains("slint_build"), "SlintApp build.rs must contain slint_build");
+
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }
