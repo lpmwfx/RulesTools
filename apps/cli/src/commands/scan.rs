@@ -41,6 +41,7 @@ pub fn find_rules_root(project_root: &std::path::Path) -> Option<PathBuf> {
     None
 }
 
+/// fn `scan_internal`.
 pub fn scan_internal(path: &std::path::Path, deny: bool) -> Result<String, String> {
     let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
     let identity = rulestools_scanner::project::ProjectIdentity::detect(&root);
@@ -63,7 +64,7 @@ pub fn scan_internal(path: &std::path::Path, deny: bool) -> Result<String, Strin
         .count();
 
     if issues.is_empty() {
-        output.push_str("rulestools: 0 issues");
+        output.push_str("rulestools: 0 issues\n");
     } else {
         output.push_str(&format!(
             "rulestools: {} issues ({} errors, {} warnings, {} new)\n",
@@ -81,6 +82,12 @@ pub fn scan_internal(path: &std::path::Path, deny: bool) -> Result<String, Strin
         output.push_str(&grouped);
     }
 
+    // Run documenter: insert /// stubs + generate man/
+    if identity.kind != rulestools_scanner::project::ProjectKind::Super {
+        let doc_summary = super::generate::gen_internal(&root);
+        output.push_str(&doc_summary);
+    }
+
     if deny && error_count > 0 {
         Err(output)
     } else {
@@ -88,6 +95,7 @@ pub fn scan_internal(path: &std::path::Path, deny: bool) -> Result<String, Strin
     }
 }
 
+/// fn `cmd_scan`.
 pub fn cmd_scan(path: &PathBuf, deny: bool) {
     match scan_internal(path, deny) {
         Ok(output) => print!("{output}"),
@@ -98,6 +106,7 @@ pub fn cmd_scan(path: &PathBuf, deny: bool) {
     }
 }
 
+/// fn `scan_file_internal`.
 pub fn scan_file_internal(file: &std::path::Path, format: &str) -> Result<String, String> {
     use rulestools_scanner::{checks, config::Config, context::FileContext, project::ProjectIdentity};
 
@@ -172,6 +181,7 @@ pub fn scan_file_internal(file: &std::path::Path, format: &str) -> Result<String
     }
 }
 
+/// fn `cmd_scan_file`.
 pub fn cmd_scan_file(file: &PathBuf, format: &str) {
     match scan_file_internal(file, format) {
         Ok(output) => println!("{output}"),

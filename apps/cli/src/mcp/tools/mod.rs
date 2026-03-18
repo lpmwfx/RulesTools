@@ -3,6 +3,7 @@ mod scan;
 mod project;
 mod issue;
 mod publish;
+mod generate;
 
 use serde_json::Value;
 use crate::mcp::{self, ToolResult};
@@ -37,11 +38,13 @@ fn handle(name: &str, args: &Value) -> ToolResult {
         "publish_status" => publish::status(args),
         "publish_init" => publish::init(args),
         "publish_sync" => publish::sync(args),
+        "generate_docs" => generate::generate_docs(args),
         "publish_check" => publish::check(args),
         _ => ToolResult::error(format!("Unknown tool: {name}")),
     }
 }
 
+/// fn `get_path`.
 pub fn get_path(args: &Value) -> Result<PathBuf, ToolResult> {
     args.get("path")
         .and_then(|v| v.as_str())

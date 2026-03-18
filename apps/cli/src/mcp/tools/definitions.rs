@@ -1,5 +1,6 @@
 use crate::mcp::ToolDef;
 
+/// fn `all`.
 pub fn all() -> Vec<ToolDef> {
     vec![
         ToolDef {
@@ -315,6 +316,21 @@ pub fn all() -> Vec<ToolDef> {
                 "properties": {
                     "path": { "type": "string", "description": "Absolute path to project root" },
                     "preview": { "type": "boolean", "description": "Preview only — show what would be synced" }
+                },
+                "required": ["path"]
+            }),
+        },
+        ToolDef {
+            name: "generate_docs".into(),
+            description: "Generate documentation for a project.\n\n\
+                Inserts /// stub comments for undocumented pub items in source files,\n\
+                then generates man/ directory with JSON + Markdown documentation.\n\
+                Returns coverage stats and number of stubs inserted.\n\n\
+                Also runs automatically as part of scan_tree.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to project root" }
                 },
                 "required": ["path"]
             }),
