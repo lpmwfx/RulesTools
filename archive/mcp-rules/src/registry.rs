@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::path::Path;
 
 #[derive(Deserialize, Default, Debug)]
+/// struct `Edges`.
 pub struct Edges {
     #[serde(default)]
     pub requires: Vec<String>,
@@ -17,6 +18,7 @@ pub struct Edges {
 }
 
 #[derive(Deserialize, Debug)]
+/// struct `RuleEntry`.
 pub struct RuleEntry {
     #[serde(default)]
     pub file: String,
@@ -50,6 +52,7 @@ fn default_layer() -> u8 {
     4
 }
 
+/// struct `Registry`.
 pub struct Registry {
     entries: Vec<RuleEntry>,
     by_file: HashMap<String, usize>,
@@ -88,6 +91,7 @@ impl Registry {
         Self { entries, by_file }
     }
 
+    /// fn `len`.
     pub fn len(&self) -> usize {
         self.entries.len()
     }

@@ -3,6 +3,7 @@ use serde_json::Value;
 use crate::mcp::ToolResult;
 use super::registry::{get_registry, RuleEntry};
 
+/// fn `help`.
 pub fn help(repo: &Path) -> ToolResult {
     let (total, cat_count, cat_list, rule_count, banned_count) = match get_registry(repo) {
         Ok(reg) => {
@@ -48,6 +49,7 @@ pub fn help(repo: &Path) -> ToolResult {
     ))
 }
 
+/// fn `get_rule`.
 pub fn get_rule(repo: &Path, args: &Value) -> ToolResult {
     let file = match args.get("file").and_then(|v| v.as_str()) {
         Some(f) => f,
@@ -61,6 +63,7 @@ pub fn get_rule(repo: &Path, args: &Value) -> ToolResult {
     }
 }
 
+/// fn `search_rules`.
 pub fn search_rules(repo: &Path, args: &Value) -> ToolResult {
     let query = match args.get("query").and_then(|v| v.as_str()) {
         Some(q) => q,
@@ -90,6 +93,7 @@ pub fn search_rules(repo: &Path, args: &Value) -> ToolResult {
     ToolResult::text(lines.join("\n"))
 }
 
+/// fn `list_rules`.
 pub fn list_rules(repo: &Path, args: &Value) -> ToolResult {
     let category = args.get("category").and_then(|v| v.as_str());
 
@@ -119,6 +123,7 @@ pub fn list_rules(repo: &Path, args: &Value) -> ToolResult {
     ToolResult::text(lines.join("\n"))
 }
 
+/// fn `get_context`.
 pub fn get_context(repo: &Path, args: &Value) -> ToolResult {
     let languages: Vec<String> = args
         .get("languages")
@@ -191,6 +196,7 @@ pub fn get_context(repo: &Path, args: &Value) -> ToolResult {
     }
 }
 
+/// fn `learning_path`.
 pub fn learning_path(repo: &Path, args: &Value) -> ToolResult {
     let languages: Vec<String> = args
         .get("languages")
@@ -245,6 +251,7 @@ pub fn learning_path(repo: &Path, args: &Value) -> ToolResult {
     ToolResult::text(sections.join("\n"))
 }
 
+/// fn `get_related`.
 pub fn get_related(repo: &Path, args: &Value) -> ToolResult {
     let file = match args.get("file").and_then(|v| v.as_str()) {
         Some(f) => f,

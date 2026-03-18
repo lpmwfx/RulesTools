@@ -3,6 +3,7 @@ use serde_json::Value;
 use std::io::{self, BufRead, Write};
 
 #[derive(Deserialize)]
+/// struct `Request`.
 pub struct Request {
     #[allow(dead_code)]
     pub jsonrpc: String,
@@ -13,6 +14,7 @@ pub struct Request {
 }
 
 #[derive(Serialize)]
+/// struct `Response`.
 pub struct Response {
     pub jsonrpc: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -24,12 +26,14 @@ pub struct Response {
 }
 
 #[derive(Serialize)]
+/// struct `RpcError`.
 pub struct RpcError {
     pub code: i32,
     pub message: String,
 }
 
 #[derive(Serialize, Clone)]
+/// struct `ToolDef`.
 pub struct ToolDef {
     pub name: String,
     pub description: String,
@@ -38,6 +42,7 @@ pub struct ToolDef {
 }
 
 #[derive(Serialize)]
+/// struct `ToolResult`.
 pub struct ToolResult {
     pub content: Vec<ContentBlock>,
     #[serde(rename = "isError", skip_serializing_if = "std::ops::Not::not")]
@@ -45,6 +50,7 @@ pub struct ToolResult {
 }
 
 #[derive(Serialize)]
+/// struct `ContentBlock`.
 pub struct ContentBlock {
     #[serde(rename = "type")]
     pub content_type: String,
@@ -52,16 +58,19 @@ pub struct ContentBlock {
 }
 
 impl Response {
+    /// fn `success`.
     pub fn success(id: Option<Value>, result: Value) -> Self {
         Self { jsonrpc: "2.0".into(), id, result: Some(result), error: None }
     }
 
+    /// fn `error`.
     pub fn error(id: Option<Value>, code: i32, message: impl Into<String>) -> Self {
         Self { jsonrpc: "2.0".into(), id, result: None, error: Some(RpcError { code, message: message.into() }) }
     }
 }
 
 impl ToolResult {
+    /// fn `text`.
     pub fn text(msg: impl Into<String>) -> Self {
         Self {
             content: vec![ContentBlock { content_type: "text".into(), text: msg.into() }],
@@ -69,6 +78,7 @@ impl ToolResult {
         }
     }
 
+    /// fn `error`.
     pub fn error(msg: impl Into<String>) -> Self {
         Self {
             content: vec![ContentBlock { content_type: "text".into(), text: msg.into() }],
@@ -77,6 +87,7 @@ impl ToolResult {
     }
 }
 
+/// fn `run_server`.
 pub fn run_server(server_name: &str, tools: Vec<ToolDef>, handler: impl Fn(&str, &Value) -> ToolResult) {
     let stdin = io::stdin();
     let stdout = io::stdout();

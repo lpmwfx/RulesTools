@@ -40,6 +40,7 @@ impl Language {
             .and_then(Self::from_extension)
     }
 
+    /// fn `name`.
     pub fn name(self) -> &'static str {
         match self {
             Language::Rust => "rust",

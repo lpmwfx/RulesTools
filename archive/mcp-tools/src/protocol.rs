@@ -26,6 +26,7 @@ pub struct Response {
 }
 
 #[derive(Serialize)]
+/// struct `RpcError`.
 pub struct RpcError {
     pub code: i32,
     pub message: String,
@@ -49,6 +50,7 @@ pub struct ToolResult {
 }
 
 #[derive(Serialize)]
+/// struct `ContentBlock`.
 pub struct ContentBlock {
     #[serde(rename = "type")]
     pub content_type: String,
@@ -56,10 +58,12 @@ pub struct ContentBlock {
 }
 
 impl Response {
+    /// fn `success`.
     pub fn success(id: Option<Value>, result: Value) -> Self {
         Self { jsonrpc: "2.0".into(), id, result: Some(result), error: None }
     }
 
+    /// fn `error`.
     pub fn error(id: Option<Value>, code: i32, message: impl Into<String>) -> Self {
         Self {
             jsonrpc: "2.0".into(),
@@ -71,6 +75,7 @@ impl Response {
 }
 
 impl ToolResult {
+    /// fn `text`.
     pub fn text(msg: impl Into<String>) -> Self {
         Self {
             content: vec![ContentBlock { content_type: "text".into(), text: msg.into() }],
@@ -78,6 +83,7 @@ impl ToolResult {
         }
     }
 
+    /// fn `error`.
     pub fn error(msg: impl Into<String>) -> Self {
         Self {
             content: vec![ContentBlock { content_type: "text".into(), text: msg.into() }],

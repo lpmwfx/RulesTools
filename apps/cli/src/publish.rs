@@ -2,6 +2,7 @@ use std::path::Path;
 
 // --- Config structs ---
 
+/// struct `PublishConfig`.
 pub struct PublishConfig {
     pub targets: Vec<String>,
     pub platforms: Vec<String>,
@@ -12,15 +13,18 @@ pub struct PublishConfig {
     pub repo: Option<RepoConfig>,
 }
 
+/// struct `GithubTarget`.
 pub struct GithubTarget {
     pub repo: String,
 }
 
+/// struct `ForgejoTarget`.
 pub struct ForgejoTarget {
     pub repo: String,
     pub api_url: String,
 }
 
+/// struct `RepoConfig`.
 pub struct RepoConfig {
     pub path: String,
     pub remote: String,
@@ -41,6 +45,7 @@ const HARDCODED_EXCLUDE_PATTERNS: &[&str] = &[
 // --- Config parsing ---
 
 impl PublishConfig {
+    /// fn `load`.
     pub fn load(root: &Path) -> Self {
         let toml_path = root.join("proj").join("rulestools.toml");
         let table = if toml_path.exists() {
@@ -344,6 +349,7 @@ fn is_excluded(rel_path: &Path, repo_cfg: &RepoConfig) -> bool {
 
 // --- Publish Plan ---
 
+/// struct `PublishPlan`.
 pub struct PublishPlan {
     pub name: String,
     pub version: String,
@@ -355,11 +361,13 @@ pub struct PublishPlan {
     pub scanner_clean: Option<bool>,
 }
 
+/// struct `TargetPlan`.
 pub struct TargetPlan {
     pub name: String,
     pub detail: String,
 }
 
+/// fn `publish_plan`.
 pub fn publish_plan(root: &Path, format: &str) -> Result<String, String> {
     let cfg = PublishConfig::load(root);
     let name = read_project_name(root);
@@ -478,6 +486,7 @@ fn format_plan_json(plan: &PublishPlan) -> String {
 
 // --- Publish Status ---
 
+/// fn `publish_status`.
 pub fn publish_status(root: &Path, format: &str) -> Result<String, String> {
     let cfg = PublishConfig::load(root);
 
@@ -596,6 +605,7 @@ fn fetch_forgejo_latest_release(api_url: &str) -> Result<(String, String, String
 
 // --- Publish Run ---
 
+/// fn `publish_run`.
 pub fn publish_run(root: &Path, target: &str, preview: bool) -> Result<String, String> {
     let cfg = PublishConfig::load(root);
     let name = read_project_name(root);
@@ -837,6 +847,7 @@ fn publish_to_archive(root: &Path, cfg: &PublishConfig, name: &str, version: &st
 
 // --- Publish Init ---
 
+/// fn `publish_init`.
 pub fn publish_init(root: &Path, remote: &str) -> Result<String, String> {
     let name = read_project_name(root);
     let pub_path = root.join("..").join(format!("{name}-pub"));
@@ -889,6 +900,7 @@ patterns = ["*.secret", "*.key", ".env*"]
 
 // --- Publish Sync ---
 
+/// fn `publish_sync`.
 pub fn publish_sync(root: &Path, preview: bool) -> Result<String, String> {
     let cfg = PublishConfig::load(root);
     let repo_cfg = cfg.repo.as_ref().ok_or("[publish.repo] not configured in proj/rulestools.toml")?;
@@ -1048,6 +1060,7 @@ fn sync_dir_recursive(
 
 // --- Publish Check ---
 
+/// fn `publish_check`.
 pub fn publish_check(root: &Path) -> Result<String, String> {
     let cfg = PublishConfig::load(root);
     let repo_cfg = cfg.repo.as_ref().ok_or("[publish.repo] not configured")?;

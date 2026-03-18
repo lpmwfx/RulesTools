@@ -3,6 +3,7 @@ use crate::mcp::ToolResult;
 use crate::commands::project as project_cmd;
 use super::get_path;
 
+/// fn `setup`.
 pub fn setup(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -15,6 +16,7 @@ pub fn setup(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `init_project`.
 pub fn init_project(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -34,6 +36,7 @@ pub fn init_project(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `new_project`.
 pub fn new_project(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -72,6 +75,7 @@ pub fn new_project(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `update_project`.
 pub fn update_project(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -103,6 +107,7 @@ pub fn update_project(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `upgrade_project`.
 pub fn upgrade_project(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,

@@ -3,7 +3,9 @@ use std::path::PathBuf;
 
 mod commands;
 mod mcp;
+/// mod `publish`.
 pub mod publish;
+/// mod `scaffold`.
 pub mod scaffold;
 
 /// Unified static code scanner — enforces Rules repo conventions across all languages.
@@ -419,6 +421,7 @@ enum PublishCmd {
 }
 
 #[derive(Subcommand)]
+/// enum `IssueCmd`.
 pub enum IssueCmd {
     /// Report a new issue to Forgejo.
     Report {

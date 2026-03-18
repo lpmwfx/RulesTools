@@ -3,6 +3,7 @@ use crate::mcp::ToolResult;
 use crate::publish as publish_mod;
 use super::get_path;
 
+/// fn `plan`.
 pub fn plan(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -15,6 +16,7 @@ pub fn plan(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `run`.
 pub fn run(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -32,6 +34,7 @@ pub fn run(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `status`.
 pub fn status(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -44,6 +47,7 @@ pub fn status(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `init`.
 pub fn init(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -60,6 +64,7 @@ pub fn init(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `sync`.
 pub fn sync(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -73,6 +78,7 @@ pub fn sync(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `check`.
 pub fn check(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,

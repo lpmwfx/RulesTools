@@ -3,6 +3,7 @@ use crate::mcp::ToolResult;
 use crate::commands::scan as scan_cmd;
 use super::get_path;
 
+/// fn `scan_file`.
 pub fn scan_file(args: &Value) -> ToolResult {
     let path = match get_path(args) {
         Ok(p) => p,
@@ -19,6 +20,7 @@ pub fn scan_file(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `scan_tree`.
 pub fn scan_tree(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -31,6 +33,7 @@ pub fn scan_tree(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `check_staged`.
 pub fn check_staged(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,
@@ -43,6 +46,7 @@ pub fn check_staged(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `security_scan`.
 pub fn security_scan(args: &Value) -> ToolResult {
     let root = match get_path(args) {
         Ok(p) => p,

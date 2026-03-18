@@ -23,6 +23,7 @@ impl Severity {
         }
     }
 
+    /// fn `label`.
     pub fn label(self) -> &'static str {
         match self {
             Severity::Critical => "critical",
@@ -52,6 +53,7 @@ pub struct Issue {
 }
 
 impl Issue {
+    /// fn `new`.
     pub fn new(
         path: impl Into<PathBuf>,
         line: usize,

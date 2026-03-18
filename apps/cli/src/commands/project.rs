@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use crate::scaffold;
 
+/// fn `cmd_init`.
 pub fn cmd_init(path: &PathBuf, kind_str: &str, name: Option<&str>) {
     let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.clone());
 
@@ -37,6 +38,7 @@ pub fn cmd_init(path: &PathBuf, kind_str: &str, name: Option<&str>) {
     }
 }
 
+/// fn `init_internal`.
 pub fn init_internal(path: &std::path::Path, kind_str: &str, name: Option<&str>) -> Result<String, String> {
     let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
 
@@ -58,6 +60,7 @@ pub fn init_internal(path: &std::path::Path, kind_str: &str, name: Option<&str>)
     Ok(format!("{summary}\n\n{setup}\n\n{detect}"))
 }
 
+/// fn `cmd_new`.
 pub fn cmd_new(
     path: &PathBuf,
     kind_str: &str,
@@ -78,6 +81,7 @@ pub fn cmd_new(
     }
 }
 
+/// fn `new_internal`.
 pub fn new_internal(
     path: &std::path::Path,
     kind_str: &str,
@@ -180,6 +184,7 @@ pub fn new_internal(
     }
 }
 
+/// fn `cmd_update`.
 pub fn cmd_update(
     path: &PathBuf,
     platforms_str: &str,
@@ -198,6 +203,7 @@ pub fn cmd_update(
     }
 }
 
+/// fn `update_internal`.
 pub fn update_internal(
     path: &std::path::Path,
     platforms_str: &str,
@@ -263,6 +269,7 @@ pub fn update_internal(
     }
 }
 
+/// fn `cmd_upgrade`.
 pub fn cmd_upgrade(path: &PathBuf, to_str: &str, preview: bool, format: &str) {
     match upgrade_internal(path, to_str, preview, format) {
         Ok(output) => print!("{output}"),
@@ -273,6 +280,7 @@ pub fn cmd_upgrade(path: &PathBuf, to_str: &str, preview: bool, format: &str) {
     }
 }
 
+/// fn `upgrade_internal`.
 pub fn upgrade_internal(
     path: &std::path::Path,
     to_str: &str,
@@ -344,10 +352,12 @@ pub fn upgrade_internal(
     }
 }
 
+/// fn `cmd_detect`.
 pub fn cmd_detect(path: &PathBuf) {
     println!("{}", detect_internal(path));
 }
 
+/// fn `detect_internal`.
 pub fn detect_internal(path: &std::path::Path) -> String {
     let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
     let identity = rulestools_scanner::project::ProjectIdentity::detect(&root);
@@ -366,10 +376,12 @@ pub fn detect_internal(path: &std::path::Path) -> String {
     out
 }
 
+/// fn `cmd_list`.
 pub fn cmd_list(path: &PathBuf) {
     print!("{}", list_internal(path));
 }
 
+/// fn `list_internal`.
 pub fn list_internal(path: &std::path::Path) -> String {
     let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
     let cfg = rulestools_scanner::config::Config::load(&root);
@@ -400,6 +412,7 @@ pub fn list_internal(path: &std::path::Path) -> String {
     out
 }
 
+/// fn `setup_internal`.
 pub fn setup_internal(path: &std::path::Path) -> Result<String, String> {
     let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
     let identity = rulestools_scanner::project::ProjectIdentity::detect(&root);
@@ -613,6 +626,7 @@ fn ensure_claude_settings(root: &std::path::Path) -> Result<Option<String>, Stri
     Ok(Some("Added PostToolUse hook to .claude/settings.json".into()))
 }
 
+/// fn `cmd_setup`.
 pub fn cmd_setup(path: &PathBuf) {
     match setup_internal(path) {
         Ok(output) => println!("{output}"),

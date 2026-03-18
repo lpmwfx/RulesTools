@@ -4,6 +4,7 @@ use std::path::Path;
 use std::sync::OnceLock;
 
 #[derive(Deserialize, Default, Debug)]
+/// struct `Edges`.
 pub struct Edges {
     #[serde(default)]
     pub requires: Vec<String>,
@@ -18,6 +19,7 @@ pub struct Edges {
 }
 
 #[derive(Deserialize, Debug)]
+/// struct `RuleEntry`.
 pub struct RuleEntry {
     #[serde(default)]
     pub file: String,
@@ -51,6 +53,7 @@ fn default_layer() -> u8 {
     4
 }
 
+/// struct `Registry`.
 pub struct Registry {
     entries: Vec<RuleEntry>,
     by_file: HashMap<String, usize>,
@@ -59,6 +62,7 @@ pub struct Registry {
 /// Lazy-loaded global registry.
 static REGISTRY: OnceLock<Registry> = OnceLock::new();
 
+/// fn `get_registry`.
 pub fn get_registry(repo: &Path) -> Result<&'static Registry, String> {
     if let Some(reg) = REGISTRY.get() {
         return Ok(reg);
@@ -69,6 +73,7 @@ pub fn get_registry(repo: &Path) -> Result<&'static Registry, String> {
 }
 
 impl Registry {
+    /// fn `load`.
     pub fn load(repo: &Path) -> Result<Self, String> {
         let jsonl_path = repo.join("register.jsonl");
         let content = std::fs::read_to_string(&jsonl_path)
@@ -91,6 +96,7 @@ impl Registry {
         Ok(Self::from_entries(entries))
     }
 
+    /// fn `from_entries`.
     pub fn from_entries(entries: Vec<RuleEntry>) -> Self {
         let mut by_file = HashMap::with_capacity(entries.len());
         for (i, entry) in entries.iter().enumerate() {
@@ -99,10 +105,12 @@ impl Registry {
         Self { entries, by_file }
     }
 
+    /// fn `len`.
     pub fn len(&self) -> usize {
         self.entries.len()
     }
 
+    /// fn `categories`.
     pub fn categories(&self) -> Vec<String> {
         let mut cats: Vec<String> = self
             .entries
@@ -115,18 +123,22 @@ impl Registry {
         cats
     }
 
+    /// fn `rule_count`.
     pub fn rule_count(&self) -> usize {
         self.entries.iter().map(|e| e.rules.len()).sum()
     }
 
+    /// fn `banned_count`.
     pub fn banned_count(&self) -> usize {
         self.entries.iter().map(|e| e.banned.len()).sum()
     }
 
+    /// fn `find_by_file`.
     pub fn find_by_file(&self, file: &str) -> Option<&RuleEntry> {
         self.by_file.get(file).map(|&i| &self.entries[i])
     }
 
+    /// fn `list`.
     pub fn list(&self, category: Option<&str>) -> Vec<&RuleEntry> {
         self.entries
             .iter()
@@ -134,6 +146,7 @@ impl Registry {
             .collect()
     }
 
+    /// fn `search`.
     pub fn search(
         &self,
         query: &str,
@@ -163,6 +176,7 @@ impl Registry {
         scored
     }
 
+    /// fn `learning_path`.
     pub fn learning_path(
         &self,
         languages: &[String],

@@ -39,6 +39,7 @@ pub enum Platform {
 }
 
 impl Platform {
+    /// fn `from_str`.
     pub fn from_str(s: &str) -> Option<Self> {
         match s.trim().to_lowercase().as_str() {
             "desktop" => Some(Self::Desktop),
@@ -48,6 +49,7 @@ impl Platform {
         }
     }
 
+    /// fn `name`.
     pub fn name(&self) -> &'static str {
         match self {
             Self::Desktop => "desktop",
@@ -66,6 +68,7 @@ pub enum Extra {
 }
 
 impl Extra {
+    /// fn `from_str`.
     pub fn from_str(s: &str) -> Option<Self> {
         match s.trim().to_lowercase().as_str() {
             "lib" => Some(Self::Lib),
