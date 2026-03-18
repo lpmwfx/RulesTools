@@ -11,6 +11,7 @@ pub enum Language {
     Css,
     Kotlin,
     CSharp,
+    Cpp,
     Html,
 }
 
@@ -26,6 +27,7 @@ impl Language {
             "css" | "scss" => Some(Language::Css),
             "kt" | "kts" => Some(Language::Kotlin),
             "cs" => Some(Language::CSharp),
+            "cpp" | "cxx" | "cc" | "h" | "hpp" | "hxx" => Some(Language::Cpp),
             "html" | "htm" => Some(Language::Html),
             _ => None,
         }
@@ -48,6 +50,7 @@ impl Language {
             Language::Css => "css",
             Language::Kotlin => "kotlin",
             Language::CSharp => "csharp",
+            Language::Cpp => "cpp",
             Language::Html => "html",
         }
     }
@@ -90,6 +93,13 @@ impl FileContext {
                     || path_str.contains("/__tests__/")
                     || path_str.contains("\\__tests__\\")
             }
+            Language::Cpp => {
+                filename.starts_with("test_")
+                    || filename.ends_with("_test.cpp")
+                    || filename.ends_with("_test.cc")
+                    || path_str.contains("/tests/")
+                    || path_str.contains("\\tests\\")
+            }
             _ => false,
         };
 
@@ -123,7 +133,7 @@ pub fn is_comment(line: &str, lang: Language) -> bool {
     let trimmed = line.trim();
     match lang {
         Language::Rust | Language::Slint | Language::JavaScript | Language::TypeScript
-        | Language::Kotlin | Language::CSharp | Language::Css => {
+        | Language::Kotlin | Language::CSharp | Language::Cpp | Language::Css => {
             trimmed.starts_with("//") || trimmed.starts_with("/*") || trimmed.starts_with('*')
         }
         Language::Html => trimmed.starts_with("<!--"),
@@ -177,6 +187,9 @@ mod tests {
         assert_eq!(Language::from_extension("scss"), Some(Language::Css));
         assert_eq!(Language::from_extension("kt"), Some(Language::Kotlin));
         assert_eq!(Language::from_extension("cs"), Some(Language::CSharp));
+        assert_eq!(Language::from_extension("cpp"), Some(Language::Cpp));
+        assert_eq!(Language::from_extension("h"), Some(Language::Cpp));
+        assert_eq!(Language::from_extension("hpp"), Some(Language::Cpp));
         assert_eq!(Language::from_extension("html"), Some(Language::Html));
         assert_eq!(Language::from_extension("htm"), Some(Language::Html));
         assert_eq!(Language::from_extension("txt"), None);

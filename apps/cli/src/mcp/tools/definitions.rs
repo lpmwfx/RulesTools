@@ -37,7 +37,7 @@ pub fn all() -> Vec<ToolDef> {
         },
         ToolDef {
             name: "setup".into(),
-            description: "Install RulesTools hooks and config for a project.\n\nCreates proj/rulestools.toml and installs pre-commit hook.".into(),
+            description: "Install FULL RulesTools integration.\n\nCreates proj/rulestools.toml, adds rulestools-scanner to Cargo.toml [build-dependencies], creates/updates build.rs with scan_project(), installs pre-commit hook, and installs .claude/settings.json PostToolUse hook.\nIdempotent — safe to run every session.".into(),
             input_schema: serde_json::json!({
                 "type": "object",
                 "properties": {

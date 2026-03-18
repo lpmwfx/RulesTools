@@ -262,10 +262,16 @@ enum Commands {
         format: String,
     },
 
-    /// Install RulesTools hooks and config for a project.
-    #[command(long_about = "Install RulesTools hooks and config for a project.\n\n\
-        Creates proj/rulestools.toml with auto-detected kind and installs\n\
-        .git/hooks/pre-commit. Idempotent — safe to run every session.\n\
+    /// Install full RulesTools integration for a project.
+    #[command(long_about = "Install full RulesTools integration for a project.\n\n\
+        Performs all setup steps:\n  \
+        1. Creates proj/ directory\n  \
+        2. Creates proj/rulestools.toml with auto-detected kind\n  \
+        3. Adds rulestools-scanner to Cargo.toml [build-dependencies]\n  \
+        4. Creates/updates build.rs with scan_project()\n  \
+        5. Installs .git/hooks/pre-commit\n  \
+        6. Installs .claude/settings.json PostToolUse hook\n\n\
+        Idempotent — safe to run every session. Skips steps already done.\n\
         \n\
         Examples:\n  \
         rulestools setup .                  # setup current directory\n  \
@@ -291,6 +297,18 @@ enum Commands {
     /// Start MCP rules server (rule lookup, search — stdio).
     #[command(name = "mcp-rules")]
     McpRules,
+
+    /// PostToolUse hook — scan file after Edit/Write (reads JSON from stdin).
+    #[command(long_about = "PostToolUse hook — scan file after Edit/Write.\n\n\
+        Reads tool invocation JSON from stdin, extracts file_path,\n\
+        scans the file for rule violations, and prints results to stderr.\n\
+        Always exits 0 — advisory only, never blocks edits.\n\
+        \n\
+        Installed automatically by `rulestools setup` in .claude/settings.json.\n\
+        \n\
+        Example:\n  \
+        echo '{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"src/main.rs\"}}' | rulestools hook")]
+    Hook,
 }
 
 #[derive(Subcommand)]
@@ -488,6 +506,7 @@ fn main() {
         Commands::Issue(cmd) => commands::issue::cmd_issue(cmd),
         Commands::McpTools => mcp::tools::run(),
         Commands::McpRules => mcp::rules::run(),
+        Commands::Hook => commands::hook::cmd_hook(),
     }
 }
 

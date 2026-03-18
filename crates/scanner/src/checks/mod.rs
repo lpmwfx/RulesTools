@@ -32,6 +32,15 @@ pub mod slint_mother_child;
 pub mod topology_naming;
 pub mod topology_suffix;
 pub mod js_safety;
+pub mod borrowed_containers;
+pub mod slint_checks;
+pub mod python_checks;
+pub mod js_modules;
+pub mod path_deps;
+pub mod cpp_checks;
+pub mod kotlin_checks;
+pub mod csharp_checks;
+pub mod css_checks;
 
 /// Per-file check function signature.
 pub type PerFileCheckFn = fn(
@@ -132,6 +141,35 @@ pub fn registry() -> Vec<CheckEntry> {
         CheckEntry::per_file("js/safety/no-var", vec![Language::JavaScript, Language::TypeScript], js_safety::check_no_var),
         CheckEntry::per_file("js/safety/no-console-log", vec![Language::JavaScript, Language::TypeScript], js_safety::check_no_console_log),
         CheckEntry::per_file("js/safety/no-eval", vec![Language::JavaScript, Language::TypeScript], js_safety::check_no_eval),
+        // Rust: borrowed containers + fire-and-forget
+        CheckEntry::per_file("rust/types/no-borrowed-container", vec![Language::Rust], borrowed_containers::check),
+        CheckEntry::per_file("rust/threading/no-fire-and-forget", vec![Language::Rust], threading::check_fire_and_forget),
+        // Slint checks
+        CheckEntry::per_file("slint/docs/doc-required", vec![Language::Slint], slint_checks::check_doc_required),
+        CheckEntry::per_file("slint/tokens/zero-literal", vec![Language::Slint], slint_checks::check_zero_literal),
+        CheckEntry::per_file("slint/globals/structure", vec![Language::Slint], slint_checks::check_globals_structure),
+        CheckEntry::per_file("slint/strings/no-hardcoded-string", vec![Language::Slint], slint_checks::check_no_hardcoded_string),
+        // Python checks
+        CheckEntry::per_file("python/types/missing-annotations", vec![Language::Python], python_checks::check_missing_annotations),
+        CheckEntry::per_file("python/naming/conventions", vec![Language::Python], python_checks::check_naming_conventions),
+        CheckEntry::per_file("python/validation/boundary-check", vec![Language::Python], python_checks::check_boundary_validation),
+        // JS module checks
+        CheckEntry::per_file("js/jsdoc/type-required", vec![Language::JavaScript, Language::TypeScript], js_modules::check_jsdoc_required),
+        CheckEntry::per_file("js/modules/no-require", vec![Language::JavaScript, Language::TypeScript], js_modules::check_no_require),
+        // C++ checks
+        CheckEntry::per_file("cpp/naming/conventions", vec![Language::Cpp], cpp_checks::check_naming),
+        CheckEntry::per_file("cpp/docs/doc-required", vec![Language::Cpp], cpp_checks::check_doc_required),
+        CheckEntry::per_file("cpp/safety/no-raw-memory", vec![Language::Cpp], cpp_checks::check_safety),
+        // Kotlin checks
+        CheckEntry::per_file("kotlin/naming/conventions", vec![Language::Kotlin], kotlin_checks::check_naming),
+        CheckEntry::per_file("kotlin/docs/doc-required", vec![Language::Kotlin], kotlin_checks::check_doc_required),
+        // C# checks
+        CheckEntry::per_file("csharp/naming/conventions", vec![Language::CSharp], csharp_checks::check_naming),
+        CheckEntry::per_file("csharp/docs/doc-required", vec![Language::CSharp], csharp_checks::check_doc_required),
+        // CSS checks
+        CheckEntry::per_file("css/tokens/zero-literal", vec![Language::Css], css_checks::check_zero_literal),
+        // Global: path dependencies (tree check)
+        CheckEntry::tree("global/install-architecture/no-path-deps", vec![], path_deps::check),
     ]
 }
 

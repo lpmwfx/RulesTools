@@ -11,6 +11,7 @@ fn max_depth(lang: Language) -> usize {
         Language::JavaScript | Language::TypeScript | Language::Css => 4,
         Language::Html => 4,
         Language::Slint | Language::Kotlin => 6,
+        Language::Cpp => 5,
         Language::CSharp => 7,
         Language::Python => 8,
     }

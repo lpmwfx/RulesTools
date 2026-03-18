@@ -2,6 +2,12 @@ use std::path::Path;
 
 use rulestools_scanner::project::{ProjectIdentity, ProjectKind};
 
+// --- Constants ---
+
+const SCANNER_BUILD_DEP: &str = "rulestools-scanner = { git = \"https://github.com/lpmwfx/RulesTools\" }";
+const BUILD_RS_SCANNER: &str = "fn main() {\n    rulestools_scanner::scan_project();\n}\n";
+const BUILD_RS_SCANNER_SLINT: &str = "fn main() {\n    rulestools_scanner::scan_project();\n    slint_build::compile(\"ui/main.slint\").expect(\"Slint build failed\");\n}\n";
+
 // --- Types ---
 
 /// Target platform for SlintApp/Super projects.
@@ -431,9 +437,11 @@ fn upgrade_tool_to_cli(
     w.write_if_missing(
         root,
         "Cargo.toml",
-        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"]),
+        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP]),
         created,
     )?;
+
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER, created)?;
 
     manual.push("Add `use clap::Parser;` and `#[derive(Parser)] struct Cli {}` to main.rs".into());
     manual.push("Add `clap` dependency to Cargo.toml if not present".into());
@@ -505,12 +513,7 @@ fn upgrade_to_slint(
         created,
     )?;
 
-    w.write_if_missing(
-        root,
-        "build.rs",
-        "fn main() {\n    slint_build::compile(\"ui/main.slint\").unwrap();\n}\n",
-        created,
-    )?;
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER_SLINT, created)?;
 
     guidance.push(MoveGuidance {
         from: "src/lib.rs".into(),
@@ -567,12 +570,7 @@ fn upgrade_cli_to_slint(
         created,
     )?;
 
-    w.write_if_missing(
-        root,
-        "build.rs",
-        "fn main() {\n    slint_build::compile(\"ui/main.slint\").unwrap();\n}\n",
-        created,
-    )?;
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER_SLINT, created)?;
 
     guidance.push(MoveGuidance {
         from: "src/shared/".into(),
@@ -621,12 +619,7 @@ fn upgrade_to_workspace(
         created,
     )?;
 
-    w.write_if_missing(
-        root,
-        "build.rs",
-        "fn main() {\n    slint_build::compile(\"ui/main.slint\").unwrap();\n}\n",
-        created,
-    )?;
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER_SLINT, created)?;
 
     // Move guidance based on source kind
     match from {
@@ -913,7 +906,7 @@ fn scaffold_kind(
     created: &mut Vec<String>,
 ) -> Result<(), String> {
     match kind {
-        ProjectKind::Tool => scaffold_tool(w, root, created),
+        ProjectKind::Tool => scaffold_tool(w, root, name, created),
         ProjectKind::CliApp => scaffold_cli(w, root, name, created),
         ProjectKind::Library => scaffold_library(w, root, name, created),
         ProjectKind::Website => scaffold_website(w, root, name, created),
@@ -1144,7 +1137,7 @@ fn create_proj_files(
     Ok(())
 }
 
-fn scaffold_tool(w: &Writer, root: &Path, created: &mut Vec<String>) -> Result<(), String> {
+fn scaffold_tool(w: &Writer, root: &Path, name: &str, created: &mut Vec<String>) -> Result<(), String> {
     let src = root.join("src");
     w.ensure_dir(&src, created)?;
     w.write_if_missing(
@@ -1153,6 +1146,13 @@ fn scaffold_tool(w: &Writer, root: &Path, created: &mut Vec<String>) -> Result<(
         "fn main() {\n    println!(\"Hello, world!\");\n}\n",
         created,
     )?;
+    w.write_if_missing(
+        root,
+        "Cargo.toml",
+        &cargo_toml_bin(name, &[], &[SCANNER_BUILD_DEP]),
+        created,
+    )?;
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER, created)?;
     Ok(())
 }
 
@@ -1193,9 +1193,11 @@ fn scaffold_cli(
     w.write_if_missing(
         root,
         "Cargo.toml",
-        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"]),
+        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP]),
         created,
     )?;
+
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER, created)?;
 
     Ok(())
 }
@@ -1216,7 +1218,8 @@ fn scaffold_library(
         ),
         created,
     )?;
-    w.write_if_missing(root, "Cargo.toml", &cargo_toml_lib(name, &[]), created)?;
+    w.write_if_missing(root, "Cargo.toml", &cargo_toml_lib(name, &[], &[SCANNER_BUILD_DEP]), created)?;
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER, created)?;
 
     Ok(())
 }
@@ -1334,12 +1337,7 @@ fn scaffold_slint_app(
     w.write_if_missing(&ui_dir, "main.slint", &slint_main_content(name), created)?;
 
     // build.rs
-    w.write_if_missing(
-        root,
-        "build.rs",
-        "fn main() {\n    slint_build::compile(\"ui/main.slint\").unwrap();\n}\n",
-        created,
-    )?;
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER_SLINT, created)?;
 
     // Cargo.toml with slint deps
     w.write_if_missing(
@@ -1347,11 +1345,8 @@ fn scaffold_slint_app(
         "Cargo.toml",
         &cargo_toml_bin(
             name,
-            &[
-                "slint = \"1\"",
-                "[build-dependencies]",
-                "slint-build = \"1\"",
-            ],
+            &["slint = \"1\""],
+            &["slint-build = \"1\"", SCANNER_BUILD_DEP],
         ),
         created,
     )?;
@@ -1403,12 +1398,7 @@ fn scaffold_workspace(
     w.write_if_missing(&ui_dir, "main.slint", &slint_main_content(name), created)?;
 
     // build.rs
-    w.write_if_missing(
-        root,
-        "build.rs",
-        "fn main() {\n    slint_build::compile(\"ui/main.slint\").unwrap();\n}\n",
-        created,
-    )?;
+    w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER_SLINT, created)?;
 
     Ok(())
 }
@@ -1533,7 +1523,7 @@ fn gitignore_content() -> &'static str {
     "/target\n*.swp\n*.swo\n*~\n.DS_Store\nThumbs.db\n"
 }
 
-fn cargo_toml_bin(name: &str, extra_deps: &[&str]) -> String {
+fn cargo_toml_bin(name: &str, extra_deps: &[&str], build_deps: &[&str]) -> String {
     let mut s = format!(
         "[package]\n\
          name = \"{name}\"\n\
@@ -1545,10 +1535,17 @@ fn cargo_toml_bin(name: &str, extra_deps: &[&str]) -> String {
         s.push_str(dep);
         s.push('\n');
     }
+    if !build_deps.is_empty() {
+        s.push_str("\n[build-dependencies]\n");
+        for dep in build_deps {
+            s.push_str(dep);
+            s.push('\n');
+        }
+    }
     s
 }
 
-fn cargo_toml_lib(name: &str, extra_deps: &[&str]) -> String {
+fn cargo_toml_lib(name: &str, extra_deps: &[&str], build_deps: &[&str]) -> String {
     let mut s = format!(
         "[package]\n\
          name = \"{name}\"\n\
@@ -1563,6 +1560,13 @@ fn cargo_toml_lib(name: &str, extra_deps: &[&str]) -> String {
     for dep in extra_deps {
         s.push_str(dep);
         s.push('\n');
+    }
+    if !build_deps.is_empty() {
+        s.push_str("\n[build-dependencies]\n");
+        for dep in build_deps {
+            s.push_str(dep);
+            s.push('\n');
+        }
     }
     s
 }

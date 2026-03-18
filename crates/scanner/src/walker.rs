@@ -5,6 +5,7 @@ use walkdir::WalkDir;
 const SOURCE_EXTENSIONS: &[&str] = &[
     "rs", "slint", "py", "js", "mjs", "cjs", "jsx", "ts", "tsx",
     "css", "scss", "kt", "kts", "cs",
+    "cpp", "cxx", "cc", "h", "hpp", "hxx",
     "html", "htm",
 ];
 

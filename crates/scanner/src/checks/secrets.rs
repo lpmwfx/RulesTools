@@ -31,8 +31,29 @@ pub fn check(
         return;
     }
 
+    let mut in_test_module = false;
+    let mut test_brace_depth: i32 = 0;
+
     for (line_num, line) in lines.iter().enumerate() {
         let trimmed = line.trim();
+
+        // Track #[cfg(test)] mod blocks — skip test data
+        if trimmed == "#[cfg(test)]" || trimmed == "#[test]" {
+            in_test_module = true;
+        }
+        if in_test_module {
+            test_brace_depth += line.chars().filter(|&c| c == '{').count() as i32;
+            test_brace_depth -= line.chars().filter(|&c| c == '}').count() as i32;
+            if test_brace_depth > 0 || trimmed.starts_with("#[") {
+                continue;
+            }
+            if test_brace_depth <= 0 {
+                in_test_module = false;
+                test_brace_depth = 0;
+                continue;
+            }
+        }
+
         if trimmed.starts_with("//") || trimmed.starts_with('#') || trimmed.starts_with('*') {
             continue;
         }

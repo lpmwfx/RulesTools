@@ -7,10 +7,8 @@ use crate::config::Config;
 use crate::context::{self, FileContext};
 use crate::issue::{Issue, Severity};
 
-// Reserved for fire-and-forget spawn detection (phase 2)
-#[allow(dead_code)]
 static FIRE_FORGET_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"\btokio::spawn\s*\(|\.spawn\s*\(").unwrap()
+    Regex::new(r"\b(?:tokio::spawn|thread::spawn)\s*\(").unwrap()
 });
 static ARC_RC_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"\b(?:Arc|Rc)::(?:new|clone)\b").unwrap()
@@ -65,6 +63,42 @@ pub fn check(
     }
 }
 
+/// Check for fire-and-forget spawns — `tokio::spawn(...)` or `thread::spawn(...)`
+/// without a `let` binding on the same line.
+pub fn check_fire_and_forget(
+    file_ctx: &FileContext,
+    lines: &[&str],
+    _cfg: &Config,
+    issues: &mut Vec<Issue>,
+    path: &Path,
+) {
+    if file_ctx.is_test_file {
+        return;
+    }
+
+    for (line_num, line) in lines.iter().enumerate() {
+        let trimmed = line.trim();
+        if trimmed.starts_with("//") {
+            continue;
+        }
+        if context::is_test_context(lines, line_num) {
+            continue;
+        }
+
+        if FIRE_FORGET_RE.is_match(trimmed) {
+            // Allow if line has `let` binding — handle is captured
+            if trimmed.starts_with("let ") {
+                continue;
+            }
+            issues.push(Issue::new(
+                path, line_num + 1, 1, Severity::Error,
+                "rust/threading/no-fire-and-forget",
+                "fire-and-forget spawn — capture the JoinHandle with `let handle = ...`",
+            ));
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -94,5 +128,35 @@ mod tests {
         let mut issues = Vec::new();
         check(&prod_ctx(), &["// Arc: shared across threads for state", "let shared = Arc::new(data);"], &Config::default(), &mut issues, Path::new("a.rs"));
         assert!(issues.iter().all(|i| !i.rule_id.contains("arc-rc")));
+    }
+
+    #[test]
+    fn catches_fire_and_forget_tokio() {
+        let mut issues = Vec::new();
+        check_fire_and_forget(&prod_ctx(), &["    tokio::spawn(async move { work() });"], &Config::default(), &mut issues, Path::new("a.rs"));
+        assert_eq!(issues.len(), 1);
+        assert!(issues[0].rule_id.contains("fire-and-forget"));
+    }
+
+    #[test]
+    fn catches_fire_and_forget_thread() {
+        let mut issues = Vec::new();
+        check_fire_and_forget(&prod_ctx(), &["    thread::spawn(|| heavy_work());"], &Config::default(), &mut issues, Path::new("a.rs"));
+        assert_eq!(issues.len(), 1);
+    }
+
+    #[test]
+    fn allows_captured_spawn() {
+        let mut issues = Vec::new();
+        check_fire_and_forget(&prod_ctx(), &["    let handle = tokio::spawn(async move { work() });"], &Config::default(), &mut issues, Path::new("a.rs"));
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn fire_forget_skips_test() {
+        let test_ctx = FileContext { language: Language::Rust, is_test_file: true, is_mother_file: false, is_definition_file: false };
+        let mut issues = Vec::new();
+        check_fire_and_forget(&test_ctx, &["    tokio::spawn(async {});"], &Config::default(), &mut issues, Path::new("tests/a.rs"));
+        assert!(issues.is_empty());
     }
 }

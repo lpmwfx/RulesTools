@@ -7,12 +7,12 @@ Enforces coding rules from the [Rules repo](https://github.com/lpmwfx/Rules).
 
 ```
 RulesTools/
-├── crates/scanner/       rulestools-scanner lib (18 checks, 208 tests)
+├── crates/scanner/       rulestools-scanner lib (50 checks, 273 tests)
 ├── crates/documenter/    rulestools-documenter lib (stub)
 ├── apps/cli/             rulestools binary — CLI + MCP servers
 │   └── src/
 │       ├── main.rs           clap structs + dispatch
-│       ├── commands/         CLI command handlers (scan, project, issue, generate)
+│       ├── commands/         CLI command handlers (scan, project, issue, generate, hook)
 │       ├── scaffold.rs       project scaffolding (init/new/update/upgrade)
 │       ├── publish.rs        publish/sync/check
 │       └── mcp/              MCP servers (embedded, no subprocess)
@@ -50,7 +50,7 @@ Override in `proj/rulestools.toml`:
 kind = "cli"  # slint-app | cli | library | lib | tool
 ```
 
-## Checks (18 active)
+## Checks (50 active)
 
 | Check ID | Type | Languages |
 |---|---|---|
@@ -58,6 +58,7 @@ kind = "cli"  # slint-app | cli | library | lib | tool
 | `global/nesting` | PerFile | all |
 | `global/tech-debt` | PerFile | all |
 | `global/secrets` | PerFile | all |
+| `global/install-architecture/no-path-deps` | Tree | all |
 | `rust/constants/no-magic-number` | PerFile | rust |
 | `rust/constants/no-hardcoded-path` | PerFile | rust |
 | `rust/constants/no-hardcoded-duration` | PerFile | rust |
@@ -65,13 +66,44 @@ kind = "cli"  # slint-app | cli | library | lib | tool
 | `rust/errors/no-unwrap` | PerFile | rust |
 | `rust/docs/doc-required` | PerFile | rust |
 | `rust/types/no-string-match` | PerFile | rust |
+| `rust/types/no-borrowed-container` | PerFile | rust |
 | `rust/naming/no-noise-names` | PerFile | rust |
 | `rust/modules/no-utils` | PerFile | rust |
 | `rust/modules/no-sibling-coupling` | PerFile | rust |
-| `rust/ownership/clone-spam` | PerFile | rust |
-| `rust/threading/no-static-mut` | PerFile | rust |
-| `uiux/mother-child/mother-too-many-fns` | PerFile | rust |
+| `rust/modules/shared-guard` | PerFile | rust |
 | `rust/modules/shared-candidate` | CrossFile | rust |
+| `rust/modules/no-sibling-import` | CrossFile | rust |
+| `rust/ownership/clone-spam` | PerFile | rust |
+| `rust/safety/unsafe-needs-comment` | PerFile | rust |
+| `rust/threading/no-static-mut` | PerFile | rust |
+| `rust/threading/no-fire-and-forget` | PerFile | rust |
+| `uiux/mother-child/mother-too-many-fns` | PerFile | rust |
+| `topology/placement` | PerFile | all |
+| `topology/layer-violation` | CrossFile | rust |
+| `topology/naming` | Tree | all |
+| `topology/suffix` | PerFile | rust |
+| `slint/docs/doc-required` | PerFile | slint |
+| `slint/tokens/zero-literal` | PerFile | slint |
+| `slint/globals/structure` | PerFile | slint |
+| `slint/strings/no-hardcoded-string` | PerFile | slint |
+| `uiux/state-flow/single-gateway` | Tree | slint |
+| `uiux/mother-child/child-has-state` | PerFile | slint |
+| `python/types/missing-annotations` | PerFile | python |
+| `python/naming/conventions` | PerFile | python |
+| `python/validation/boundary-check` | PerFile | python |
+| `js/safety/no-var` | PerFile | js/ts |
+| `js/safety/no-console-log` | PerFile | js/ts |
+| `js/safety/no-eval` | PerFile | js/ts |
+| `js/jsdoc/type-required` | PerFile | js/ts |
+| `js/modules/no-require` | PerFile | js/ts |
+| `cpp/naming/conventions` | PerFile | cpp |
+| `cpp/docs/doc-required` | PerFile | cpp |
+| `cpp/safety/no-raw-memory` | PerFile | cpp |
+| `kotlin/naming/conventions` | PerFile | kotlin |
+| `kotlin/docs/doc-required` | PerFile | kotlin |
+| `csharp/naming/conventions` | PerFile | csharp |
+| `csharp/docs/doc-required` | PerFile | csharp |
+| `css/tokens/zero-literal` | PerFile | css |
 
 ## Key check: shared-candidate
 

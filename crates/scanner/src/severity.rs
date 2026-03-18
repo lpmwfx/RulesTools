@@ -41,12 +41,29 @@ impl SeverityResolver {
     }
 
     /// Resolve the final severity for a check.
-    pub fn resolve(&self, check_id: &str, default: Severity) -> Severity {
+    ///
+    /// Matches on exact rule_id first, then tries category prefix
+    /// (everything up to the last `/`). This handles checks that emit
+    /// sub-IDs like `rust/errors/no-expect` from the `rust/errors/no-unwrap` check.
+    pub fn resolve(&self, rule_id: &str, default: Severity) -> Severity {
         // secrets always error — cannot be overridden
-        if check_id == "global/secrets" {
+        if rule_id == "global/secrets" {
             return Severity::Error;
         }
-        self.overrides.get(check_id).copied().unwrap_or(default)
+        // Exact match
+        if let Some(&sev) = self.overrides.get(rule_id) {
+            return sev;
+        }
+        // Category prefix match: rust/errors/no-expect → try rust/errors/ prefix
+        if let Some(pos) = rule_id.rfind('/') {
+            let category = &rule_id[..pos + 1]; // "rust/errors/"
+            for (key, &sev) in &self.overrides {
+                if key.starts_with(category) {
+                    return sev;
+                }
+            }
+        }
+        default
     }
 }
 
@@ -58,14 +75,20 @@ const TOOL_SKIP: &[&str] = &[
     "rust/errors/no-unwrap",
     "rust/docs/doc-required",
     "rust/types/no-string-match",
+    "rust/types/no-borrowed-container",
     "rust/naming/no-noise-names",
     "rust/modules/no-utils",
     "rust/modules/no-sibling-coupling",
+    "rust/modules/no-sibling-import",
     "rust/modules/shared-guard",
+    "rust/modules/shared-candidate",
     "rust/ownership/clone-spam",
     "rust/threading/no-static-mut",
+    "rust/threading/no-fire-and-forget",
     "rust/safety/unsafe-needs-comment",
     "uiux/mother-child/mother-too-many-fns",
+    "uiux/mother-child/child-has-state",
+    "uiux/state-flow/single-gateway",
     "topology/layer-violation",
     "topology/placement",
     "topology/naming",
@@ -73,9 +96,27 @@ const TOOL_SKIP: &[&str] = &[
     "global/nesting",
     "global/file-limits",
     "global/tech-debt",
+    "global/install-architecture/no-path-deps",
     "js/safety/no-var",
     "js/safety/no-console-log",
     "js/safety/no-eval",
+    "js/jsdoc/type-required",
+    "js/modules/no-require",
+    "slint/docs/doc-required",
+    "slint/tokens/zero-literal",
+    "slint/globals/structure",
+    "slint/strings/no-hardcoded-string",
+    "python/types/missing-annotations",
+    "python/naming/conventions",
+    "python/validation/boundary-check",
+    "cpp/naming/conventions",
+    "cpp/docs/doc-required",
+    "cpp/safety/no-raw-memory",
+    "kotlin/naming/conventions",
+    "kotlin/docs/doc-required",
+    "csharp/naming/conventions",
+    "csharp/docs/doc-required",
+    "css/tokens/zero-literal",
 ];
 
 const CLI_WARN: &[&str] = &[
@@ -86,11 +127,13 @@ const CLI_WARN: &[&str] = &[
     "rust/errors/no-unwrap",
     "rust/docs/doc-required",
     "rust/types/no-string-match",
+    "rust/types/no-borrowed-container",
     "rust/naming/no-noise-names",
     "rust/modules/no-utils",
     "rust/modules/no-sibling-coupling",
     "rust/modules/shared-guard",
     "rust/ownership/clone-spam",
+    "rust/threading/no-fire-and-forget",
     "uiux/mother-child/mother-too-many-fns",
     "topology/placement",
     "global/nesting",
@@ -98,6 +141,19 @@ const CLI_WARN: &[&str] = &[
     "global/tech-debt",
     "js/safety/no-var",
     "js/safety/no-console-log",
+    "js/jsdoc/type-required",
+    "js/modules/no-require",
+    "python/types/missing-annotations",
+    "python/naming/conventions",
+    "python/validation/boundary-check",
+    "cpp/naming/conventions",
+    "cpp/docs/doc-required",
+    "cpp/safety/no-raw-memory",
+    "kotlin/naming/conventions",
+    "kotlin/docs/doc-required",
+    "csharp/naming/conventions",
+    "csharp/docs/doc-required",
+    "css/tokens/zero-literal",
 ];
 
 const CLI_SKIP: &[&str] = &[
@@ -164,5 +220,23 @@ mod tests {
     fn unknown_check_uses_default() {
         let r = SeverityResolver::for_kind(ProjectKind::Tool);
         assert_eq!(r.resolve("some/unknown/check", Severity::Error), Severity::Error);
+    }
+
+    #[test]
+    fn tool_skips_sub_rule_ids() {
+        let r = SeverityResolver::for_kind(ProjectKind::Tool);
+        // rust/errors/no-unwrap is in TOOL_SKIP — sub-IDs should also resolve to Skip
+        assert_eq!(r.resolve("rust/errors/no-expect", Severity::Error), Severity::Skip);
+        assert_eq!(r.resolve("rust/errors/no-panic", Severity::Error), Severity::Skip);
+        assert_eq!(r.resolve("rust/errors/no-todo", Severity::Error), Severity::Skip);
+        // rust/types/no-string-match is in TOOL_SKIP — sub-IDs should also match
+        assert_eq!(r.resolve("rust/types/no-string-compare", Severity::Error), Severity::Skip);
+    }
+
+    #[test]
+    fn cli_warns_sub_rule_ids() {
+        let r = SeverityResolver::for_kind(ProjectKind::CliApp);
+        assert_eq!(r.resolve("rust/errors/no-expect", Severity::Error), Severity::Warning);
+        assert_eq!(r.resolve("rust/types/no-string-compare", Severity::Error), Severity::Warning);
     }
 }
