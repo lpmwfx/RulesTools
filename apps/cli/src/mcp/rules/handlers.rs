@@ -161,9 +161,22 @@ pub fn get_context(repo: &Path, args: &Value) -> ToolResult {
         let is_quick_ref = entry.file.ends_with("quick-ref.md");
 
         if quick_ref {
-            // Quick-ref mode: only quick-ref files from requested languages + global
-            if is_quick_ref && (lang_set.contains(&cat) || cat == "global") {
-                matched.push(entry);
+            // Quick-ref mode: match combo files in quick-ref/ category
+            if cat == "quick-ref" {
+                // Build combo name from languages: ["rust","slint"] → "rust-slint"
+                let mut sorted_langs: Vec<&str> =
+                    languages.iter().map(|s| s.as_str()).collect();
+                sorted_langs.sort();
+                let combo = sorted_langs.join("-").to_lowercase();
+
+                // Match exact combo or single-language files
+                let stem = entry
+                    .file
+                    .trim_start_matches("quick-ref/")
+                    .trim_end_matches(".md");
+                if stem == combo {
+                    matched.push(entry);
+                }
             }
         } else if topic_set.is_empty() {
             // No topics: include all files from requested languages
