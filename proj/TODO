@@ -41,6 +41,19 @@ Fix: Respektér `is_test_context()`.
 
 Samlet: Fix #1 fjerner 16/25 errors. Fix #2+#3 fjerner de resterende 9.
 
+### ~~Merge MCP-servere ind i rulestools binary~~ DONE 2026-03-18
+Én binary med `mcp-tools` og `mcp-rules` subkommandoer. Færdig.
+
+### Scaffolded kode fejler scanner
+Nyoprettede slint-app projekter har 3 errors + 2 warnings fra scanneren:
+- `unwrap()` i build.rs og main.rs (genereret af scaffold_slint_app)
+- `TODO` comments i pal/desktop.rs og pal/mobile.rs
+
+Fix: Scaffold-templates skal generere kode der passerer `rulestools check .`
+- build.rs: brug `expect()` eller if-let i stedet for `unwrap()`
+- main.rs: samme
+- pal/*.rs: fjern TODO-kommentarer eller brug anden formulering
+
 ### ManViewer
 Erstat installeret `rustdoc-viewer` med ny `man-viewer` fra `D:/REPO/Rules-dev/ManViewer/`.
 Test med gui-mcp projektet (generer man/ → åbn viewer).

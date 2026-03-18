@@ -3,8 +3,6 @@ members = [
     "crates/scanner",
     "crates/documenter",
     "apps/cli",
-    "apps/mcp-rules",
-    "apps/mcp-tools",
 ]
 resolver = "2"
 

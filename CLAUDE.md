@@ -1,19 +1,37 @@
 # RulesTools — CLAUDE.md
 
-Unified static code scanner — one Rust workspace replacing 7 separate repos.
+Unified static code scanner — one Rust workspace, one binary.
 Enforces coding rules from the [Rules repo](https://github.com/lpmwfx/Rules).
 
 ## Architecture
 
 ```
 RulesTools/
-├── crates/scanner/       rulestools-scanner lib (18 checks, 104 tests)
+├── crates/scanner/       rulestools-scanner lib (18 checks, 208 tests)
 ├── crates/documenter/    rulestools-documenter lib (stub)
-├── apps/cli/             rulestools binary (scan/check/list/detect)
-├── apps/mcp-rules/       MCP server for rule lookup (stub)
-├── apps/mcp-tools/       MCP server for scan/init (stub)
+├── apps/cli/             rulestools binary — CLI + MCP servers
+│   └── src/
+│       ├── main.rs           clap structs + dispatch
+│       ├── commands/         CLI command handlers (scan, project, issue, generate)
+│       ├── scaffold.rs       project scaffolding (init/new/update/upgrade)
+│       ├── publish.rs        publish/sync/check
+│       └── mcp/              MCP servers (embedded, no subprocess)
+│           ├── mod.rs         shared protocol (JSON-RPC stdio)
+│           ├── tools/         rulestools mcp-tools (22 tools)
+│           └── rules/         rulestools mcp-rules (7 tools)
+├── archive/              old separate MCP binaries (reference only)
 └── Rules/                markdown rule data (separate repo)
 ```
+
+## One binary, three modes
+
+```bash
+rulestools scan .              # CLI: scan project
+rulestools mcp-tools           # MCP server: scan, setup, init, publish (stdio)
+rulestools mcp-rules           # MCP server: rule lookup, search (stdio)
+```
+
+MCP handlers call the SAME internal functions as CLI commands — no subprocess, no version drift.
 
 ## Project auto-detection
 
@@ -69,6 +87,10 @@ rulestools scan . --deny       # fail on errors (for CI)
 rulestools check .             # same as scan --deny (pre-commit)
 rulestools list .              # show all checks and status
 rulestools detect .            # show auto-detected project kind + layout
+rulestools setup .             # install hooks + config
+rulestools init . --kind tool  # scaffold new project
+rulestools mcp-tools           # start MCP tools server (stdio)
+rulestools mcp-rules           # start MCP rules server (stdio)
 ```
 
 ## build.rs integration
