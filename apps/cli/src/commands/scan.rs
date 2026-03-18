@@ -83,7 +83,8 @@ pub fn scan_internal(path: &std::path::Path, deny: bool) -> Result<String, Strin
     }
 
     // Run documenter: insert /// stubs + generate man/
-    if identity.kind != rulestools_scanner::project::ProjectKind::Super {
+    // Skip in deny mode (pre-commit) — don't modify files during commit check
+    if !deny && identity.kind != rulestools_scanner::project::ProjectKind::Super {
         let doc_summary = super::generate::gen_internal(&root);
         output.push_str(&doc_summary);
     }
