@@ -5,8 +5,28 @@ use rulestools_scanner::project::{ProjectIdentity, ProjectKind};
 // --- Constants ---
 
 const SCANNER_BUILD_DEP: &str = "rulestools-scanner = { git = \"https://github.com/lpmwfx/RulesTools\" }";
-const BUILD_RS_SCANNER: &str = "fn main() {\n    rulestools_scanner::scan_project();\n}\n";
-const BUILD_RS_SCANNER_SLINT: &str = "fn main() {\n    rulestools_scanner::scan_project();\n    slint_build::compile(\"ui/main.slint\").expect(\"Slint build failed\");\n}\n";
+const DOCUMENTER_BUILD_DEP: &str = "rulestools-documenter = { git = \"https://github.com/lpmwfx/RulesTools\" }";
+const BUILD_RS_SCANNER: &str = "fn main() {\n    rulestools_scanner::scan_project();\n    rulestools_documenter::document_project();\n}\n";
+const BUILD_RS_SCANNER_SLINT: &str = "fn main() {\n    rulestools_scanner::scan_project();\n    rulestools_documenter::document_project();\n    slint_build::compile(\"ui/main.slint\").expect(\"Slint build failed\");\n}\n";
+
+const CLAUDE_SETTINGS: &str = r#"{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rulestools hook"
+          }
+        ]
+      }
+    ]
+  }
+}
+"#;
+
+const PRE_COMMIT_HOOK: &str = "#!/bin/sh\nrulestools check \"$(git rev-parse --show-toplevel)\"\n";
 
 // --- Types ---
 
@@ -220,6 +240,9 @@ pub fn scaffold_with_options(root: &Path, opts: &ScaffoldOptions) -> Result<Scaf
 }
 
 /// Update an existing project — add features within current kind.
+///
+/// Also checks for missing integration components (hooks, build.rs, topology)
+/// and adds them if absent.
 pub fn update_project(root: &Path, opts: &UpdateOptions) -> Result<ScaffoldResult, String> {
     let identity = ProjectIdentity::detect(root);
     let w = Writer {
@@ -227,6 +250,69 @@ pub fn update_project(root: &Path, opts: &UpdateOptions) -> Result<ScaffoldResul
     };
     let mut created = Vec::new();
     let mut skipped = Vec::new();
+
+    // --- Integrity checks: add missing components ---
+    let project_name = root
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("project");
+
+    // .claude/settings.json
+    let claude_dir = root.join(".claude");
+    w.ensure_dir(&claude_dir, &mut created)?;
+    w.write_if_missing(&claude_dir, "settings.json", CLAUDE_SETTINGS, &mut created)?;
+
+    // Pre-commit hook
+    let hooks_dir = root.join(".git").join("hooks");
+    if root.join(".git").exists() {
+        w.ensure_dir(&hooks_dir, &mut created)?;
+        let hook_path = hooks_dir.join("pre-commit");
+        if !hook_path.exists() {
+            if !w.dry_run {
+                std::fs::write(&hook_path, PRE_COMMIT_HOOK)
+                    .map_err(|e| format!("Cannot write pre-commit hook: {e}"))?;
+            }
+            created.push(format!("{}", hook_path.display()));
+        }
+    }
+
+    // proj/rulestools.toml — ensure [project].kind exists
+    let toml_path = root.join("proj").join("rulestools.toml");
+    if toml_path.exists() {
+        let content = std::fs::read_to_string(&toml_path).unwrap_or_default();
+        if !content.contains("kind") {
+            if !w.dry_run {
+                let new_content = format!("[project]\nkind = \"{}\"\n\n{content}", identity.kind.as_str());
+                std::fs::write(&toml_path, new_content)
+                    .map_err(|e| format!("Cannot update rulestools.toml: {e}"))?;
+            }
+            created.push(format!("{} (added [project].kind)", toml_path.display()));
+        }
+    }
+
+    // build.rs — ensure it exists with scanner + documenter
+    let build_rs = root.join("build.rs");
+    if !build_rs.exists() && root.join("Cargo.toml").exists() {
+        let is_slint = identity.kind == ProjectKind::SlintApp || identity.kind == ProjectKind::Super;
+        let content = if is_slint { BUILD_RS_SCANNER_SLINT } else { BUILD_RS_SCANNER };
+        if !w.dry_run {
+            std::fs::write(&build_rs, content)
+                .map_err(|e| format!("Cannot write build.rs: {e}"))?;
+        }
+        created.push(format!("{}", build_rs.display()));
+    }
+
+    // Topology folders (SlintApp/Super only)
+    if identity.kind == ProjectKind::SlintApp {
+        let src = root.join("src");
+        for folder in &["app", "core", "adapter", "gateway", "pal", "ui", "shared", "state"] {
+            let dir = src.join(folder);
+            w.ensure_dir(&dir, &mut created)?;
+            w.write_if_missing(&dir, "mod.rs", &format!("//! {folder} layer.\n"), &mut created)?;
+        }
+    }
+
+    // --- Feature additions (user-requested) ---
 
     // Platforms (SlintApp/Super only)
     if !opts.platforms.is_empty() {
@@ -256,10 +342,6 @@ pub fn update_project(root: &Path, opts: &UpdateOptions) -> Result<ScaffoldResul
     if let Some(ref crate_name) = opts.crate_name {
         if identity.kind == ProjectKind::Super {
             let crates_dir = root.join("crates");
-            let project_name = root
-                .file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or("project");
             scaffold_workspace_lib(&w, &crates_dir, crate_name, project_name, &mut created)?;
         } else {
             skipped.push(format!(
@@ -270,10 +352,6 @@ pub fn update_project(root: &Path, opts: &UpdateOptions) -> Result<ScaffoldResul
     }
 
     // Extras
-    let project_name = root
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("project");
     scaffold_extras(&w, root, identity.kind, project_name, &opts.folders, &mut created)?;
 
     let summary = if opts.preview {
@@ -437,7 +515,7 @@ fn upgrade_tool_to_cli(
     w.write_if_missing(
         root,
         "Cargo.toml",
-        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP]),
+        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP, DOCUMENTER_BUILD_DEP]),
         created,
     )?;
 
@@ -1134,6 +1212,30 @@ fn create_proj_files(
         created,
     )?;
 
+    // .claude/settings.json — PostToolUse hook for AI-session scanning
+    let claude_dir = root.join(".claude");
+    w.ensure_dir(&claude_dir, created)?;
+    w.write_if_missing(&claude_dir, "settings.json", CLAUDE_SETTINGS, created)?;
+
+    // Pre-commit hook
+    let hooks_dir = root.join(".git").join("hooks");
+    if root.join(".git").exists() {
+        w.ensure_dir(&hooks_dir, created)?;
+        let hook_path = hooks_dir.join("pre-commit");
+        if !hook_path.exists() {
+            if !w.dry_run {
+                std::fs::write(&hook_path, PRE_COMMIT_HOOK)
+                    .map_err(|e| format!("Cannot write pre-commit hook: {e}"))?;
+                #[cfg(unix)]
+                {
+                    use std::os::unix::fs::PermissionsExt;
+                    let _ = std::fs::set_permissions(&hook_path, std::fs::Permissions::from_mode(0o755));
+                }
+            }
+            created.push(format!("{}", hook_path.display()));
+        }
+    }
+
     Ok(())
 }
 
@@ -1149,7 +1251,7 @@ fn scaffold_tool(w: &Writer, root: &Path, name: &str, created: &mut Vec<String>)
     w.write_if_missing(
         root,
         "Cargo.toml",
-        &cargo_toml_bin(name, &[], &[SCANNER_BUILD_DEP]),
+        &cargo_toml_bin(name, &[], &[SCANNER_BUILD_DEP, DOCUMENTER_BUILD_DEP]),
         created,
     )?;
     w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER, created)?;
@@ -1193,7 +1295,7 @@ fn scaffold_cli(
     w.write_if_missing(
         root,
         "Cargo.toml",
-        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP]),
+        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP, DOCUMENTER_BUILD_DEP]),
         created,
     )?;
 
@@ -1218,7 +1320,7 @@ fn scaffold_library(
         ),
         created,
     )?;
-    w.write_if_missing(root, "Cargo.toml", &cargo_toml_lib(name, &[], &[SCANNER_BUILD_DEP]), created)?;
+    w.write_if_missing(root, "Cargo.toml", &cargo_toml_lib(name, &[], &[SCANNER_BUILD_DEP, DOCUMENTER_BUILD_DEP]), created)?;
     w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER, created)?;
 
     Ok(())
