@@ -1,0 +1,12 @@
+{
+  "source": "apps/cli/src/commands/hook.rs",
+  "items": [
+    {
+      "name": "cmd_hook",
+      "kind": "Fn",
+      "signature": "pub fn cmd_hook()",
+      "line": 7,
+      "doc": "PostToolUse hook — scan file after Edit/Write (reads JSON from stdin).\n\nCalled by Claude Code `.claude/settings.json` PostToolUse hook.\nReads tool invocation JSON from stdin, extracts file_path,\nscans the file, and prints violations to stderr (advisory).\nAlways exits 0 — never blocks edits."
+    }
+  ]
+}

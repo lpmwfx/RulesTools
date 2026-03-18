@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/path_deps.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( paths: &[PathBuf], _cfg: &Config, issues: &mut Vec<Issue>, )",
+      "line": 13,
+      "doc": "Tree check: find path dependencies in Cargo.toml and pyproject.toml."
+    }
+  ]
+}

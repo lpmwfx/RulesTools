@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/shared_discovery.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( contents: &[(PathBuf, String)], _cfg: &Config, issues: &mut Vec<Issue>, )",
+      "line": 16,
+      "doc": "Cross-file check: find duplicate pub fn names across child files in the same module.\nFunctions that appear in 2+ siblings are candidates for `shared/` extraction."
+    }
+  ]
+}

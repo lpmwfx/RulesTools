@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/topology_naming.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( paths: &[PathBuf], cfg: &Config, issues: &mut Vec<Issue>, )",
+      "line": 30,
+      "doc": "Check Level 1 topology naming: folder/crate names at topology boundary.\n\n1. BANNED names → error with suggestion\n2. Unknown topology folders → error (only registered names allowed)"
+    }
+  ]
+}

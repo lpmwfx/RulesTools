@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/placement.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( _file_ctx: &FileContext, _lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 7,
+      "doc": "Check that code files are not in metadata/documentation folders."
+    }
+  ]
+}

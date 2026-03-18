@@ -1,0 +1,19 @@
+{
+  "source": "apps/cli/src/mcp/rules/mod.rs",
+  "items": [
+    {
+      "name": "run",
+      "kind": "Fn",
+      "signature": "pub fn run()",
+      "line": 9,
+      "doc": "Run the MCP rules server (stdio loop)."
+    },
+    {
+      "name": "find_rules_repo",
+      "kind": "Fn",
+      "signature": "pub fn find_rules_repo() -> Option<PathBuf>",
+      "line": 15,
+      "doc": "Find Rules repo — check common locations (unified)."
+    }
+  ]
+}

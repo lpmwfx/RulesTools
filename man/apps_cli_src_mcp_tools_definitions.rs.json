@@ -1,0 +1,12 @@
+{
+  "source": "apps/cli/src/mcp/tools/definitions.rs",
+  "items": [
+    {
+      "name": "all",
+      "kind": "Fn",
+      "signature": "pub fn all() -> Vec<ToolDef>",
+      "line": 4,
+      "doc": "fn `all`."
+    }
+  ]
+}

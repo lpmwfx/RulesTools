@@ -1,0 +1,96 @@
+{
+  "source": "apps/cli/src/mcp/mod.rs",
+  "items": [
+    {
+      "name": "tools",
+      "kind": "Mod",
+      "signature": "pub mod tools;",
+      "line": 2,
+      "doc": "mod `tools`."
+    },
+    {
+      "name": "rules",
+      "kind": "Mod",
+      "signature": "pub mod rules;",
+      "line": 4,
+      "doc": "mod `rules`."
+    },
+    {
+      "name": "Request",
+      "kind": "Struct",
+      "signature": "pub struct Request",
+      "line": 12,
+      "doc": "JSON-RPC request from MCP client."
+    },
+    {
+      "name": "Response",
+      "kind": "Struct",
+      "signature": "pub struct Response",
+      "line": 23,
+      "doc": "JSON-RPC response to MCP client."
+    },
+    {
+      "name": "RpcError",
+      "kind": "Struct",
+      "signature": "pub struct RpcError",
+      "line": 35,
+      "doc": "struct `RpcError`."
+    },
+    {
+      "name": "ToolDef",
+      "kind": "Struct",
+      "signature": "pub struct ToolDef",
+      "line": 42,
+      "doc": "MCP tool definition for tools/list."
+    },
+    {
+      "name": "ToolResult",
+      "kind": "Struct",
+      "signature": "pub struct ToolResult",
+      "line": 51,
+      "doc": "MCP tool call result."
+    },
+    {
+      "name": "ContentBlock",
+      "kind": "Struct",
+      "signature": "pub struct ContentBlock",
+      "line": 59,
+      "doc": "struct `ContentBlock`."
+    },
+    {
+      "name": "success",
+      "kind": "Fn",
+      "signature": "pub fn success(id: Option<Value>, result: Value) -> Self",
+      "line": 67,
+      "doc": "fn `success`."
+    },
+    {
+      "name": "error",
+      "kind": "Fn",
+      "signature": "pub fn error(id: Option<Value>, code: i32, message: impl Into<String>) -> Self",
+      "line": 72,
+      "doc": "fn `error`."
+    },
+    {
+      "name": "text",
+      "kind": "Fn",
+      "signature": "pub fn text(msg: impl Into<String>) -> Self",
+      "line": 84,
+      "doc": "fn `text`."
+    },
+    {
+      "name": "error",
+      "kind": "Fn",
+      "signature": "pub fn error(msg: impl Into<String>) -> Self",
+      "line": 92,
+      "doc": "fn `error`."
+    },
+    {
+      "name": "run_server",
+      "kind": "Fn",
+      "signature": "pub fn run_server( server_name: &str, tools: Vec<ToolDef>, handler: impl Fn(&str, &Value) -> ToolResult, )",
+      "line": 101,
+      "doc": "Run the MCP server stdio loop."
+    }
+  ]
+}

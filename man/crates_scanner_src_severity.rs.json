@@ -1,0 +1,26 @@
+{
+  "source": "crates/scanner/src/severity.rs",
+  "items": [
+    {
+      "name": "SeverityResolver",
+      "kind": "Struct",
+      "signature": "pub struct SeverityResolver",
+      "line": 10,
+      "doc": "Maps check IDs to severity based on ProjectKind.\n\nSame checks, different enforcement per project kind.\nTool = most relaxed, SlintApp = full enforcement."
+    },
+    {
+      "name": "for_kind",
+      "kind": "Fn",
+      "signature": "pub fn for_kind(kind: ProjectKind) -> Self",
+      "line": 16,
+      "doc": "Build resolver for a given ProjectKind."
+    },
+    {
+      "name": "resolve",
+      "kind": "Fn",
+      "signature": "pub fn resolve(&self, rule_id: &str, default: Severity) -> Severity",
+      "line": 48,
+      "doc": "Resolve the final severity for a check.\n\nMatches on exact rule_id first, then tries category prefix\n(everything up to the last `/`). This handles checks that emit\nsub-IDs like `rust/errors/no-expect` from the `rust/errors/no-unwrap` check."
+    }
+  ]
+}

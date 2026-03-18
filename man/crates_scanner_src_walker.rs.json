@@ -1,0 +1,33 @@
+{
+  "source": "crates/scanner/src/walker.rs",
+  "items": [
+    {
+      "name": "find_workspace_root",
+      "kind": "Fn",
+      "signature": "pub fn find_workspace_root(start: &Path) -> Option<PathBuf>",
+      "line": 21,
+      "doc": "Find the workspace root by walking up from `start` looking for Cargo.toml\nwith `[workspace]`."
+    },
+    {
+      "name": "collect_files",
+      "kind": "Fn",
+      "signature": "pub fn collect_files(root: &Path, exclude_patterns: &[String]) -> Vec<PathBuf>",
+      "line": 39,
+      "doc": "Collect all source files under `root`, respecting exclude patterns."
+    },
+    {
+      "name": "is_source_extension",
+      "kind": "Fn",
+      "signature": "pub fn is_source_extension(ext: &str) -> bool",
+      "line": 86,
+      "doc": "Check if a file extension is a known source extension."
+    },
+    {
+      "name": "is_metadata_path",
+      "kind": "Fn",
+      "signature": "pub fn is_metadata_path(path: &Path) -> bool",
+      "line": 96,
+      "doc": "Check if a path is inside a metadata directory (proj/, doc/, man/).\nFiles in these dirs should not have code checks run on them,\nbut placement checks should still verify no code files exist there."
+    }
+  ]
+}

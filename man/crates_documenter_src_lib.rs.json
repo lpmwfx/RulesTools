@@ -1,0 +1,47 @@
+{
+  "source": "crates/documenter/src/lib.rs",
+  "items": [
+    {
+      "name": "manifest",
+      "kind": "Mod",
+      "signature": "pub mod manifest;",
+      "line": 2,
+      "doc": "Serde types for documentation items and manifests."
+    },
+    {
+      "name": "parser",
+      "kind": "Mod",
+      "signature": "pub mod parser;",
+      "line": 4,
+      "doc": "Source file parser — extracts pub items and `///` doc comments."
+    },
+    {
+      "name": "generator",
+      "kind": "Mod",
+      "signature": "pub mod generator;",
+      "line": 6,
+      "doc": "`man/` directory generator — writes JSON + Markdown."
+    },
+    {
+      "name": "docgen",
+      "kind": "Mod",
+      "signature": "pub mod docgen;",
+      "line": 8,
+      "doc": "Auto-documentation via AI or stub generation."
+    },
+    {
+      "name": "document_project",
+      "kind": "Fn",
+      "signature": "pub fn document_project()",
+      "line": 22,
+      "doc": "Build-time entry point — call from `build.rs`.\n\nScans for undocumented pub items, generates stubs,\nemits `cargo:warning` for each documented item.\n\n```ignore\nfn main() {\n    rulestools_documenter::document_project();\n}\n```"
+    },
+    {
+      "name": "generate_docs",
+      "kind": "Fn",
+      "signature": "pub fn generate_docs(root: &Path, project_name: &str)",
+      "line": 53,
+      "doc": "Generate `man/` directory for a project."
+    }
+  ]
+}

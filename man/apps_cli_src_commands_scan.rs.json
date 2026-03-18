@@ -1,0 +1,47 @@
+{
+  "source": "apps/cli/src/commands/scan.rs",
+  "items": [
+    {
+      "name": "find_project_root",
+      "kind": "Fn",
+      "signature": "pub fn find_project_root(path: &std::path::Path) -> PathBuf",
+      "line": 4,
+      "doc": "Walk up from file to find project root (directory with Cargo.toml or proj/)."
+    },
+    {
+      "name": "find_rules_root",
+      "kind": "Fn",
+      "signature": "pub fn find_rules_root(project_root: &std::path::Path) -> Option<PathBuf>",
+      "line": 21,
+      "doc": "Find the Rules/ directory — check common locations."
+    },
+    {
+      "name": "scan_internal",
+      "kind": "Fn",
+      "signature": "pub fn scan_internal(path: &std::path::Path, deny: bool) -> Result<String, String>",
+      "line": 45,
+      "doc": "fn `scan_internal`."
+    },
+    {
+      "name": "cmd_scan",
+      "kind": "Fn",
+      "signature": "pub fn cmd_scan(path: &PathBuf, deny: bool)",
+      "line": 100,
+      "doc": "fn `cmd_scan`."
+    },
+    {
+      "name": "scan_file_internal",
+      "kind": "Fn",
+      "signature": "pub fn scan_file_internal(file: &std::path::Path, format: &str) -> Result<String, String>",
+      "line": 111,
+      "doc": "fn `scan_file_internal`."
+    },
+    {
+      "name": "cmd_scan_file",
+      "kind": "Fn",
+      "signature": "pub fn cmd_scan_file(file: &PathBuf, format: &str)",
+      "line": 186,
+      "doc": "fn `cmd_scan_file`."
+    }
+  ]
+}

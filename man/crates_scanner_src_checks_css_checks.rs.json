@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/css_checks.rs",
+  "items": [
+    {
+      "name": "check_zero_literal",
+      "kind": "Fn",
+      "signature": "pub fn check_zero_literal( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 20,
+      "doc": "Check for hardcoded hex colors and px values outside :root/custom properties."
+    }
+  ]
+}

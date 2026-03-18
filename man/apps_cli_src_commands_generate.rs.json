@@ -1,0 +1,19 @@
+{
+  "source": "apps/cli/src/commands/generate.rs",
+  "items": [
+    {
+      "name": "gen_internal",
+      "kind": "Fn",
+      "signature": "pub fn gen_internal(root: &Path) -> String",
+      "line": 6,
+      "doc": "Run documenter: insert /// stubs for undocumented items + generate man/ files.\n\nReturns a summary string with coverage stats."
+    },
+    {
+      "name": "cmd_gen",
+      "kind": "Fn",
+      "signature": "pub fn cmd_gen(path: &PathBuf)",
+      "line": 36,
+      "doc": "fn `cmd_gen`."
+    }
+  ]
+}

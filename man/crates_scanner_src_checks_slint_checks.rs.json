@@ -1,0 +1,33 @@
+{
+  "source": "crates/scanner/src/checks/slint_checks.rs",
+  "items": [
+    {
+      "name": "check_doc_required",
+      "kind": "Fn",
+      "signature": "pub fn check_doc_required( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 22,
+      "doc": "Check that exported components/structs have `///` doc comments."
+    },
+    {
+      "name": "check_zero_literal",
+      "kind": "Fn",
+      "signature": "pub fn check_zero_literal( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 47,
+      "doc": "Check for hardcoded hex colors and px values in component files."
+    },
+    {
+      "name": "check_globals_structure",
+      "kind": "Fn",
+      "signature": "pub fn check_globals_structure( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 83,
+      "doc": "Check that global/definition files have no control flow."
+    },
+    {
+      "name": "check_no_hardcoded_string",
+      "kind": "Fn",
+      "signature": "pub fn check_no_hardcoded_string( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 110,
+      "doc": "Check for hardcoded text strings in component files."
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "source": "crates/scanner/src/context.rs",
+  "items": [
+    {
+      "name": "Language",
+      "kind": "Enum",
+      "signature": "pub enum Language",
+      "line": 5,
+      "doc": "Supported source languages."
+    },
+    {
+      "name": "from_extension",
+      "kind": "Fn",
+      "signature": "pub fn from_extension(ext: &str) -> Option<Self>",
+      "line": 20,
+      "doc": "Detect language from file extension."
+    },
+    {
+      "name": "from_path",
+      "kind": "Fn",
+      "signature": "pub fn from_path(path: &Path) -> Option<Self>",
+      "line": 37,
+      "doc": "Detect language from a file path."
+    },
+    {
+      "name": "name",
+      "kind": "Fn",
+      "signature": "pub fn name(self) -> &'static str",
+      "line": 44,
+      "doc": "fn `name`."
+    },
+    {
+      "name": "FileContext",
+      "kind": "Struct",
+      "signature": "pub struct FileContext",
+      "line": 62,
+      "doc": "Context for a single file being scanned."
+    },
+    {
+      "name": "from_path",
+      "kind": "Fn",
+      "signature": "pub fn from_path(path: &Path) -> Option<Self>",
+      "line": 71,
+      "doc": "Build context from a file path."
+    },
+    {
+      "name": "is_comment",
+      "kind": "Fn",
+      "signature": "pub fn is_comment(line: &str, lang: Language) -> bool",
+      "line": 133,
+      "doc": "Check if a line is a comment in the given language."
+    },
+    {
+      "name": "is_const_def",
+      "kind": "Fn",
+      "signature": "pub fn is_const_def(line: &str) -> bool",
+      "line": 146,
+      "doc": "Check if a line is a const/static definition (Rust)."
+    },
+    {
+      "name": "is_test_context",
+      "kind": "Fn",
+      "signature": "pub fn is_test_context(lines: &[&str], index: usize) -> bool",
+      "line": 152,
+      "doc": "Check if lines around an index indicate a test context (Rust #[test] or #[cfg(test)])."
+    }
+  ]
+}

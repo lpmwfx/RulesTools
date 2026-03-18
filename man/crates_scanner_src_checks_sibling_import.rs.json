@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/sibling_import.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( contents: &[(PathBuf, String)], _cfg: &Config, issues: &mut Vec<Issue>, )",
+      "line": 11,
+      "doc": "Check that child modules do not import sibling children directly.\n\nChildren must route through mother (mod.rs) or extract to shared/.\n`use super::<sibling>` in a child file is an error."
+    }
+  ]
+}

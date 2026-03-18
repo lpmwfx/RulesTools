@@ -1,0 +1,54 @@
+{
+  "source": "apps/cli/src/mcp/rules/handlers.rs",
+  "items": [
+    {
+      "name": "help",
+      "kind": "Fn",
+      "signature": "pub fn help(repo: &Path) -> ToolResult",
+      "line": 7,
+      "doc": "fn `help`."
+    },
+    {
+      "name": "get_rule",
+      "kind": "Fn",
+      "signature": "pub fn get_rule(repo: &Path, args: &Value) -> ToolResult",
+      "line": 53,
+      "doc": "fn `get_rule`."
+    },
+    {
+      "name": "search_rules",
+      "kind": "Fn",
+      "signature": "pub fn search_rules(repo: &Path, args: &Value) -> ToolResult",
+      "line": 67,
+      "doc": "fn `search_rules`."
+    },
+    {
+      "name": "list_rules",
+      "kind": "Fn",
+      "signature": "pub fn list_rules(repo: &Path, args: &Value) -> ToolResult",
+      "line": 97,
+      "doc": "fn `list_rules`."
+    },
+    {
+      "name": "get_context",
+      "kind": "Fn",
+      "signature": "pub fn get_context(repo: &Path, args: &Value) -> ToolResult",
+      "line": 127,
+      "doc": "fn `get_context`."
+    },
+    {
+      "name": "learning_path",
+      "kind": "Fn",
+      "signature": "pub fn learning_path(repo: &Path, args: &Value) -> ToolResult",
+      "line": 200,
+      "doc": "fn `learning_path`."
+    },
+    {
+      "name": "get_related",
+      "kind": "Fn",
+      "signature": "pub fn get_related(repo: &Path, args: &Value) -> ToolResult",
+      "line": 255,
+      "doc": "fn `get_related`."
+    }
+  ]
+}

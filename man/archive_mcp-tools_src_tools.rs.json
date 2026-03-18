@@ -1,0 +1,19 @@
+{
+  "source": "archive/mcp-tools/src/tools.rs",
+  "items": [
+    {
+      "name": "definitions",
+      "kind": "Fn",
+      "signature": "pub fn definitions() -> Vec<ToolDef>",
+      "line": 7,
+      "doc": "Register all tool definitions."
+    },
+    {
+      "name": "handle",
+      "kind": "Fn",
+      "signature": "pub fn handle(name: &str, args: &Value) -> ToolResult",
+      "line": 345,
+      "doc": "Dispatch tool calls — all delegate to rulestools CLI via subprocess."
+    }
+  ]
+}

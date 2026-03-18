@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/layer_violation.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( contents: &[(PathBuf, String)], _cfg: &Config, issues: &mut Vec<Issue>, )",
+      "line": 86,
+      "doc": "Check for cross-layer import violations.\n\nLegal import matrix:\n  ui      → adapter, shared\n  core    → pal, shared\n  gateway → pal, shared\n  pal     → shared only\n  adapter → all (hub)\n  app     → all (entry point)\n  shared  → nothing internal"
+    }
+  ]
+}

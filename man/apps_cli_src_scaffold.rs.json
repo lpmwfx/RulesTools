@@ -1,0 +1,124 @@
+{
+  "source": "apps/cli/src/scaffold.rs",
+  "items": [
+    {
+      "name": "Platform",
+      "kind": "Enum",
+      "signature": "pub enum Platform",
+      "line": 35,
+      "doc": "Target platform for SlintApp/Super projects."
+    },
+    {
+      "name": "from_str",
+      "kind": "Fn",
+      "signature": "pub fn from_str(s: &str) -> Option<Self>",
+      "line": 43,
+      "doc": "fn `from_str`."
+    },
+    {
+      "name": "name",
+      "kind": "Fn",
+      "signature": "pub fn name(&self) -> &'static str",
+      "line": 53,
+      "doc": "fn `name`."
+    },
+    {
+      "name": "Extra",
+      "kind": "Enum",
+      "signature": "pub enum Extra",
+      "line": 64,
+      "doc": "Extra folders/crates to scaffold."
+    },
+    {
+      "name": "from_str",
+      "kind": "Fn",
+      "signature": "pub fn from_str(s: &str) -> Option<Self>",
+      "line": 72,
+      "doc": "fn `from_str`."
+    },
+    {
+      "name": "ScaffoldOptions",
+      "kind": "Struct",
+      "signature": "pub struct ScaffoldOptions",
+      "line": 83,
+      "doc": "Options for `rulestools new`."
+    },
+    {
+      "name": "ScaffoldResult",
+      "kind": "Struct",
+      "signature": "pub struct ScaffoldResult",
+      "line": 94,
+      "doc": "Result of a scaffold/update operation."
+    },
+    {
+      "name": "UpdateOptions",
+      "kind": "Struct",
+      "signature": "pub struct UpdateOptions",
+      "line": 101,
+      "doc": "Options for `rulestools update`."
+    },
+    {
+      "name": "MoveGuidance",
+      "kind": "Struct",
+      "signature": "pub struct MoveGuidance",
+      "line": 111,
+      "doc": "Move guidance for project upgrades."
+    },
+    {
+      "name": "UpgradeResult",
+      "kind": "Struct",
+      "signature": "pub struct UpgradeResult",
+      "line": 119,
+      "doc": "Result of a project upgrade."
+    },
+    {
+      "name": "scaffold_project",
+      "kind": "Fn",
+      "signature": "pub fn scaffold_project(root: &Path, kind: ProjectKind, name: &str) -> Result<String, String>",
+      "line": 168,
+      "doc": "Scaffold a full project structure for the given kind (backward compat)."
+    },
+    {
+      "name": "scaffold_with_options",
+      "kind": "Fn",
+      "signature": "pub fn scaffold_with_options(root: &Path, opts: &ScaffoldOptions) -> Result<ScaffoldResult, String>",
+      "line": 189,
+      "doc": "Scaffold a project with full options (new_project)."
+    },
+    {
+      "name": "update_project",
+      "kind": "Fn",
+      "signature": "pub fn update_project(root: &Path, opts: &UpdateOptions) -> Result<ScaffoldResult, String>",
+      "line": 249,
+      "doc": "Update an existing project — add features within current kind.\n\nAlso checks for missing integration components (hooks, build.rs, topology)\nand adds them if absent."
+    },
+    {
+      "name": "upgrade_project",
+      "kind": "Fn",
+      "signature": "pub fn upgrade_project( root: &Path, to_kind: ProjectKind, preview: bool, ) -> Result<UpgradeResult, String>",
+      "line": 382,
+      "doc": "Upgrade a project to a higher kind."
+    },
+    {
+      "name": "render_tree",
+      "kind": "Fn",
+      "signature": "pub fn render_tree(root_name: &str, paths: &[String]) -> String",
+      "line": 479,
+      "doc": "Render a simple directory tree from a list of created paths."
+    },
+    {
+      "name": "init",
+      "kind": "Fn",
+      "signature": "pub fn init() {{\\n\\",
+      "line": 785,
+      "doc": "Initialize {} platform.\\n\\"
+    },
+    {
+      "name": "init",
+      "kind": "Fn",
+      "signature": "pub fn init() {{\\n\\",
+      "line": 802,
+      "doc": "Initialize {} platform.\\n\\"
+    }
+  ]
+}

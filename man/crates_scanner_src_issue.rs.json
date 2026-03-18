@@ -1,0 +1,61 @@
+{
+  "source": "crates/scanner/src/issue.rs",
+  "items": [
+    {
+      "name": "Severity",
+      "kind": "Enum",
+      "signature": "pub enum Severity",
+      "line": 7,
+      "doc": "Severity level for scan issues."
+    },
+    {
+      "name": "label",
+      "kind": "Fn",
+      "signature": "pub fn label(self) -> &'static str",
+      "line": 27,
+      "doc": "fn `label`."
+    },
+    {
+      "name": "Issue",
+      "kind": "Struct",
+      "signature": "pub struct Issue",
+      "line": 46,
+      "doc": "A single scan issue — one violation of one rule in one file."
+    },
+    {
+      "name": "new",
+      "kind": "Fn",
+      "signature": "pub fn new( path: impl Into<PathBuf>, line: usize, col: usize, severity: Severity, rule_id: impl Into<String>, message: impl Into<String>, ) -> Self",
+      "line": 57,
+      "doc": "fn `new`."
+    },
+    {
+      "name": "rule_ref",
+      "kind": "Fn",
+      "signature": "pub fn rule_ref(&self) -> &'static str",
+      "line": 77,
+      "doc": "The Rules file that documents this check.\nMaps rule_id prefix to the .md file an AI should read."
+    },
+    {
+      "name": "identity_key",
+      "kind": "Fn",
+      "signature": "pub fn identity_key(&self) -> String",
+      "line": 126,
+      "doc": "Key used to identify this issue across scans (for [NEW]/[KNOWN] delta)."
+    },
+    {
+      "name": "display_line",
+      "kind": "Fn",
+      "signature": "pub fn display_line(&self) -> String",
+      "line": 137,
+      "doc": "Format as VSCode problem-matcher compatible line."
+    },
+    {
+      "name": "relative_path",
+      "kind": "Fn",
+      "signature": "pub fn relative_path(&self, base: &Path) -> PathBuf",
+      "line": 164,
+      "doc": "Returns the relative path if possible, otherwise the original."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "source": "crates/documenter/src/parser.rs",
+  "items": [
+    {
+      "name": "parse_rs",
+      "kind": "Fn",
+      "signature": "pub fn parse_rs(_path: &Path, content: &str) -> Vec<DocItem>",
+      "line": 34,
+      "doc": "Parse a Rust source file for public items and their doc comments."
+    },
+    {
+      "name": "parse_slint",
+      "kind": "Fn",
+      "signature": "pub fn parse_slint(_path: &Path, content: &str) -> Vec<DocItem>",
+      "line": 80,
+      "doc": "Parse a Slint source file for exported items and their doc comments."
+    },
+    {
+      "name": "collect_docs",
+      "kind": "Fn",
+      "signature": "pub fn collect_docs(root: &Path) -> Vec<SourceDoc>",
+      "line": 133,
+      "doc": "Collect all source docs from a project root."
+    }
+  ]
+}

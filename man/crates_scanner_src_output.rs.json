@@ -1,0 +1,47 @@
+{
+  "source": "crates/scanner/src/output.rs",
+  "items": [
+    {
+      "name": "emit_cargo_warnings",
+      "kind": "Fn",
+      "signature": "pub fn emit_cargo_warnings(issues: &[Issue], base: &Path)",
+      "line": 7,
+      "doc": "Emit issues as `cargo:warning` lines (for build.rs integration)."
+    },
+    {
+      "name": "write_issues_file",
+      "kind": "Fn",
+      "signature": "pub fn write_issues_file(issues: &[Issue], project_root: &Path) -> std::io::Result<usize>",
+      "line": 25,
+      "doc": "Write issues to `proj/ISSUES` with [NEW]/[KNOWN] delta markers.\n\nReturns the number of new issues found."
+    },
+    {
+      "name": "IssueGroup",
+      "kind": "Struct",
+      "signature": "pub struct IssueGroup",
+      "line": 76,
+      "doc": "Error group with guidance text."
+    },
+    {
+      "name": "format_grouped",
+      "kind": "Fn",
+      "signature": "pub fn format_grouped(issues: &[Issue], base: &Path) -> String",
+      "line": 140,
+      "doc": "Format issues as grouped output with guidance per group.\n\nIf `rules_root` is provided, loads decision trees from Rules/guidance/*.toml."
+    },
+    {
+      "name": "format_grouped_with_guidance",
+      "kind": "Fn",
+      "signature": "pub fn format_grouped_with_guidance(issues: &[Issue], base: &Path, rules_root: Option<&Path>) -> String",
+      "line": 145,
+      "doc": "Format with optional guidance trees from Rules/guidance/."
+    },
+    {
+      "name": "should_deny",
+      "kind": "Fn",
+      "signature": "pub fn should_deny(issues: &[Issue], deny: bool) -> bool",
+      "line": 236,
+      "doc": "Check if build should be denied.\nCritical issues always deny. Error issues deny when deny=true."
+    }
+  ]
+}

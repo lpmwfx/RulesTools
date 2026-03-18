@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/borrowed_containers.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 21,
+      "doc": "Check for borrowed container types in function parameters.\n`&Vec<T>` should be `&[T]`, `&String` should be `&str`."
+    }
+  ]
+}

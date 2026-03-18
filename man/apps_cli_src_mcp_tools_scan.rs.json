@@ -1,0 +1,33 @@
+{
+  "source": "apps/cli/src/mcp/tools/scan.rs",
+  "items": [
+    {
+      "name": "scan_file",
+      "kind": "Fn",
+      "signature": "pub fn scan_file(args: &Value) -> ToolResult",
+      "line": 7,
+      "doc": "fn `scan_file`."
+    },
+    {
+      "name": "scan_tree",
+      "kind": "Fn",
+      "signature": "pub fn scan_tree(args: &Value) -> ToolResult",
+      "line": 24,
+      "doc": "fn `scan_tree`."
+    },
+    {
+      "name": "check_staged",
+      "kind": "Fn",
+      "signature": "pub fn check_staged(args: &Value) -> ToolResult",
+      "line": 37,
+      "doc": "fn `check_staged`."
+    },
+    {
+      "name": "security_scan",
+      "kind": "Fn",
+      "signature": "pub fn security_scan(args: &Value) -> ToolResult",
+      "line": 50,
+      "doc": "fn `security_scan`."
+    }
+  ]
+}

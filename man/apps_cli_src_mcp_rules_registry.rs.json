@@ -1,0 +1,103 @@
+{
+  "source": "apps/cli/src/mcp/rules/registry.rs",
+  "items": [
+    {
+      "name": "Edges",
+      "kind": "Struct",
+      "signature": "pub struct Edges",
+      "line": 8,
+      "doc": "struct `Edges`."
+    },
+    {
+      "name": "RuleEntry",
+      "kind": "Struct",
+      "signature": "pub struct RuleEntry",
+      "line": 23,
+      "doc": "struct `RuleEntry`."
+    },
+    {
+      "name": "Registry",
+      "kind": "Struct",
+      "signature": "pub struct Registry",
+      "line": 57,
+      "doc": "struct `Registry`."
+    },
+    {
+      "name": "get_registry",
+      "kind": "Fn",
+      "signature": "pub fn get_registry(repo: &Path) -> Result<&'static Registry, String>",
+      "line": 66,
+      "doc": "fn `get_registry`."
+    },
+    {
+      "name": "load",
+      "kind": "Fn",
+      "signature": "pub fn load(repo: &Path) -> Result<Self, String>",
+      "line": 77,
+      "doc": "fn `load`."
+    },
+    {
+      "name": "from_entries",
+      "kind": "Fn",
+      "signature": "pub fn from_entries(entries: Vec<RuleEntry>) -> Self",
+      "line": 100,
+      "doc": "fn `from_entries`."
+    },
+    {
+      "name": "len",
+      "kind": "Fn",
+      "signature": "pub fn len(&self) -> usize",
+      "line": 109,
+      "doc": "fn `len`."
+    },
+    {
+      "name": "categories",
+      "kind": "Fn",
+      "signature": "pub fn categories(&self) -> Vec<String>",
+      "line": 114,
+      "doc": "fn `categories`."
+    },
+    {
+      "name": "rule_count",
+      "kind": "Fn",
+      "signature": "pub fn rule_count(&self) -> usize",
+      "line": 127,
+      "doc": "fn `rule_count`."
+    },
+    {
+      "name": "banned_count",
+      "kind": "Fn",
+      "signature": "pub fn banned_count(&self) -> usize",
+      "line": 132,
+      "doc": "fn `banned_count`."
+    },
+    {
+      "name": "find_by_file",
+      "kind": "Fn",
+      "signature": "pub fn find_by_file(&self, file: &str) -> Option<&RuleEntry>",
+      "line": 137,
+      "doc": "fn `find_by_file`."
+    },
+    {
+      "name": "list",
+      "kind": "Fn",
+      "signature": "pub fn list(&self, category: Option<&str>) -> Vec<&RuleEntry>",
+      "line": 142,
+      "doc": "fn `list`."
+    },
+    {
+      "name": "search",
+      "kind": "Fn",
+      "signature": "pub fn search( &self, query: &str, category: Option<&str>, limit: usize, ) -> Vec<(&RuleEntry, usize)>",
+      "line": 150,
+      "doc": "fn `search`."
+    },
+    {
+      "name": "learning_path",
+      "kind": "Fn",
+      "signature": "pub fn learning_path( &self, languages: &[String], phase: Option<u8>, ) -> Vec<(u8, Vec<&RuleEntry>)>",
+      "line": 180,
+      "doc": "fn `learning_path`."
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "source": "apps/cli/src/commands/mod.rs",
+  "items": [
+    {
+      "name": "scan",
+      "kind": "Mod",
+      "signature": "pub mod scan;",
+      "line": 2,
+      "doc": "mod `scan`."
+    },
+    {
+      "name": "project",
+      "kind": "Mod",
+      "signature": "pub mod project;",
+      "line": 4,
+      "doc": "mod `project`."
+    },
+    {
+      "name": "generate",
+      "kind": "Mod",
+      "signature": "pub mod generate;",
+      "line": 6,
+      "doc": "mod `generate`."
+    },
+    {
+      "name": "issue",
+      "kind": "Mod",
+      "signature": "pub mod issue;",
+      "line": 8,
+      "doc": "mod `issue`."
+    },
+    {
+      "name": "hook",
+      "kind": "Mod",
+      "signature": "pub mod hook;",
+      "line": 10,
+      "doc": "mod `hook`."
+    }
+  ]
+}

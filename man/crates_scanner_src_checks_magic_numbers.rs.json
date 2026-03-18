@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/magic_numbers.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 27,
+      "doc": "Check for magic numbers in Rust code."
+    }
+  ]
+}

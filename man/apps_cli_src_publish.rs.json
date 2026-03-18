@@ -1,0 +1,96 @@
+{
+  "source": "apps/cli/src/publish.rs",
+  "items": [
+    {
+      "name": "PublishConfig",
+      "kind": "Struct",
+      "signature": "pub struct PublishConfig",
+      "line": 6,
+      "doc": "struct `PublishConfig`."
+    },
+    {
+      "name": "GithubTarget",
+      "kind": "Struct",
+      "signature": "pub struct GithubTarget",
+      "line": 17,
+      "doc": "struct `GithubTarget`."
+    },
+    {
+      "name": "ForgejoTarget",
+      "kind": "Struct",
+      "signature": "pub struct ForgejoTarget",
+      "line": 22,
+      "doc": "struct `ForgejoTarget`."
+    },
+    {
+      "name": "RepoConfig",
+      "kind": "Struct",
+      "signature": "pub struct RepoConfig",
+      "line": 28,
+      "doc": "struct `RepoConfig`."
+    },
+    {
+      "name": "load",
+      "kind": "Fn",
+      "signature": "pub fn load(root: &Path) -> Self",
+      "line": 49,
+      "doc": "fn `load`."
+    },
+    {
+      "name": "PublishPlan",
+      "kind": "Struct",
+      "signature": "pub struct PublishPlan",
+      "line": 353,
+      "doc": "struct `PublishPlan`."
+    },
+    {
+      "name": "TargetPlan",
+      "kind": "Struct",
+      "signature": "pub struct TargetPlan",
+      "line": 365,
+      "doc": "struct `TargetPlan`."
+    },
+    {
+      "name": "publish_plan",
+      "kind": "Fn",
+      "signature": "pub fn publish_plan(root: &Path, format: &str) -> Result<String, String>",
+      "line": 371,
+      "doc": "fn `publish_plan`."
+    },
+    {
+      "name": "publish_status",
+      "kind": "Fn",
+      "signature": "pub fn publish_status(root: &Path, format: &str) -> Result<String, String>",
+      "line": 490,
+      "doc": "fn `publish_status`."
+    },
+    {
+      "name": "publish_run",
+      "kind": "Fn",
+      "signature": "pub fn publish_run(root: &Path, target: &str, preview: bool) -> Result<String, String>",
+      "line": 609,
+      "doc": "fn `publish_run`."
+    },
+    {
+      "name": "publish_init",
+      "kind": "Fn",
+      "signature": "pub fn publish_init(root: &Path, remote: &str) -> Result<String, String>",
+      "line": 851,
+      "doc": "fn `publish_init`."
+    },
+    {
+      "name": "publish_sync",
+      "kind": "Fn",
+      "signature": "pub fn publish_sync(root: &Path, preview: bool) -> Result<String, String>",
+      "line": 904,
+      "doc": "fn `publish_sync`."
+    },
+    {
+      "name": "publish_check",
+      "kind": "Fn",
+      "signature": "pub fn publish_check(root: &Path) -> Result<String, String>",
+      "line": 1064,
+      "doc": "fn `publish_check`."
+    }
+  ]
+}

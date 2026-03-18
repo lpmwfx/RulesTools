@@ -1,0 +1,12 @@
+{
+  "source": "crates/documenter/src/docgen/inserter.rs",
+  "items": [
+    {
+      "name": "process_all",
+      "kind": "Fn",
+      "signature": "pub fn process_all(root: &Path, docs: &[SourceDoc]) -> DocGenResult",
+      "line": 7,
+      "doc": "Process all source docs: find undocumented items, call AI, insert docs."
+    }
+  ]
+}

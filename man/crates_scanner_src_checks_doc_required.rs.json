@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/doc_required.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 15,
+      "doc": "Check that all pub items have `///` doc comments."
+    }
+  ]
+}

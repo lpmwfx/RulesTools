@@ -1,0 +1,19 @@
+{
+  "source": "apps/cli/src/mcp/tools/mod.rs",
+  "items": [
+    {
+      "name": "run",
+      "kind": "Fn",
+      "signature": "pub fn run()",
+      "line": 13,
+      "doc": "Run the MCP tools server (stdio loop)."
+    },
+    {
+      "name": "get_path",
+      "kind": "Fn",
+      "signature": "pub fn get_path(args: &Value) -> Result<PathBuf, ToolResult>",
+      "line": 48,
+      "doc": "fn `get_path`."
+    }
+  ]
+}

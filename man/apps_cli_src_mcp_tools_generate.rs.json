@@ -1,0 +1,12 @@
+{
+  "source": "apps/cli/src/mcp/tools/generate.rs",
+  "items": [
+    {
+      "name": "generate_docs",
+      "kind": "Fn",
+      "signature": "pub fn generate_docs(args: &Value) -> ToolResult",
+      "line": 7,
+      "doc": "fn `generate_docs`."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/nesting.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 25,
+      "doc": "Check control-flow nesting depth — measures complexity, not just braces.\n\nCounts nesting for control flow (`if`, `for`, `while`, `match`, `loop`,\nclosures, callbacks) but NOT for struct/enum bodies, type annotations,\nor Slint property types."
+    }
+  ]
+}

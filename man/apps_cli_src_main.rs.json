@@ -1,0 +1,26 @@
+{
+  "source": "apps/cli/src/main.rs",
+  "items": [
+    {
+      "name": "publish",
+      "kind": "Mod",
+      "signature": "pub mod publish;",
+      "line": 7,
+      "doc": "mod `publish`."
+    },
+    {
+      "name": "scaffold",
+      "kind": "Mod",
+      "signature": "pub mod scaffold;",
+      "line": 9,
+      "doc": "mod `scaffold`."
+    },
+    {
+      "name": "IssueCmd",
+      "kind": "Enum",
+      "signature": "pub enum IssueCmd",
+      "line": 425,
+      "doc": "enum `IssueCmd`."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/debt.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( _file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 16,
+      "doc": "Check for TODO/FIXME/HACK/NOCOMMIT markers."
+    }
+  ]
+}

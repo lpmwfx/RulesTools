@@ -1,0 +1,124 @@
+{
+  "source": "apps/cli/src/commands/issue.rs",
+  "items": [
+    {
+      "name": "forgejo_token",
+      "kind": "Fn",
+      "signature": "pub fn forgejo_token() -> Result<String, String>",
+      "line": 4,
+      "doc": "fn `forgejo_token`."
+    },
+    {
+      "name": "resolve_label_ids",
+      "kind": "Fn",
+      "signature": "pub fn resolve_label_ids(token: &str, names: &[&str]) -> Result<Vec<u64>, String>",
+      "line": 10,
+      "doc": "fn `resolve_label_ids`."
+    },
+    {
+      "name": "report_internal",
+      "kind": "Fn",
+      "signature": "pub fn report_internal(title: &str, body: &str, labels_str: &str) -> Result<String, String>",
+      "line": 35,
+      "doc": "fn `report_internal`."
+    },
+    {
+      "name": "list_internal",
+      "kind": "Fn",
+      "signature": "pub fn list_internal(state: &str, labels_str: &str) -> Result<String, String>",
+      "line": 63,
+      "doc": "fn `list_internal`."
+    },
+    {
+      "name": "close_internal",
+      "kind": "Fn",
+      "signature": "pub fn close_internal(number: u64, comment: &str) -> Result<String, String>",
+      "line": 98,
+      "doc": "fn `close_internal`."
+    },
+    {
+      "name": "add_label_internal",
+      "kind": "Fn",
+      "signature": "pub fn add_label_internal(number: u64, label: &str) -> Result<String, String>",
+      "line": 120,
+      "doc": "fn `add_label_internal`."
+    },
+    {
+      "name": "create_label_internal",
+      "kind": "Fn",
+      "signature": "pub fn create_label_internal(name: &str, color: &str, description: &str) -> Result<String, String>",
+      "line": 139,
+      "doc": "fn `create_label_internal`."
+    },
+    {
+      "name": "list_labels_internal",
+      "kind": "Fn",
+      "signature": "pub fn list_labels_internal() -> Result<String, String>",
+      "line": 163,
+      "doc": "fn `list_labels_internal`."
+    },
+    {
+      "name": "comment_internal",
+      "kind": "Fn",
+      "signature": "pub fn comment_internal(number: u64, body: &str) -> Result<String, String>",
+      "line": 193,
+      "doc": "fn `comment_internal`."
+    },
+    {
+      "name": "cmd_issue_report",
+      "kind": "Fn",
+      "signature": "pub fn cmd_issue_report(title: &str, body: &str, labels: &str)",
+      "line": 209,
+      "doc": "fn `cmd_issue_report`."
+    },
+    {
+      "name": "cmd_issue_list",
+      "kind": "Fn",
+      "signature": "pub fn cmd_issue_list(state: &str, labels: &str)",
+      "line": 217,
+      "doc": "fn `cmd_issue_list`."
+    },
+    {
+      "name": "cmd_issue_close",
+      "kind": "Fn",
+      "signature": "pub fn cmd_issue_close(number: u64, comment: &str)",
+      "line": 225,
+      "doc": "fn `cmd_issue_close`."
+    },
+    {
+      "name": "cmd_issue_add_label",
+      "kind": "Fn",
+      "signature": "pub fn cmd_issue_add_label(number: u64, label: &str)",
+      "line": 233,
+      "doc": "fn `cmd_issue_add_label`."
+    },
+    {
+      "name": "cmd_issue_create_label",
+      "kind": "Fn",
+      "signature": "pub fn cmd_issue_create_label(name: &str, color: &str, description: &str)",
+      "line": 241,
+      "doc": "fn `cmd_issue_create_label`."
+    },
+    {
+      "name": "cmd_issue_list_labels",
+      "kind": "Fn",
+      "signature": "pub fn cmd_issue_list_labels()",
+      "line": 249,
+      "doc": "fn `cmd_issue_list_labels`."
+    },
+    {
+      "name": "cmd_issue_comment",
+      "kind": "Fn",
+      "signature": "pub fn cmd_issue_comment(number: u64, body: &str)",
+      "line": 257,
+      "doc": "fn `cmd_issue_comment`."
+    },
+    {
+      "name": "cmd_issue",
+      "kind": "Fn",
+      "signature": "pub fn cmd_issue(cmd: IssueCmd)",
+      "line": 268,
+      "doc": "fn `cmd_issue`."
+    }
+  ]
+}

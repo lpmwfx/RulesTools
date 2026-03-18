@@ -1,0 +1,390 @@
+{
+  "project": "RulesTools",
+  "files": [
+    {
+      "source": "apps/cli/src/commands/generate.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/commands/hook.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/commands/issue.rs",
+      "item_count": 17,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/commands/mod.rs",
+      "item_count": 5,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/commands/project.rs",
+      "item_count": 14,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/commands/scan.rs",
+      "item_count": 6,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/main.rs",
+      "item_count": 3,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/mod.rs",
+      "item_count": 13,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/rules/handlers.rs",
+      "item_count": 7,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/rules/mod.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/rules/registry.rs",
+      "item_count": 14,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/tools/definitions.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/tools/generate.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/tools/issue.rs",
+      "item_count": 7,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/tools/mod.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/tools/project.rs",
+      "item_count": 5,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/tools/publish.rs",
+      "item_count": 6,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/mcp/tools/scan.rs",
+      "item_count": 4,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/publish.rs",
+      "item_count": 13,
+      "undocumented": 0
+    },
+    {
+      "source": "apps/cli/src/scaffold.rs",
+      "item_count": 17,
+      "undocumented": 0
+    },
+    {
+      "source": "archive/mcp-rules/src/protocol.rs",
+      "item_count": 11,
+      "undocumented": 0
+    },
+    {
+      "source": "archive/mcp-rules/src/registry.rs",
+      "item_count": 13,
+      "undocumented": 0
+    },
+    {
+      "source": "archive/mcp-rules/src/rules.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "archive/mcp-tools/src/protocol.rs",
+      "item_count": 11,
+      "undocumented": 0
+    },
+    {
+      "source": "archive/mcp-tools/src/tools.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/documenter/src/docgen/inserter.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/documenter/src/docgen/mod.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/documenter/src/generator.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/documenter/src/lib.rs",
+      "item_count": 6,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/documenter/src/manifest.rs",
+      "item_count": 7,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/documenter/src/parser.rs",
+      "item_count": 3,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/borrowed_containers.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/clone_spam.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/coupling.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/cpp_checks.rs",
+      "item_count": 3,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/csharp_checks.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/css_checks.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/debt.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/doc_required.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/errors.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/file_size.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/hardcoded_durations.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/hardcoded_paths.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/hardcoded_urls.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/js_modules.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/js_safety.rs",
+      "item_count": 3,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/kotlin_checks.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/layer_violation.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/magic_numbers.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/mod.rs",
+      "item_count": 47,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/modules.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/mother_child.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/naming.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/nesting.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/path_deps.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/placement.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/python_checks.rs",
+      "item_count": 3,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/secrets.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/shared_discovery.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/shared_guard.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/sibling_import.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/slint_checks.rs",
+      "item_count": 4,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/slint_gateway.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/slint_mother_child.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/string_states.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/threading.rs",
+      "item_count": 2,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/topology_naming.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/topology_suffix.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/checks/unsafe_comment.rs",
+      "item_count": 1,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/config.rs",
+      "item_count": 6,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/context.rs",
+      "item_count": 9,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/issue.rs",
+      "item_count": 8,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/lib.rs",
+      "item_count": 12,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/output.rs",
+      "item_count": 6,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/project.rs",
+      "item_count": 11,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/severity.rs",
+      "item_count": 3,
+      "undocumented": 0
+    },
+    {
+      "source": "crates/scanner/src/walker.rs",
+      "item_count": 4,
+      "undocumented": 0
+    }
+  ]
+}

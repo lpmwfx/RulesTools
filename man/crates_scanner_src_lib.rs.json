@@ -1,0 +1,89 @@
+{
+  "source": "crates/scanner/src/lib.rs",
+  "items": [
+    {
+      "name": "issue",
+      "kind": "Mod",
+      "signature": "pub mod issue;",
+      "line": 2,
+      "doc": "Scan issue types and severity levels."
+    },
+    {
+      "name": "config",
+      "kind": "Mod",
+      "signature": "pub mod config;",
+      "line": 4,
+      "doc": "Configuration parsing and project settings."
+    },
+    {
+      "name": "context",
+      "kind": "Mod",
+      "signature": "pub mod context;",
+      "line": 6,
+      "doc": "Language detection and file context."
+    },
+    {
+      "name": "walker",
+      "kind": "Mod",
+      "signature": "pub mod walker;",
+      "line": 8,
+      "doc": "File system walking and source file collection."
+    },
+    {
+      "name": "output",
+      "kind": "Mod",
+      "signature": "pub mod output;",
+      "line": 10,
+      "doc": "Output formatting — cargo warnings and ISSUES file."
+    },
+    {
+      "name": "checks",
+      "kind": "Mod",
+      "signature": "pub mod checks;",
+      "line": 12,
+      "doc": "Check registry and dispatch traits."
+    },
+    {
+      "name": "project",
+      "kind": "Mod",
+      "signature": "pub mod project;",
+      "line": 14,
+      "doc": "Auto-detection of project kind and layout."
+    },
+    {
+      "name": "severity",
+      "kind": "Mod",
+      "signature": "pub mod severity;",
+      "line": 16,
+      "doc": "Severity resolver — maps check severity per ProjectKind."
+    },
+    {
+      "name": "scan_project",
+      "kind": "Fn",
+      "signature": "pub fn scan_project()",
+      "line": 33,
+      "doc": "Scan a project from build.rs — emits `cargo:warning` lines.\n\nCall this from your `build.rs`:\n```ignore\nfn main() {\n    rulestools_scanner::scan_project();\n}\n```"
+    },
+    {
+      "name": "scan_at",
+      "kind": "Fn",
+      "signature": "pub fn scan_at(root: &Path) -> (Vec<Issue>, usize)",
+      "line": 58,
+      "doc": "Scan a project from CLI/MCP — returns issues and writes `proj/ISSUES`.\n\nReturns `(all_issues, new_count)`.\nIf the project has no `proj/rulestools.toml` with `[project].kind`,\nreturns a single Info issue with a registration suggestion."
+    },
+    {
+      "name": "scan_super",
+      "kind": "Fn",
+      "signature": "pub fn scan_super(root: &Path) -> (Vec<Issue>, usize)",
+      "line": 81,
+      "doc": "Scan a super-project — find sub-repos and scan each with its own config.\n\nReturns aggregated issues from all sub-repos with path prefixed by sub-repo name."
+    },
+    {
+      "name": "run_scan",
+      "kind": "Fn",
+      "signature": "pub fn run_scan(root: &Path) -> Vec<Issue>",
+      "line": 125,
+      "doc": "Core scan logic — collects files, runs all registered checks."
+    }
+  ]
+}

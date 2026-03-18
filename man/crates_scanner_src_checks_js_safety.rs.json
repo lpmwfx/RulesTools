@@ -1,0 +1,26 @@
+{
+  "source": "crates/scanner/src/checks/js_safety.rs",
+  "items": [
+    {
+      "name": "check_no_var",
+      "kind": "Fn",
+      "signature": "pub fn check_no_var( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 16,
+      "doc": "Check for `var` declarations — use `let` or `const` instead."
+    },
+    {
+      "name": "check_no_console_log",
+      "kind": "Fn",
+      "signature": "pub fn check_no_console_log( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 44,
+      "doc": "Check for `console.log` — use a structured logger."
+    },
+    {
+      "name": "check_no_eval",
+      "kind": "Fn",
+      "signature": "pub fn check_no_eval( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 72,
+      "doc": "Check for `eval()` — security risk."
+    }
+  ]
+}

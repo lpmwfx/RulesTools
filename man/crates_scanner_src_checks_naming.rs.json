@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/naming.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 34,
+      "doc": "Check naming conventions in Rust code."
+    }
+  ]
+}

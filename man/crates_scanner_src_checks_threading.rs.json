@@ -1,0 +1,19 @@
+{
+  "source": "crates/scanner/src/checks/threading.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 24,
+      "doc": "Check threading patterns in Rust code."
+    },
+    {
+      "name": "check_fire_and_forget",
+      "kind": "Fn",
+      "signature": "pub fn check_fire_and_forget( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 68,
+      "doc": "Check for fire-and-forget spawns — `tokio::spawn(...)` or `thread::spawn(...)`\nwithout a `let` binding on the same line."
+    }
+  ]
+}

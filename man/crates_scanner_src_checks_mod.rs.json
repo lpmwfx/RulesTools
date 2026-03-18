@@ -1,0 +1,334 @@
+{
+  "source": "crates/scanner/src/checks/mod.rs",
+  "items": [
+    {
+      "name": "file_size",
+      "kind": "Mod",
+      "signature": "pub mod file_size;",
+      "line": 8,
+      "doc": "mod `file_size`."
+    },
+    {
+      "name": "nesting",
+      "kind": "Mod",
+      "signature": "pub mod nesting;",
+      "line": 10,
+      "doc": "mod `nesting`."
+    },
+    {
+      "name": "debt",
+      "kind": "Mod",
+      "signature": "pub mod debt;",
+      "line": 12,
+      "doc": "mod `debt`."
+    },
+    {
+      "name": "secrets",
+      "kind": "Mod",
+      "signature": "pub mod secrets;",
+      "line": 14,
+      "doc": "mod `secrets`."
+    },
+    {
+      "name": "magic_numbers",
+      "kind": "Mod",
+      "signature": "pub mod magic_numbers;",
+      "line": 16,
+      "doc": "mod `magic_numbers`."
+    },
+    {
+      "name": "errors",
+      "kind": "Mod",
+      "signature": "pub mod errors;",
+      "line": 18,
+      "doc": "mod `errors`."
+    },
+    {
+      "name": "doc_required",
+      "kind": "Mod",
+      "signature": "pub mod doc_required;",
+      "line": 20,
+      "doc": "mod `doc_required`."
+    },
+    {
+      "name": "string_states",
+      "kind": "Mod",
+      "signature": "pub mod string_states;",
+      "line": 22,
+      "doc": "mod `string_states`."
+    },
+    {
+      "name": "naming",
+      "kind": "Mod",
+      "signature": "pub mod naming;",
+      "line": 24,
+      "doc": "mod `naming`."
+    },
+    {
+      "name": "modules",
+      "kind": "Mod",
+      "signature": "pub mod modules;",
+      "line": 26,
+      "doc": "mod `modules`."
+    },
+    {
+      "name": "hardcoded_paths",
+      "kind": "Mod",
+      "signature": "pub mod hardcoded_paths;",
+      "line": 28,
+      "doc": "mod `hardcoded_paths`."
+    },
+    {
+      "name": "hardcoded_durations",
+      "kind": "Mod",
+      "signature": "pub mod hardcoded_durations;",
+      "line": 30,
+      "doc": "mod `hardcoded_durations`."
+    },
+    {
+      "name": "hardcoded_urls",
+      "kind": "Mod",
+      "signature": "pub mod hardcoded_urls;",
+      "line": 32,
+      "doc": "mod `hardcoded_urls`."
+    },
+    {
+      "name": "clone_spam",
+      "kind": "Mod",
+      "signature": "pub mod clone_spam;",
+      "line": 34,
+      "doc": "mod `clone_spam`."
+    },
+    {
+      "name": "coupling",
+      "kind": "Mod",
+      "signature": "pub mod coupling;",
+      "line": 36,
+      "doc": "mod `coupling`."
+    },
+    {
+      "name": "threading",
+      "kind": "Mod",
+      "signature": "pub mod threading;",
+      "line": 38,
+      "doc": "mod `threading`."
+    },
+    {
+      "name": "mother_child",
+      "kind": "Mod",
+      "signature": "pub mod mother_child;",
+      "line": 40,
+      "doc": "mod `mother_child`."
+    },
+    {
+      "name": "shared_discovery",
+      "kind": "Mod",
+      "signature": "pub mod shared_discovery;",
+      "line": 42,
+      "doc": "mod `shared_discovery`."
+    },
+    {
+      "name": "placement",
+      "kind": "Mod",
+      "signature": "pub mod placement;",
+      "line": 44,
+      "doc": "mod `placement`."
+    },
+    {
+      "name": "shared_guard",
+      "kind": "Mod",
+      "signature": "pub mod shared_guard;",
+      "line": 46,
+      "doc": "mod `shared_guard`."
+    },
+    {
+      "name": "unsafe_comment",
+      "kind": "Mod",
+      "signature": "pub mod unsafe_comment;",
+      "line": 48,
+      "doc": "mod `unsafe_comment`."
+    },
+    {
+      "name": "layer_violation",
+      "kind": "Mod",
+      "signature": "pub mod layer_violation;",
+      "line": 50,
+      "doc": "mod `layer_violation`."
+    },
+    {
+      "name": "sibling_import",
+      "kind": "Mod",
+      "signature": "pub mod sibling_import;",
+      "line": 52,
+      "doc": "mod `sibling_import`."
+    },
+    {
+      "name": "slint_gateway",
+      "kind": "Mod",
+      "signature": "pub mod slint_gateway;",
+      "line": 54,
+      "doc": "mod `slint_gateway`."
+    },
+    {
+      "name": "slint_mother_child",
+      "kind": "Mod",
+      "signature": "pub mod slint_mother_child;",
+      "line": 56,
+      "doc": "mod `slint_mother_child`."
+    },
+    {
+      "name": "topology_naming",
+      "kind": "Mod",
+      "signature": "pub mod topology_naming;",
+      "line": 58,
+      "doc": "mod `topology_naming`."
+    },
+    {
+      "name": "topology_suffix",
+      "kind": "Mod",
+      "signature": "pub mod topology_suffix;",
+      "line": 60,
+      "doc": "mod `topology_suffix`."
+    },
+    {
+      "name": "js_safety",
+      "kind": "Mod",
+      "signature": "pub mod js_safety;",
+      "line": 62,
+      "doc": "mod `js_safety`."
+    },
+    {
+      "name": "borrowed_containers",
+      "kind": "Mod",
+      "signature": "pub mod borrowed_containers;",
+      "line": 64,
+      "doc": "mod `borrowed_containers`."
+    },
+    {
+      "name": "slint_checks",
+      "kind": "Mod",
+      "signature": "pub mod slint_checks;",
+      "line": 66,
+      "doc": "mod `slint_checks`."
+    },
+    {
+      "name": "python_checks",
+      "kind": "Mod",
+      "signature": "pub mod python_checks;",
+      "line": 68,
+      "doc": "mod `python_checks`."
+    },
+    {
+      "name": "js_modules",
+      "kind": "Mod",
+      "signature": "pub mod js_modules;",
+      "line": 70,
+      "doc": "mod `js_modules`."
+    },
+    {
+      "name": "path_deps",
+      "kind": "Mod",
+      "signature": "pub mod path_deps;",
+      "line": 72,
+      "doc": "mod `path_deps`."
+    },
+    {
+      "name": "cpp_checks",
+      "kind": "Mod",
+      "signature": "pub mod cpp_checks;",
+      "line": 74,
+      "doc": "mod `cpp_checks`."
+    },
+    {
+      "name": "kotlin_checks",
+      "kind": "Mod",
+      "signature": "pub mod kotlin_checks;",
+      "line": 76,
+      "doc": "mod `kotlin_checks`."
+    },
+    {
+      "name": "csharp_checks",
+      "kind": "Mod",
+      "signature": "pub mod csharp_checks;",
+      "line": 78,
+      "doc": "mod `csharp_checks`."
+    },
+    {
+      "name": "css_checks",
+      "kind": "Mod",
+      "signature": "pub mod css_checks;",
+      "line": 80,
+      "doc": "mod `css_checks`."
+    },
+    {
+      "name": "PerFileCheckFn",
+      "kind": "Type",
+      "signature": "pub type PerFileCheckFn = fn( file_ctx: &FileContext, lines: &[&str], cfg: &Config, issues: &mut Vec<Issue>, path: &std::path::Path, );",
+      "line": 83,
+      "doc": "Per-file check function signature."
+    },
+    {
+      "name": "CrossFileCheckFn",
+      "kind": "Type",
+      "signature": "pub type CrossFileCheckFn = fn( contents: &[(PathBuf, String)], cfg: &Config, issues: &mut Vec<Issue>, );",
+      "line": 92,
+      "doc": "Cross-file check function signature."
+    },
+    {
+      "name": "TreeCheckFn",
+      "kind": "Type",
+      "signature": "pub type TreeCheckFn = fn( paths: &[PathBuf], cfg: &Config, issues: &mut Vec<Issue>, );",
+      "line": 99,
+      "doc": "Tree-level check function signature."
+    },
+    {
+      "name": "CheckKind",
+      "kind": "Enum",
+      "signature": "pub enum CheckKind",
+      "line": 106,
+      "doc": "The kind of check — determines how it is dispatched."
+    },
+    {
+      "name": "CheckEntry",
+      "kind": "Struct",
+      "signature": "pub struct CheckEntry",
+      "line": 113,
+      "doc": "A registered check entry."
+    },
+    {
+      "name": "per_file",
+      "kind": "Fn",
+      "signature": "pub fn per_file(id: impl Into<String>, languages: Vec<Language>, func: PerFileCheckFn) -> Self",
+      "line": 121,
+      "doc": "Create a per-file check for specific languages."
+    },
+    {
+      "name": "cross_file",
+      "kind": "Fn",
+      "signature": "pub fn cross_file(id: impl Into<String>, languages: Vec<Language>, func: CrossFileCheckFn) -> Self",
+      "line": 126,
+      "doc": "Create a cross-file check."
+    },
+    {
+      "name": "tree",
+      "kind": "Fn",
+      "signature": "pub fn tree(id: impl Into<String>, languages: Vec<Language>, func: TreeCheckFn) -> Self",
+      "line": 131,
+      "doc": "Create a tree-level check."
+    },
+    {
+      "name": "applies_to",
+      "kind": "Fn",
+      "signature": "pub fn applies_to(&self, lang: Language) -> bool",
+      "line": 136,
+      "doc": "Check if this entry applies to the given language."
+    },
+    {
+      "name": "registry",
+      "kind": "Fn",
+      "signature": "pub fn registry() -> Vec<CheckEntry>",
+      "line": 142,
+      "doc": "Return all registered checks."
+    }
+  ]
+}

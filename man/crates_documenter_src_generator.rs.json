@@ -1,0 +1,12 @@
+{
+  "source": "crates/documenter/src/generator.rs",
+  "items": [
+    {
+      "name": "generate",
+      "kind": "Fn",
+      "signature": "pub fn generate(root: &Path, project_name: &str, docs: &[SourceDoc])",
+      "line": 6,
+      "doc": "Generate `man/` directory with JSON + Markdown for all source docs."
+    }
+  ]
+}

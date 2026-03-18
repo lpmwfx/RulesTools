@@ -1,0 +1,19 @@
+{
+  "source": "crates/scanner/src/checks/csharp_checks.rs",
+  "items": [
+    {
+      "name": "check_naming",
+      "kind": "Fn",
+      "signature": "pub fn check_naming( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 20,
+      "doc": "Check C# naming conventions."
+    },
+    {
+      "name": "check_doc_required",
+      "kind": "Fn",
+      "signature": "pub fn check_doc_required( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 78,
+      "doc": "Check C# public items have XML doc comments (///)."
+    }
+  ]
+}

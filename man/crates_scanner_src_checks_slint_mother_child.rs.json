@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/slint_mother_child.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( file_ctx: &FileContext, lines: &[&str], _cfg: &Config, issues: &mut Vec<Issue>, path: &Path, )",
+      "line": 10,
+      "doc": "Check Slint mother-child topology rules.\n\n1. Children must be stateless — no `in-out property` (except <=> delegation)\n2. Child files cannot import from sibling views"
+    }
+  ]
+}

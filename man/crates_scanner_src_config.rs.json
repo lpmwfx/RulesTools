@@ -1,0 +1,47 @@
+{
+  "source": "crates/scanner/src/config.rs",
+  "items": [
+    {
+      "name": "Config",
+      "kind": "Struct",
+      "signature": "pub struct Config",
+      "line": 6,
+      "doc": "Unified scan configuration — parsed from `proj/rulestools.toml`."
+    },
+    {
+      "name": "parse",
+      "kind": "Fn",
+      "signature": "pub fn parse(content: &str) -> Self",
+      "line": 16,
+      "doc": "Parse config from TOML string content."
+    },
+    {
+      "name": "load",
+      "kind": "Fn",
+      "signature": "pub fn load(project_root: &Path) -> Self",
+      "line": 73,
+      "doc": "Load config from a project directory (reads `proj/rulestools.toml`)."
+    },
+    {
+      "name": "is_enabled",
+      "kind": "Fn",
+      "signature": "pub fn is_enabled(&self, check_id: &str) -> bool",
+      "line": 82,
+      "doc": "Check if a specific check is enabled. Defaults to true if not configured."
+    },
+    {
+      "name": "param_i64",
+      "kind": "Fn",
+      "signature": "pub fn param_i64(&self, key: &str, default: i64) -> i64",
+      "line": 87,
+      "doc": "Get a parameter value for a check, with a default fallback."
+    },
+    {
+      "name": "param_str",
+      "kind": "Fn",
+      "signature": "pub fn param_str(&self, key: &str, default: &str) -> String",
+      "line": 95,
+      "doc": "Get a parameter string value."
+    }
+  ]
+}

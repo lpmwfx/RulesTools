@@ -1,0 +1,82 @@
+{
+  "source": "crates/scanner/src/project.rs",
+  "items": [
+    {
+      "name": "ProjectKind",
+      "kind": "Enum",
+      "signature": "pub enum ProjectKind",
+      "line": 5,
+      "doc": "What kind of project is this — determines which checks apply."
+    },
+    {
+      "name": "Layout",
+      "kind": "Enum",
+      "signature": "pub enum Layout",
+      "line": 22,
+      "doc": "Project layout — single crate or Cargo workspace."
+    },
+    {
+      "name": "ProjectIdentity",
+      "kind": "Struct",
+      "signature": "pub struct ProjectIdentity",
+      "line": 31,
+      "doc": "Auto-detected project identity."
+    },
+    {
+      "name": "detect",
+      "kind": "Fn",
+      "signature": "pub fn detect(root: &Path) -> Self",
+      "line": 39,
+      "doc": "Detect project kind and layout. Explicit `[project].kind` in\n`proj/rulestools.toml` overrides auto-detection."
+    },
+    {
+      "name": "is_registered",
+      "kind": "Fn",
+      "signature": "pub fn is_registered(root: &Path) -> bool",
+      "line": 46,
+      "doc": "Check if project has explicit registration (proj/rulestools.toml with [project].kind)."
+    },
+    {
+      "name": "suggest",
+      "kind": "Fn",
+      "signature": "pub fn suggest(root: &Path) -> String",
+      "line": 51,
+      "doc": "Suggest the best matching ProjectKind for an unregistered project."
+    },
+    {
+      "name": "from_str",
+      "kind": "Fn",
+      "signature": "pub fn from_str(s: &str) -> Option<Self>",
+      "line": 150,
+      "doc": "Parse from string (for `proj/rulestools.toml` `[project].kind`)."
+    },
+    {
+      "name": "skipped_categories",
+      "kind": "Fn",
+      "signature": "pub fn skipped_categories(&self) -> &'static [&'static str]",
+      "line": 164,
+      "doc": "Check categories that are skipped for this project kind."
+    },
+    {
+      "name": "upgrade_ord",
+      "kind": "Fn",
+      "signature": "pub fn upgrade_ord(&self) -> u8",
+      "line": 198,
+      "doc": "Numeric ordering for upgrade validation.\nHigher values = more complex project kind."
+    },
+    {
+      "name": "as_str",
+      "kind": "Fn",
+      "signature": "pub fn as_str(&self) -> &'static str",
+      "line": 210,
+      "doc": "Human-readable kind string for config files and display."
+    },
+    {
+      "name": "allows_check",
+      "kind": "Fn",
+      "signature": "pub fn allows_check(&self, check_id: &str) -> bool",
+      "line": 222,
+      "doc": "Whether a check ID should run for this project kind."
+    }
+  ]
+}

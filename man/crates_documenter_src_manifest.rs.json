@@ -1,0 +1,54 @@
+{
+  "source": "crates/documenter/src/manifest.rs",
+  "items": [
+    {
+      "name": "ItemKind",
+      "kind": "Enum",
+      "signature": "pub enum ItemKind",
+      "line": 5,
+      "doc": "Kind of documented item."
+    },
+    {
+      "name": "label",
+      "kind": "Fn",
+      "signature": "pub fn label(&self) -> &'static str",
+      "line": 20,
+      "doc": "Display label."
+    },
+    {
+      "name": "DocItem",
+      "kind": "Struct",
+      "signature": "pub struct DocItem",
+      "line": 38,
+      "doc": "A single documented item extracted from source."
+    },
+    {
+      "name": "is_documented",
+      "kind": "Fn",
+      "signature": "pub fn is_documented(&self) -> bool",
+      "line": 48,
+      "doc": "Whether this item has documentation."
+    },
+    {
+      "name": "SourceDoc",
+      "kind": "Struct",
+      "signature": "pub struct SourceDoc",
+      "line": 55,
+      "doc": "All documented items from one source file."
+    },
+    {
+      "name": "Manifest",
+      "kind": "Struct",
+      "signature": "pub struct Manifest",
+      "line": 62,
+      "doc": "Aggregated manifest for the entire project."
+    },
+    {
+      "name": "ManifestEntry",
+      "kind": "Struct",
+      "signature": "pub struct ManifestEntry",
+      "line": 69,
+      "doc": "Per-file entry in the manifest."
+    }
+  ]
+}

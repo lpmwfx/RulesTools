@@ -1,0 +1,19 @@
+{
+  "source": "crates/documenter/src/docgen/mod.rs",
+  "items": [
+    {
+      "name": "DocGenResult",
+      "kind": "Struct",
+      "signature": "pub struct DocGenResult",
+      "line": 8,
+      "doc": "Result of auto-documentation generation."
+    },
+    {
+      "name": "document_project",
+      "kind": "Fn",
+      "signature": "pub fn document_project(root: &Path) -> DocGenResult",
+      "line": 15,
+      "doc": "Run auto-documentation on a project: find undocumented items, call AI, insert `///`."
+    }
+  ]
+}

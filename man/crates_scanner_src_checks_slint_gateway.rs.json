@@ -1,0 +1,12 @@
+{
+  "source": "crates/scanner/src/checks/slint_gateway.rs",
+  "items": [
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check( paths: &[PathBuf], _cfg: &Config, issues: &mut Vec<Issue>, )",
+      "line": 34,
+      "doc": "Check that all Slint UI callbacks delegate to exactly ONE gateway object.\n\nMultiple different gateway receivers across .slint files = error."
+    }
+  ]
+}

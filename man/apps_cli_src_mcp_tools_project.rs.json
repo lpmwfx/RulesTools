@@ -1,0 +1,40 @@
+{
+  "source": "apps/cli/src/mcp/tools/project.rs",
+  "items": [
+    {
+      "name": "setup",
+      "kind": "Fn",
+      "signature": "pub fn setup(args: &Value) -> ToolResult",
+      "line": 7,
+      "doc": "fn `setup`."
+    },
+    {
+      "name": "init_project",
+      "kind": "Fn",
+      "signature": "pub fn init_project(args: &Value) -> ToolResult",
+      "line": 20,
+      "doc": "fn `init_project`."
+    },
+    {
+      "name": "new_project",
+      "kind": "Fn",
+      "signature": "pub fn new_project(args: &Value) -> ToolResult",
+      "line": 40,
+      "doc": "fn `new_project`."
+    },
+    {
+      "name": "update_project",
+      "kind": "Fn",
+      "signature": "pub fn update_project(args: &Value) -> ToolResult",
+      "line": 79,
+      "doc": "fn `update_project`."
+    },
+    {
+      "name": "upgrade_project",
+      "kind": "Fn",
+      "signature": "pub fn upgrade_project(args: &Value) -> ToolResult",
+      "line": 111,
+      "doc": "fn `upgrade_project`."
+    }
+  ]
+}

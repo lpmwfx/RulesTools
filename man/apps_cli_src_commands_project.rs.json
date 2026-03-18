@@ -1,0 +1,103 @@
+{
+  "source": "apps/cli/src/commands/project.rs",
+  "items": [
+    {
+      "name": "cmd_init",
+      "kind": "Fn",
+      "signature": "pub fn cmd_init(path: &PathBuf, kind_str: &str, name: Option<&str>)",
+      "line": 6,
+      "doc": "fn `cmd_init`."
+    },
+    {
+      "name": "init_internal",
+      "kind": "Fn",
+      "signature": "pub fn init_internal(path: &std::path::Path, kind_str: &str, name: Option<&str>) -> Result<String, String>",
+      "line": 42,
+      "doc": "fn `init_internal`."
+    },
+    {
+      "name": "cmd_new",
+      "kind": "Fn",
+      "signature": "pub fn cmd_new( path: &PathBuf, kind_str: &str, name: Option<&str>, platforms_str: &str, themes_str: &str, mcp: bool, extras_str: &str,",
+      "line": 64,
+      "doc": "fn `cmd_new`."
+    },
+    {
+      "name": "new_internal",
+      "kind": "Fn",
+      "signature": "pub fn new_internal( path: &std::path::Path, kind_str: &str, name: Option<&str>, platforms_str: &str, themes_str: &str, mcp: bool, extras_str: &str,",
+      "line": 85,
+      "doc": "fn `new_internal`."
+    },
+    {
+      "name": "cmd_update",
+      "kind": "Fn",
+      "signature": "pub fn cmd_update( path: &PathBuf, platforms_str: &str, themes_str: &str, crate_name: Option<&str>, folders_str: &str, preview: bool, format: &str,",
+      "line": 188,
+      "doc": "fn `cmd_update`."
+    },
+    {
+      "name": "update_internal",
+      "kind": "Fn",
+      "signature": "pub fn update_internal( path: &std::path::Path, platforms_str: &str, themes_str: &str, crate_name: Option<&str>, folders_str: &str, preview: bool, format: &str,",
+      "line": 207,
+      "doc": "fn `update_internal`."
+    },
+    {
+      "name": "cmd_upgrade",
+      "kind": "Fn",
+      "signature": "pub fn cmd_upgrade(path: &PathBuf, to_str: &str, preview: bool, format: &str)",
+      "line": 273,
+      "doc": "fn `cmd_upgrade`."
+    },
+    {
+      "name": "upgrade_internal",
+      "kind": "Fn",
+      "signature": "pub fn upgrade_internal( path: &std::path::Path, to_str: &str, preview: bool, format: &str, ) -> Result<String, String>",
+      "line": 284,
+      "doc": "fn `upgrade_internal`."
+    },
+    {
+      "name": "cmd_detect",
+      "kind": "Fn",
+      "signature": "pub fn cmd_detect(path: &PathBuf)",
+      "line": 356,
+      "doc": "fn `cmd_detect`."
+    },
+    {
+      "name": "detect_internal",
+      "kind": "Fn",
+      "signature": "pub fn detect_internal(path: &std::path::Path) -> String",
+      "line": 361,
+      "doc": "fn `detect_internal`."
+    },
+    {
+      "name": "cmd_list",
+      "kind": "Fn",
+      "signature": "pub fn cmd_list(path: &PathBuf)",
+      "line": 380,
+      "doc": "fn `cmd_list`."
+    },
+    {
+      "name": "list_internal",
+      "kind": "Fn",
+      "signature": "pub fn list_internal(path: &std::path::Path) -> String",
+      "line": 385,
+      "doc": "fn `list_internal`."
+    },
+    {
+      "name": "setup_internal",
+      "kind": "Fn",
+      "signature": "pub fn setup_internal(path: &std::path::Path) -> Result<String, String>",
+      "line": 416,
+      "doc": "fn `setup_internal`."
+    },
+    {
+      "name": "cmd_setup",
+      "kind": "Fn",
+      "signature": "pub fn cmd_setup(path: &PathBuf)",
+      "line": 630,
+      "doc": "fn `cmd_setup`."
+    }
+  ]
+}

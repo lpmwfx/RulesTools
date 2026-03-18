@@ -1,0 +1,47 @@
+{
+  "source": "apps/cli/src/mcp/tools/publish.rs",
+  "items": [
+    {
+      "name": "plan",
+      "kind": "Fn",
+      "signature": "pub fn plan(args: &Value) -> ToolResult",
+      "line": 7,
+      "doc": "fn `plan`."
+    },
+    {
+      "name": "run",
+      "kind": "Fn",
+      "signature": "pub fn run(args: &Value) -> ToolResult",
+      "line": 20,
+      "doc": "fn `run`."
+    },
+    {
+      "name": "status",
+      "kind": "Fn",
+      "signature": "pub fn status(args: &Value) -> ToolResult",
+      "line": 38,
+      "doc": "fn `status`."
+    },
+    {
+      "name": "init",
+      "kind": "Fn",
+      "signature": "pub fn init(args: &Value) -> ToolResult",
+      "line": 51,
+      "doc": "fn `init`."
+    },
+    {
+      "name": "sync",
+      "kind": "Fn",
+      "signature": "pub fn sync(args: &Value) -> ToolResult",
+      "line": 68,
+      "doc": "fn `sync`."
+    },
+    {
+      "name": "check",
+      "kind": "Fn",
+      "signature": "pub fn check(args: &Value) -> ToolResult",
+      "line": 82,
+      "doc": "fn `check`."
+    }
+  ]
+}

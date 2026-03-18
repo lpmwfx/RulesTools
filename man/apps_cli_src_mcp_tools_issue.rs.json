@@ -1,0 +1,54 @@
+{
+  "source": "apps/cli/src/mcp/tools/issue.rs",
+  "items": [
+    {
+      "name": "report_issue",
+      "kind": "Fn",
+      "signature": "pub fn report_issue(args: &Value) -> ToolResult",
+      "line": 6,
+      "doc": "fn `report_issue`."
+    },
+    {
+      "name": "list_issues",
+      "kind": "Fn",
+      "signature": "pub fn list_issues(args: &Value) -> ToolResult",
+      "line": 30,
+      "doc": "fn `list_issues`."
+    },
+    {
+      "name": "add_label",
+      "kind": "Fn",
+      "signature": "pub fn add_label(args: &Value) -> ToolResult",
+      "line": 41,
+      "doc": "fn `add_label`."
+    },
+    {
+      "name": "list_labels",
+      "kind": "Fn",
+      "signature": "pub fn list_labels(_args: &Value) -> ToolResult",
+      "line": 58,
+      "doc": "fn `list_labels`."
+    },
+    {
+      "name": "comment_issue",
+      "kind": "Fn",
+      "signature": "pub fn comment_issue(args: &Value) -> ToolResult",
+      "line": 66,
+      "doc": "fn `comment_issue`."
+    },
+    {
+      "name": "create_label",
+      "kind": "Fn",
+      "signature": "pub fn create_label(args: &Value) -> ToolResult",
+      "line": 83,
+      "doc": "fn `create_label`."
+    },
+    {
+      "name": "close_issue",
+      "kind": "Fn",
+      "signature": "pub fn close_issue(args: &Value) -> ToolResult",
+      "line": 98,
+      "doc": "fn `close_issue`."
+    }
+  ]
+}
