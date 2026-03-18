@@ -1,10 +1,12 @@
 const FORGEJO_API: &str = "https://git.lpmintra.com/api/v1/repos/lpmwfx/issues";
 
+/// fn `forgejo_token`.
 pub fn forgejo_token() -> Result<String, String> {
     std::env::var("FORGEJO_TOKEN")
         .map_err(|_| "FORGEJO_TOKEN environment variable not set".to_string())
 }
 
+/// fn `resolve_label_ids`.
 pub fn resolve_label_ids(token: &str, names: &[&str]) -> Result<Vec<u64>, String> {
     let resp = ureq::get(&format!("{FORGEJO_API}/labels?limit=50"))
         .set("Authorization", &format!("token {token}"))
@@ -29,6 +31,7 @@ pub fn resolve_label_ids(token: &str, names: &[&str]) -> Result<Vec<u64>, String
 
 // --- Internal functions (return Result for MCP reuse) ---
 
+/// fn `report_internal`.
 pub fn report_internal(title: &str, body: &str, labels_str: &str) -> Result<String, String> {
     let token = forgejo_token()?;
 
@@ -56,6 +59,7 @@ pub fn report_internal(title: &str, body: &str, labels_str: &str) -> Result<Stri
     Ok(format!("Issue #{number} created: {url}"))
 }
 
+/// fn `list_internal`.
 pub fn list_internal(state: &str, labels_str: &str) -> Result<String, String> {
     let token = forgejo_token()?;
 
@@ -90,6 +94,57 @@ pub fn list_internal(state: &str, labels_str: &str) -> Result<String, String> {
     Ok(out)
 }
 
+/// Read a single issue by number — returns title, body, labels, state, comments.
+pub fn read_internal(number: u64) -> Result<String, String> {
+    let token = forgejo_token()?;
+
+    let resp = ureq::get(&format!("{FORGEJO_API}/issues/{number}"))
+        .set("Authorization", &format!("token {token}"))
+        .call()
+        .map_err(|e| format!("Failed to read issue: {e}"))?;
+
+    let body = resp.into_string().map_err(|e| format!("Cannot read response: {e}"))?;
+    let issue: serde_json::Value = serde_json::from_str(&body)
+        .map_err(|e| format!("Cannot parse response: {e}"))?;
+
+    let title = issue.get("title").and_then(|v| v.as_str()).unwrap_or("?");
+    let state = issue.get("state").and_then(|v| v.as_str()).unwrap_or("?");
+    let issue_body = issue.get("body").and_then(|v| v.as_str()).unwrap_or("");
+    let labels: Vec<&str> = issue.get("labels")
+        .and_then(|v| v.as_array())
+        .map(|arr| arr.iter().filter_map(|l| l.get("name").and_then(|n| n.as_str())).collect())
+        .unwrap_or_default();
+    let created = issue.get("created_at").and_then(|v| v.as_str()).unwrap_or("?");
+
+    let mut out = format!("#{number} [{state}] {title}\nLabels: {}\nCreated: {created}\n\n{issue_body}", labels.join(", "));
+
+    // Fetch comments
+    let comments_resp = ureq::get(&format!("{FORGEJO_API}/issues/{number}/comments"))
+        .set("Authorization", &format!("token {token}"))
+        .call();
+
+    if let Ok(resp) = comments_resp {
+        if let Ok(body) = resp.into_string() {
+            let comments: Vec<serde_json::Value> = serde_json::from_str(&body).unwrap_or_default();
+            if !comments.is_empty() {
+                out.push_str(&format!("\n\n--- {} comment(s) ---\n", comments.len()));
+                for comment in &comments {
+                    let author = comment.get("user")
+                        .and_then(|u| u.get("login"))
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("?");
+                    let body = comment.get("body").and_then(|v| v.as_str()).unwrap_or("");
+                    let date = comment.get("created_at").and_then(|v| v.as_str()).unwrap_or("?");
+                    out.push_str(&format!("\n[{author} @ {date}]\n{body}\n"));
+                }
+            }
+        }
+    }
+
+    Ok(out)
+}
+
+/// fn `close_internal`.
 pub fn close_internal(number: u64, comment: &str) -> Result<String, String> {
     let token = forgejo_token()?;
 
@@ -111,6 +166,7 @@ pub fn close_internal(number: u64, comment: &str) -> Result<String, String> {
     Ok(format!("Issue #{number} closed"))
 }
 
+/// fn `add_label_internal`.
 pub fn add_label_internal(number: u64, label: &str) -> Result<String, String> {
     let token = forgejo_token()?;
 
@@ -129,6 +185,7 @@ pub fn add_label_internal(number: u64, label: &str) -> Result<String, String> {
     Ok(format!("Label '{label}' added to issue #{number}"))
 }
 
+/// fn `create_label_internal`.
 pub fn create_label_internal(name: &str, color: &str, description: &str) -> Result<String, String> {
     let token = forgejo_token()?;
 
@@ -152,6 +209,7 @@ pub fn create_label_internal(name: &str, color: &str, description: &str) -> Resu
     Ok(format!("Label '{name}' created (id: {id})"))
 }
 
+/// fn `list_labels_internal`.
 pub fn list_labels_internal() -> Result<String, String> {
     let token = forgejo_token()?;
 
@@ -181,6 +239,7 @@ pub fn list_labels_internal() -> Result<String, String> {
     Ok(out)
 }
 
+/// fn `comment_internal`.
 pub fn comment_internal(number: u64, body: &str) -> Result<String, String> {
     let token = forgejo_token()?;
 
@@ -196,6 +255,7 @@ pub fn comment_internal(number: u64, body: &str) -> Result<String, String> {
 
 // --- CLI wrappers ---
 
+/// fn `cmd_issue_report`.
 pub fn cmd_issue_report(title: &str, body: &str, labels: &str) {
     match report_internal(title, body, labels) {
         Ok(output) => println!("{output}"),
@@ -203,6 +263,7 @@ pub fn cmd_issue_report(title: &str, body: &str, labels: &str) {
     }
 }
 
+/// fn `cmd_issue_list`.
 pub fn cmd_issue_list(state: &str, labels: &str) {
     match list_internal(state, labels) {
         Ok(output) => print!("{output}"),
@@ -210,6 +271,7 @@ pub fn cmd_issue_list(state: &str, labels: &str) {
     }
 }
 
+/// fn `cmd_issue_close`.
 pub fn cmd_issue_close(number: u64, comment: &str) {
     match close_internal(number, comment) {
         Ok(output) => println!("{output}"),
@@ -217,6 +279,7 @@ pub fn cmd_issue_close(number: u64, comment: &str) {
     }
 }
 
+/// fn `cmd_issue_add_label`.
 pub fn cmd_issue_add_label(number: u64, label: &str) {
     match add_label_internal(number, label) {
         Ok(output) => println!("{output}"),
@@ -224,6 +287,7 @@ pub fn cmd_issue_add_label(number: u64, label: &str) {
     }
 }
 
+/// fn `cmd_issue_create_label`.
 pub fn cmd_issue_create_label(name: &str, color: &str, description: &str) {
     match create_label_internal(name, color, description) {
         Ok(output) => println!("{output}"),
@@ -231,6 +295,7 @@ pub fn cmd_issue_create_label(name: &str, color: &str, description: &str) {
     }
 }
 
+/// fn `cmd_issue_list_labels`.
 pub fn cmd_issue_list_labels() {
     match list_labels_internal() {
         Ok(output) => print!("{output}"),
@@ -238,6 +303,7 @@ pub fn cmd_issue_list_labels() {
     }
 }
 
+/// fn `cmd_issue_comment`.
 pub fn cmd_issue_comment(number: u64, body: &str) {
     match comment_internal(number, body) {
         Ok(output) => println!("{output}"),
@@ -248,6 +314,7 @@ pub fn cmd_issue_comment(number: u64, body: &str) {
 // --- IssueCmd dispatch ---
 use crate::IssueCmd;
 
+/// fn `cmd_issue`.
 pub fn cmd_issue(cmd: IssueCmd) {
     match cmd {
         IssueCmd::Report { title, body, labels } => cmd_issue_report(&title, &body, &labels),

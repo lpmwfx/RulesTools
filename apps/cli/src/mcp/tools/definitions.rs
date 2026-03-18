@@ -167,6 +167,18 @@ pub fn all() -> Vec<ToolDef> {
             }),
         },
         ToolDef {
+            name: "read_issue".into(),
+            description: "Read a single issue from Forgejo issue tracker.\n\n\
+                Returns title, body, labels, state, creation date, and all comments.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "number": { "type": "integer", "description": "Issue number" }
+                },
+                "required": ["number"]
+            }),
+        },
+        ToolDef {
             name: "report_issue".into(),
             description: "Report an issue to Forgejo issue tracker.\n\nAlways adds 'ai-reported' label. Use component labels (scanner, documenter, mcp-rules, mcp-tools, rules, man-viewer) and type labels (bug, debt, architecture, security).".into(),
             input_schema: serde_json::json!({

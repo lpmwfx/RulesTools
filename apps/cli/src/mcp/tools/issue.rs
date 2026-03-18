@@ -2,6 +2,7 @@ use serde_json::Value;
 use crate::mcp::ToolResult;
 use crate::commands::issue as issue_cmd;
 
+/// fn `report_issue`.
 pub fn report_issue(args: &Value) -> ToolResult {
     let title = match args.get("title").and_then(|v| v.as_str()) {
         Some(t) => t,
@@ -25,6 +26,7 @@ pub fn report_issue(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `list_issues`.
 pub fn list_issues(args: &Value) -> ToolResult {
     let state = args.get("state").and_then(|v| v.as_str()).unwrap_or("open");
     let labels = args.get("labels").and_then(|v| v.as_str()).unwrap_or("");
@@ -35,6 +37,20 @@ pub fn list_issues(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `read_issue`.
+pub fn read_issue(args: &Value) -> ToolResult {
+    let number = match args.get("number").and_then(|v| v.as_u64()) {
+        Some(n) => n,
+        None => return ToolResult::error("Missing required parameter: number"),
+    };
+
+    match issue_cmd::read_internal(number) {
+        Ok(output) => ToolResult::text(output),
+        Err(e) => ToolResult::error(e),
+    }
+}
+
+/// fn `add_label`.
 pub fn add_label(args: &Value) -> ToolResult {
     let number = match args.get("number").and_then(|v| v.as_u64()) {
         Some(n) => n,
@@ -51,6 +67,7 @@ pub fn add_label(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `list_labels`.
 pub fn list_labels(_args: &Value) -> ToolResult {
     match issue_cmd::list_labels_internal() {
         Ok(output) => ToolResult::text(output),
@@ -58,6 +75,7 @@ pub fn list_labels(_args: &Value) -> ToolResult {
     }
 }
 
+/// fn `comment_issue`.
 pub fn comment_issue(args: &Value) -> ToolResult {
     let number = match args.get("number").and_then(|v| v.as_u64()) {
         Some(n) => n,
@@ -74,6 +92,7 @@ pub fn comment_issue(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `create_label`.
 pub fn create_label(args: &Value) -> ToolResult {
     let name = match args.get("name").and_then(|v| v.as_str()) {
         Some(n) => n,
@@ -88,6 +107,7 @@ pub fn create_label(args: &Value) -> ToolResult {
     }
 }
 
+/// fn `close_issue`.
 pub fn close_issue(args: &Value) -> ToolResult {
     let number = match args.get("number").and_then(|v| v.as_u64()) {
         Some(n) => n,

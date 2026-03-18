@@ -26,6 +26,7 @@ fn handle(name: &str, args: &Value) -> ToolResult {
         "new_project" => project::new_project(args),
         "update_project" => project::update_project(args),
         "upgrade_project" => project::upgrade_project(args),
+        "read_issue" => issue::read_issue(args),
         "report_issue" => issue::report_issue(args),
         "list_issues" => issue::list_issues(args),
         "add_label" => issue::add_label(args),
