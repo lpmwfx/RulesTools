@@ -306,7 +306,8 @@ pub fn update_project(root: &Path, opts: &UpdateOptions) -> Result<ScaffoldResul
     // build.rs — ensure it exists with scanner + documenter
     let build_rs = root.join("build.rs");
     if !build_rs.exists() && root.join("Cargo.toml").exists() {
-        let is_slint = identity.kind == ProjectKind::SlintApp || identity.kind == ProjectKind::Super;
+        let is_slint = identity.kind == ProjectKind::SlintApp
+            || (identity.kind == ProjectKind::Super && root.join("ui").exists());
         let content = if is_slint { BUILD_RS_SCANNER_SLINT } else { BUILD_RS_SCANNER };
         if !w.dry_run {
             std::fs::write(&build_rs, content)
