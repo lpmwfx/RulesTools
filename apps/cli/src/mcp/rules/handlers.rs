@@ -158,7 +158,7 @@ pub fn get_context(repo: &Path, args: &Value) -> ToolResult {
     let mut matched: Vec<&RuleEntry> = Vec::new();
     for entry in reg.list(None) {
         let cat = entry.category.to_lowercase();
-        let is_quick_ref = entry.file.ends_with("quick-ref.md");
+        let _is_quick_ref = entry.file.ends_with("quick-ref.md");
 
         if quick_ref {
             // Quick-ref mode: match combo files in quick-ref/ category
@@ -336,4 +336,171 @@ pub fn get_related(repo: &Path, args: &Value) -> ToolResult {
     }
 
     ToolResult::text(lines.join("\n"))
+}
+
+/// fn `get_file_context` — detect language, topology layer, and key rules for a file.
+pub fn get_file_context(_repo: &Path, args: &Value) -> ToolResult {
+    let file_path = match args.get("path").and_then(|v| v.as_str()) {
+        Some(p) => p,
+        None => return ToolResult::error("Missing required parameter: path"),
+    };
+
+    // Detect language from extension
+    let language = detect_language(file_path);
+
+    // Detect topology layer from path
+    let layer = detect_topology_layer(file_path);
+
+    // Get allowed imports for this layer
+    let (allowed_imports, _disallowed_imports) = get_layer_constraints(&layer);
+
+    // Get type suffix for this layer
+    let type_suffix = get_type_suffix(&layer);
+
+    // Get key rules for this language/layer
+    let key_rules = get_key_rules(&language, &layer);
+
+    // Build output
+    let mut output = format!(
+        "## File context: {}\n\n\
+        Language: {}\n",
+        file_path, language
+    );
+
+    if !layer.is_empty() {
+        output.push_str(&format!(
+            "Topology layer: {}\n  \
+            Allowed imports: {}\n  \
+            Public types must carry: {} suffix\n\n",
+            layer,
+            if allowed_imports.is_empty() { "nothing".to_string() } else { allowed_imports.join(", ") },
+            if type_suffix.is_empty() { "no" } else { &type_suffix }
+        ));
+    } else {
+        output.push_str("Topology layer: (no topology detected)\n\n");
+    }
+
+    output.push_str("Key rules:\n");
+    for rule in &key_rules {
+        output.push_str(&format!("- get_rule(\"{}\") — {}\n", rule.0, rule.1));
+    }
+
+    output.push_str("\nCompliance checklist:\n");
+    if !layer.is_empty() {
+        output.push_str(&format!("- [ ] File respects {} layer import rules (allowed: {})?\n",
+            layer, allowed_imports.join(", ")));
+        if !type_suffix.is_empty() {
+            output.push_str(&format!("- [ ] All pub types end in {} suffix?\n", type_suffix));
+        }
+    }
+    output.push_str("- [ ] No .unwrap() calls in non-test code?\n");
+    output.push_str("- [ ] All constants named (no magic numbers)?\n");
+    output.push_str("- [ ] File under size limit after changes?\n");
+
+    ToolResult::text(output)
+}
+
+fn detect_language(path: &str) -> String {
+    let lower = path.to_lowercase();
+    if lower.ends_with(".rs") { "rust" }
+    else if lower.ends_with(".slint") { "slint" }
+    else if lower.ends_with(".py") { "python" }
+    else if lower.ends_with(".js") || lower.ends_with(".mjs") { "js" }
+    else if lower.ends_with(".ts") || lower.ends_with(".tsx") { "typescript" }
+    else if lower.ends_with(".cpp") || lower.ends_with(".cc") || lower.ends_with(".cxx") || lower.ends_with(".c++") { "cpp" }
+    else if lower.ends_with(".h") || lower.ends_with(".hpp") || lower.ends_with(".hxx") { "cpp" }
+    else if lower.ends_with(".kt") || lower.ends_with(".kts") { "kotlin" }
+    else if lower.ends_with(".cs") { "csharp" }
+    else if lower.ends_with(".css") { "css" }
+    else { "unknown" }
+    .to_string()
+}
+
+fn detect_topology_layer(path: &str) -> String {
+    let normalized = path.replace("\\", "/");
+
+    // Check for topology folders in path
+    let parts: Vec<&str> = normalized.split('/').collect();
+
+    for part in &parts {
+        match *part {
+            "core" => return "core".to_string(),
+            "adapter" | "adp" => return "adapter".to_string(),
+            "gateway" | "gtw" => return "gateway".to_string(),
+            "pal" => return "pal".to_string(),
+            "shared" => return "shared".to_string(),
+            "ui" => return "ui".to_string(),
+            "app" => return "app".to_string(),
+            _ => {}
+        }
+    }
+
+    String::new()
+}
+
+fn get_layer_constraints(layer: &str) -> (Vec<String>, Vec<String>) {
+    match layer {
+        "app" => (vec!["core", "adapter", "gateway", "pal", "ui", "shared"]
+            .iter().map(|s| s.to_string()).collect(),
+         vec![]),
+        "adapter" => (vec!["core", "gateway", "pal", "ui", "shared"]
+            .iter().map(|s| s.to_string()).collect(),
+         vec!["app".to_string()]),
+        "ui" => (vec!["adapter", "shared"]
+            .iter().map(|s| s.to_string()).collect(),
+         vec!["app".to_string(), "core".to_string(), "gateway".to_string(), "pal".to_string()]),
+        "core" => (vec!["pal", "shared"]
+            .iter().map(|s| s.to_string()).collect(),
+         vec!["app".to_string(), "adapter".to_string(), "gateway".to_string(), "ui".to_string()]),
+        "gateway" => (vec!["pal", "shared"]
+            .iter().map(|s| s.to_string()).collect(),
+         vec!["app".to_string(), "adapter".to_string(), "core".to_string(), "ui".to_string()]),
+        "pal" => (vec!["shared"]
+            .iter().map(|s| s.to_string()).collect(),
+         vec!["app".to_string(), "adapter".to_string(), "core".to_string(), "gateway".to_string(), "ui".to_string()]),
+        "shared" => (vec![], vec!["app".to_string(), "adapter".to_string(), "core".to_string(), "gateway".to_string(), "pal".to_string(), "ui".to_string()]),
+        _ => (vec![], vec![]),
+    }
+}
+
+fn get_type_suffix(layer: &str) -> String {
+    match layer {
+        "core" => "_core",
+        "adapter" => "_adp",
+        "gateway" => "_gtw",
+        "pal" => "_pal",
+        "shared" => "_x",
+        "ui" => "_ui",
+        _ => "",
+    }.to_string()
+}
+
+fn get_key_rules(language: &str, _layer: &str) -> Vec<(String, String)> {
+    let mut rules: Vec<(String, String)> = vec![
+        ("global/file-limits.md".to_string(), "max lines per file".to_string()),
+        ("global/topology.md".to_string(), "import DAG enforcement".to_string()),
+    ];
+
+    match language {
+        "rust" => {
+            rules.push(("rust/errors.md".to_string(), "no unwrap, use ?".to_string()));
+            rules.push(("rust/naming.md".to_string(), "layer suffix, bool prefixes".to_string()));
+            rules.push(("rust/types.md".to_string(), "no &Vec/&String".to_string()));
+        }
+        "python" => {
+            rules.push(("python/naming.md".to_string(), "naming conventions".to_string()));
+            rules.push(("python/boundary-check.md".to_string(), "boundary validation".to_string()));
+        }
+        "js" | "typescript" => {
+            rules.push(("js/naming.md".to_string(), "naming conventions".to_string()));
+            rules.push(("js/modules.md".to_string(), "module structure".to_string()));
+        }
+        "slint" => {
+            rules.push(("slint/states.md".to_string(), "zero-literal enforcement".to_string()));
+            rules.push(("slint/globals.md".to_string(), "named constants".to_string()));
+        }
+        _ => {}
+    }
+
+    rules
 }

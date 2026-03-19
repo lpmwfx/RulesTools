@@ -142,6 +142,17 @@ fn definitions() -> Vec<ToolDef> {
                 "required": ["file"]
             }),
         },
+        ToolDef {
+            name: "get_file_context".into(),
+            description: "Get compliance context for a specific file before editing it.\nReturns: detected language, topology layer, import rules, and key rule references.\nCall this BEFORE editing any file to know which rules apply.".into(),
+            input_schema: serde_json::json!({
+                "type": "object",
+                "properties": {
+                    "path": { "type": "string", "description": "Absolute path to the file" }
+                },
+                "required": ["path"]
+            }),
+        },
     ]
 }
 
@@ -159,6 +170,7 @@ fn handle(name: &str, args: &Value) -> ToolResult {
         "get_context" => handlers::get_context(&repo, args),
         "get_learning_path" => handlers::learning_path(&repo, args),
         "get_related" => handlers::get_related(&repo, args),
+        "get_file_context" => handlers::get_file_context(&repo, args),
         _ => ToolResult::error(format!("Unknown tool: {name}")),
     }
 }

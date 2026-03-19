@@ -15,9 +15,63 @@ pub fn scan_file(args: &Value) -> ToolResult {
     }
 
     match scan_cmd::scan_file_internal(&path, "text") {
-        Ok(output) => ToolResult::text(output),
+        Ok(mut output) => {
+            // If not CLEAN, append rule hints
+            if !output.contains("CLEAN") {
+                let hints = collect_rule_hints(&output);
+                if !hints.is_empty() {
+                    output.push_str("\n\n### Relevant rules — call get_rule() for details\n");
+                    for hint in hints {
+                        output.push_str(&format!("- get_rule(\"{}\")\n", hint));
+                    }
+                }
+            }
+            ToolResult::text(output)
+        }
         Err(e) => ToolResult::error(e),
     }
+}
+
+/// Collect relevant rule files based on violation keywords.
+fn collect_rule_hints(output: &str) -> Vec<String> {
+    let mut hints = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+
+    let lower = output.to_lowercase();
+
+    // Map violation keywords to rule files
+    let patterns = vec![
+        ("mother", "global/mother-tree.md"),
+        ("delegate", "global/mother-tree.md"),
+        ("fn definitions", "global/mother-tree.md"),
+        ("magic number", "global/config-driven.md"),
+        ("literal", "global/config-driven.md"),
+        ("zero", "global/config-driven.md"),
+        ("unwrap", "rust/errors.md"),
+        ("expect", "rust/errors.md"),
+        ("panic", "rust/errors.md"),
+        ("too long", "global/file-limits.md"),
+        ("oversized", "global/file-limits.md"),
+        ("lines", "global/file-limits.md"),
+        ("stringly", "rust/types.md"),
+        ("string match", "rust/types.md"),
+        ("clone", "rust/ownership.md"),
+        ("layer", "global/topology.md"),
+        ("topology", "global/topology.md"),
+        ("placement", "global/topology.md"),
+        ("unsafe", "rust/threading.md"),
+        ("arc", "rust/threading.md"),
+        ("rc", "rust/threading.md"),
+    ];
+
+    for (keyword, rule) in patterns {
+        if lower.contains(keyword) && !seen.contains(rule) {
+            hints.push(rule.to_string());
+            seen.insert(rule);
+        }
+    }
+
+    hints
 }
 
 /// fn `scan_tree`.
