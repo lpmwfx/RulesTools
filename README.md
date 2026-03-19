@@ -116,3 +116,12 @@ RulesTools/
 | **RulesTools** | This repo — scanner, documenter, CLI, MCP |
 | **ManViewer** | [lpmwfx/ManViewer](https://github.com/lpmwfx/ManViewer) — GUI docs viewer |
 | **Rules** | [lpmwfx/Rules](https://github.com/lpmwfx/Rules) — markdown rule definitions |
+
+
+---
+
+<!-- LARS:START -->
+<a href="https://lpmathiasen.com">
+  <img src="https://carousel.lpmathiasen.com/carousel.svg?slot=6" alt="Lars P. Mathiasen"/>
+</a>
+<!-- LARS:END -->
