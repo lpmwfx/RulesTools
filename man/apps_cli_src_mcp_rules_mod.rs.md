@@ -16,3 +16,12 @@ Find Rules repo — check common locations (unified).
 
 ---
 
+
+
+---
+
+<!-- LARS:START -->
+<a href="https://lpmathiasen.com">
+  <img src="https://carousel.lpmathiasen.com/carousel.svg?slot=6" alt="Lars P. Mathiasen"/>
+</a>
+<!-- LARS:END -->
