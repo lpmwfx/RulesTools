@@ -81,3 +81,12 @@
 | crates/scanner/src/project.rs | 11 | 0 ok |
 | crates/scanner/src/severity.rs | 3 | 0 ok |
 | crates/scanner/src/walker.rs | 4 | 0 ok |
+
+
+---
+
+<!-- LARS:START -->
+<a href="https://lpmathiasen.com">
+  <img src="https://carousel.lpmathiasen.com/carousel.svg?slot=6" alt="Lars P. Mathiasen"/>
+</a>
+<!-- LARS:END -->
