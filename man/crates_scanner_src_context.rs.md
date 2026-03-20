@@ -72,3 +72,12 @@ Check if lines around an index indicate a test context (Rust #[test] or #[cfg(te
 
 ---
 
+
+
+---
+
+<!-- LARS:START -->
+<a href="https://lpmathiasen.com">
+  <img src="https://carousel.lpmathiasen.com/carousel.svg?slot=6" alt="Lars P. Mathiasen"/>
+</a>
+<!-- LARS:END -->
