@@ -38,8 +38,25 @@ pub fn check(
         return;
     }
 
+    let mut in_global = false;
+    let mut global_depth: i32 = 0;
+
     for (i, line) in lines.iter().enumerate() {
         let trimmed = line.trim();
+
+        // Track export global blocks — globals legitimately use in-out property for Rust bridge
+        if trimmed.starts_with("export global ") || trimmed.starts_with("global ") {
+            in_global = true;
+            global_depth = 0;
+        }
+        if in_global {
+            global_depth += trimmed.chars().filter(|c| *c == '{').count() as i32;
+            global_depth -= trimmed.chars().filter(|c| *c == '}').count() as i32;
+            if global_depth <= 0 && i > 0 {
+                in_global = false;
+            }
+            continue;
+        }
 
         // Check 1: Children must be stateless — no `in-out property`
         // Exception: `<=>` delegation (binding to parent property)
@@ -219,6 +236,36 @@ mod tests {
             extract_import_source(r#"import { A, B } from "../shared/widgets.slint";"#),
             Some("../shared/widgets.slint".to_string())
         );
+    }
+
+    #[test]
+    fn global_in_out_property_ok() {
+        let lines = vec![
+            "export global AppState {",
+            "    in-out property <string> current-page;",
+            "    in-out property <bool> dark-mode;",
+            "}",
+        ];
+        let mut issues = Vec::new();
+        check(&child_ctx(), &lines, &Config::default(), &mut issues, Path::new("ui/state.slint"));
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn global_followed_by_component_still_checked() {
+        let lines = vec![
+            "export global Settings {",
+            "    in-out property <string> theme;",
+            "}",
+            "",
+            "export component MyWidget inherits Rectangle {",
+            "    in-out property <string> label;",
+            "}",
+        ];
+        let mut issues = Vec::new();
+        check(&child_ctx(), &lines, &Config::default(), &mut issues, Path::new("ui/widget.slint"));
+        assert_eq!(issues.len(), 1); // Only the component in-out, not the global
+        assert!(issues[0].message.contains("MyWidget") || issues[0].line == 6);
     }
 
     #[test]

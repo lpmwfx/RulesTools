@@ -29,6 +29,10 @@ pub fn check(
             || trimmed.starts_with("pub use crate::")
             || trimmed.starts_with("pub use super::")
         {
+            // Skip imports inside #[cfg(test)] modules — test code can import from parent
+            if crate::context::is_test_context(lines, i) {
+                continue;
+            }
             issues.push(Issue::new(
                 path,
                 i + 1,
@@ -115,6 +119,38 @@ mod tests {
     #[test]
     fn comment_ignored() {
         let lines = vec!["// use crate::gateway::db;"];
+        let mut issues = Vec::new();
+        check(&ctx(), &lines, &Config::default(), &mut issues, Path::new("src/shared/utils.rs"));
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn use_super_in_cfg_test_ok() {
+        let lines = vec![
+            "pub fn helper() -> bool { true }",
+            "",
+            "#[cfg(test)]",
+            "mod tests {",
+            "    use super::*;",
+            "    #[test]",
+            "    fn test_helper() {}",
+            "}",
+        ];
+        let mut issues = Vec::new();
+        check(&ctx(), &lines, &Config::default(), &mut issues, Path::new("src/shared/utils.rs"));
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn use_crate_in_cfg_test_ok() {
+        let lines = vec![
+            "pub fn helper() -> bool { true }",
+            "",
+            "#[cfg(test)]",
+            "mod tests {",
+            "    use crate::shared::other_module::Thing;",
+            "}",
+        ];
         let mut issues = Vec::new();
         check(&ctx(), &lines, &Config::default(), &mut issues, Path::new("src/shared/utils.rs"));
         assert!(issues.is_empty());

@@ -85,6 +85,12 @@ pub fn parse_slint(_path: &Path, content: &str) -> Vec<DocItem> {
     for (idx, line) in lines.iter().enumerate() {
         let trimmed = line.trim();
 
+        // Recognize both /// (inserted by documenter) and // (hand-written) as doc comments
+        if trimmed.starts_with("/// ") || trimmed == "///" {
+            let doc_line = trimmed.strip_prefix("/// ").unwrap_or("");
+            doc_buf.push(doc_line.to_string());
+            continue;
+        }
         if trimmed.starts_with("// ") {
             let doc_line = trimmed.strip_prefix("// ").unwrap_or("");
             doc_buf.push(doc_line.to_string());
@@ -208,5 +214,33 @@ mod tests {
         assert_eq!(items.len(), 1);
         assert_eq!(items[0].name, "MyButton");
         assert_eq!(items[0].doc, "A button.");
+    }
+
+    #[test]
+    fn parse_slint_triple_slash_doc() {
+        let content = "/// A button component.\nexport component MyButton { }";
+        let items = parse_slint(&PathBuf::from("test.slint"), content);
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].name, "MyButton");
+        assert_eq!(items[0].doc, "A button component.");
+        assert!(items[0].is_documented());
+    }
+
+    #[test]
+    fn parse_slint_double_slash_still_works() {
+        let content = "// A panel.\nexport component Panel { }";
+        let items = parse_slint(&PathBuf::from("test.slint"), content);
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].doc, "A panel.");
+        assert!(items[0].is_documented());
+    }
+
+    #[test]
+    fn parse_slint_generated_stub_recognized() {
+        // Simulates what the inserter generates: `/// component 'Foo'.`
+        let content = "/// component `MyButton`.\nexport component MyButton { }";
+        let items = parse_slint(&PathBuf::from("test.slint"), content);
+        assert_eq!(items.len(), 1);
+        assert!(items[0].is_documented(), "inserter-generated /// must be recognized");
     }
 }

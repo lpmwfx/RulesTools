@@ -94,7 +94,7 @@ pub fn check_staged(args: &Value) -> ToolResult {
         Err(e) => return e,
     };
 
-    match scan_cmd::scan_internal(&root, true) {
+    match scan_cmd::check_internal(&root) {
         Ok(output) => ToolResult::text(output),
         Err(output) => ToolResult::error(output),
     }

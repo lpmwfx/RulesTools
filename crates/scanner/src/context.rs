@@ -115,7 +115,9 @@ impl FileContext {
 
         let is_definition_file = match lang {
             Language::Slint => {
-                filename.starts_with("_") || path_str.contains("/globals/") || path_str.contains("\\globals\\")
+                filename.starts_with("_")
+                    || path_str.contains("/globals/") || path_str.contains("\\globals\\")
+                    || path_str.contains("/tokens/") || path_str.contains("\\tokens\\")
             }
             _ => false,
         };
@@ -126,6 +128,20 @@ impl FileContext {
             is_mother_file,
             is_definition_file,
         })
+    }
+
+    /// Refine context using file content (for cases where path alone is insufficient).
+    ///
+    /// Detects Slint Mother components by `inherits Window` content.
+    pub fn refine_with_content(&mut self, lines: &[&str]) {
+        if self.language == Language::Slint && !self.is_mother_file {
+            for line in lines {
+                if line.trim().contains("inherits Window") {
+                    self.is_mother_file = true;
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -149,22 +165,45 @@ pub fn is_const_def(line: &str) -> bool {
 }
 
 /// Check if lines around an index indicate a test context (Rust #[test] or #[cfg(test)]).
+///
+/// Scans backward from `index` looking for test attributes. Crosses fn boundaries
+/// to find `#[cfg(test)] mod tests` enclosing the function.
 pub fn is_test_context(lines: &[&str], index: usize) -> bool {
     let start = index.saturating_sub(60);
+    let mut past_fn_boundary = false;
     for i in (start..index).rev() {
         let trimmed = lines[i].trim();
         if trimmed == "#[test]" || trimmed == "#[cfg(test)]" || trimmed.starts_with("#[rstest") {
             return true;
         }
-        // Stop at fn boundary — but peek one line up for #[test] first
-        if trimmed.starts_with("fn ") || trimmed.starts_with("pub fn ") || trimmed.starts_with("async fn ") {
-            if i > 0 {
-                let above = lines[i - 1].trim();
-                if above == "#[test]" || above == "#[cfg(test)]" || above.starts_with("#[rstest") {
-                    return true;
+        if !past_fn_boundary {
+            if trimmed.starts_with("fn ")
+                || trimmed.starts_with("pub fn ")
+                || trimmed.starts_with("async fn ")
+                || trimmed.starts_with("pub async fn ")
+            {
+                if i > 0 {
+                    let above = lines[i - 1].trim();
+                    if above == "#[test]"
+                        || above == "#[cfg(test)]"
+                        || above.starts_with("#[rstest")
+                    {
+                        return true;
+                    }
                 }
+                past_fn_boundary = true;
+                continue;
             }
-            return false;
+        } else {
+            // Past fn boundary: look for enclosing test module
+            if trimmed.starts_with("mod tests") {
+                // mod tests is always test context (with or without explicit #[cfg(test)])
+                return true;
+            }
+            // Stop at any other module boundary
+            if trimmed.starts_with("mod ") && !trimmed.starts_with("mod tests") {
+                return false;
+            }
         }
     }
     false
@@ -235,6 +274,27 @@ mod tests {
 
         let ctx = FileContext::from_path(&PathBuf::from("ui/globals/theme.slint")).unwrap();
         assert!(ctx.is_definition_file);
+
+        let ctx = FileContext::from_path(&PathBuf::from("ui/tokens/colors.slint")).unwrap();
+        assert!(ctx.is_definition_file);
+
+        let ctx = FileContext::from_path(&PathBuf::from("ui/tokens/fluent-spacing.slint")).unwrap();
+        assert!(ctx.is_definition_file);
+    }
+
+    #[test]
+    fn slint_refine_inherits_window() {
+        let mut ctx = FileContext::from_path(&PathBuf::from("ui/app-window.slint")).unwrap();
+        assert!(!ctx.is_mother_file); // path alone does not detect it
+        ctx.refine_with_content(&["export component AppWindow inherits Window {"]);
+        assert!(ctx.is_mother_file);
+    }
+
+    #[test]
+    fn slint_refine_no_window() {
+        let mut ctx = FileContext::from_path(&PathBuf::from("ui/button.slint")).unwrap();
+        ctx.refine_with_content(&["export component MyButton inherits Rectangle {"]);
+        assert!(!ctx.is_mother_file);
     }
 
     #[test]
@@ -282,5 +342,53 @@ mod tests {
         assert!(is_test_context(&lines, 3));
         // Line 0 (empty) has nothing above
         assert!(!is_test_context(&lines, 0));
+    }
+
+    #[test]
+    fn test_context_cfg_test_mod() {
+        let lines = vec![
+            "#[cfg(test)]",
+            "mod tests {",
+            "    use super::*;",
+            "",
+            "    #[test]",
+            "    fn test_foo() {",
+            "        let x = foo.expect(\"boom\");",
+            "    }",
+            "}",
+        ];
+        // expect line inside #[test] fn inside #[cfg(test)] mod
+        assert!(is_test_context(&lines, 6));
+        // use super::* inside #[cfg(test)] mod tests
+        assert!(is_test_context(&lines, 2));
+    }
+
+    #[test]
+    fn test_context_cfg_test_mod_helper_fn() {
+        let lines = vec![
+            "#[cfg(test)]",
+            "mod tests {",
+            "    use super::*;",
+            "",
+            "    fn helper() {",
+            "        let x = foo.expect(\"y\");",
+            "    }",
+            "}",
+        ];
+        // helper fn (no #[test]) inside #[cfg(test)] mod — still test context
+        assert!(is_test_context(&lines, 5));
+    }
+
+    #[test]
+    fn test_context_not_in_regular_mod() {
+        let lines = vec![
+            "mod utils {",
+            "    fn helper() {",
+            "        let x = foo.expect(\"y\");",
+            "    }",
+            "}",
+        ];
+        // Not a test module — should NOT be test context
+        assert!(!is_test_context(&lines, 2));
     }
 }

@@ -7,6 +7,7 @@ pub struct Config {
     pub languages: Vec<String>,
     pub topology: String,
     pub deny: bool,
+    pub exclude: Vec<String>,
     checks: HashMap<String, bool>,
     params: HashMap<String, toml::Value>,
 }
@@ -29,6 +30,11 @@ impl Config {
             })
         {
             cfg.languages = langs;
+        }
+
+        // Exclude patterns: [scan].exclude
+        if let Some(excludes) = Self::extract_string_array(&table, &["scan", "exclude"]) {
+            cfg.exclude = excludes;
         }
 
         // Topology: [project].topology
@@ -134,6 +140,7 @@ impl Default for Config {
             languages: Vec::new(),
             topology: String::from("flat"),
             deny: false,
+            exclude: Vec::new(),
             checks: HashMap::new(),
             params: HashMap::new(),
         }
@@ -236,5 +243,28 @@ languages = ["rust"]
         assert_eq!(cfg.topology, "flat");
         assert!(!cfg.deny);
         assert!(cfg.is_enabled("any/check"));
+        assert!(cfg.exclude.is_empty());
+    }
+
+    #[test]
+    fn parse_exclude_patterns() {
+        let content = r#"
+[scan]
+exclude = ["ui/tokens/*.slint", "**/generated/**"]
+"#;
+        let cfg = Config::parse(content);
+        assert_eq!(cfg.exclude, vec!["ui/tokens/*.slint", "**/generated/**"]);
+    }
+
+    #[test]
+    fn parse_exclude_with_languages() {
+        let content = r#"
+[scan]
+languages = ["rust", "slint"]
+exclude = ["ui/app-window.slint"]
+"#;
+        let cfg = Config::parse(content);
+        assert_eq!(cfg.languages, vec!["rust", "slint"]);
+        assert_eq!(cfg.exclude, vec!["ui/app-window.slint"]);
     }
 }

@@ -243,4 +243,38 @@ mod tests {
         check_no_hardcoded_string(&definition_ctx(), &["    text: \"default\";"], &Config::default(), &mut issues, Path::new("_strings.slint"));
         assert!(issues.is_empty());
     }
+
+    // --- comment regression tests (#79) ---
+    #[test]
+    fn skips_doc_comment_with_text() {
+        let mut issues = Vec::new();
+        check_no_hardcoded_string(
+            &component_ctx(),
+            &["/// text: \"Some doc example\""],
+            &Config::default(), &mut issues, Path::new("a.slint"),
+        );
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn skips_doc_comment_hex_color() {
+        let mut issues = Vec::new();
+        check_zero_literal(
+            &component_ctx(),
+            &["/// Default color is #ff0000."],
+            &Config::default(), &mut issues, Path::new("a.slint"),
+        );
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn skips_double_slash_comment_hex() {
+        let mut issues = Vec::new();
+        check_zero_literal(
+            &component_ctx(),
+            &["// background: #1a1a1a;"],
+            &Config::default(), &mut issues, Path::new("a.slint"),
+        );
+        assert!(issues.is_empty());
+    }
 }

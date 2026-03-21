@@ -489,7 +489,7 @@ fn main() {
 
     match cli.command {
         Commands::Scan { path, deny } => commands::scan::cmd_scan(&path, deny),
-        Commands::Check { path } => commands::scan::cmd_scan(&path, true),
+        Commands::Check { path } => commands::scan::cmd_check(&path),
         Commands::List { path } => commands::project::cmd_list(&path),
         Commands::Detect { path } => commands::project::cmd_detect(&path),
         Commands::Gen { path } => commands::generate::cmd_gen(&path),

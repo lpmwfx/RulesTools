@@ -107,6 +107,89 @@ pub fn cmd_scan(path: &PathBuf, deny: bool) {
     }
 }
 
+/// Git-aware check: scan only staged files for pre-commit.
+///
+/// Falls back to full project scan if git is unavailable or no files are staged.
+pub fn check_internal(path: &std::path::Path) -> Result<String, String> {
+    let root = std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
+    let identity = rulestools_scanner::project::ProjectIdentity::detect(&root);
+    let mut output = format!("rulestools: {:?} / {:?}\n", identity.kind, identity.layout);
+
+    // Try to get staged files from git
+    let staged = get_staged_files(&root);
+    let (issues, mode) = match staged {
+        Some(ref files) if !files.is_empty() => {
+            output.push_str(&format!("rulestools: checking {} staged file(s)\n", files.len()));
+            (rulestools_scanner::scan_files(&root, files), "staged")
+        }
+        _ => {
+            output.push_str("rulestools: no staged files — full project scan\n");
+            let (issues, _) = rulestools_scanner::scan_at(&root);
+            (issues, "full")
+        }
+    };
+
+    let error_count = issues
+        .iter()
+        .filter(|i| i.severity == rulestools_scanner::issue::Severity::Error)
+        .count();
+    let warning_count = issues
+        .iter()
+        .filter(|i| i.severity == rulestools_scanner::issue::Severity::Warning)
+        .count();
+
+    if issues.is_empty() {
+        output.push_str(&format!("rulestools: 0 issues ({mode} scan)\n"));
+    } else {
+        output.push_str(&format!(
+            "rulestools: {} issues ({} errors, {} warnings) [{mode} scan]\n",
+            issues.len(), error_count, warning_count,
+        ));
+        let rules_root = find_rules_root(&root);
+        let grouped = rulestools_scanner::output::format_grouped_with_guidance(
+            &issues, &root, rules_root.as_deref(),
+        );
+        output.push_str(&grouped);
+    }
+
+    if error_count > 0 {
+        Err(output)
+    } else {
+        Ok(output)
+    }
+}
+
+/// Get staged files from git (added, copied, modified, renamed).
+fn get_staged_files(root: &std::path::Path) -> Option<Vec<PathBuf>> {
+    let output = std::process::Command::new("git")
+        .args(["diff", "--cached", "--name-only", "--diff-filter=ACMR"])
+        .current_dir(root)
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let files: Vec<PathBuf> = stdout
+        .lines()
+        .filter(|l| !l.is_empty())
+        .map(|l| root.join(l))
+        .filter(|p| p.exists())
+        .collect();
+    Some(files)
+}
+
+/// fn `cmd_check`.
+pub fn cmd_check(path: &PathBuf) {
+    match check_internal(path) {
+        Ok(output) => print!("{output}"),
+        Err(output) => {
+            print!("{output}");
+            std::process::exit(1);
+        }
+    }
+}
+
 /// fn `scan_file_internal`.
 pub fn scan_file_internal(file: &std::path::Path, format: &str) -> Result<String, String> {
     use rulestools_scanner::{checks, config::Config, context::FileContext, project::ProjectIdentity};
@@ -119,7 +202,7 @@ pub fn scan_file_internal(file: &std::path::Path, format: &str) -> Result<String
     let content = std::fs::read_to_string(&path)
         .map_err(|e| format!("Cannot read file: {e}"))?;
 
-    let file_ctx = match FileContext::from_path(&path) {
+    let mut file_ctx = match FileContext::from_path(&path) {
         Some(c) => c,
         None => return Ok("SKIP — unsupported file type".into()),
     };
@@ -131,6 +214,7 @@ pub fn scan_file_internal(file: &std::path::Path, format: &str) -> Result<String
     let registry = checks::registry();
 
     let lines: Vec<&str> = content.lines().collect();
+    file_ctx.refine_with_content(&lines);
     let mut issues = Vec::new();
 
     for check in &registry {

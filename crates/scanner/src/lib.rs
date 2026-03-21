@@ -121,12 +121,64 @@ pub fn scan_super(root: &Path) -> (Vec<Issue>, usize) {
     (all_issues, total_new)
 }
 
+/// Scan specific files only (for pre-commit staged-only mode).
+///
+/// Runs per-file checks on the given paths. Cross-file and tree checks are skipped
+/// because the file set is incomplete (only staged files).
+pub fn scan_files(root: &Path, files: &[std::path::PathBuf]) -> Vec<Issue> {
+    let cfg = Config::load(root);
+    let identity = ProjectIdentity::detect(root);
+    let resolver = severity::SeverityResolver::for_kind(identity.kind);
+    let registry = checks::registry();
+
+    let mut issues = Vec::new();
+
+    for path in files {
+        let content = match std::fs::read_to_string(path) {
+            Ok(c) => c,
+            Err(_) => continue,
+        };
+        let mut file_ctx = match FileContext::from_path(path) {
+            Some(c) => c,
+            None => continue,
+        };
+        let lines: Vec<&str> = content.lines().collect();
+        file_ctx.refine_with_content(&lines);
+        let is_metadata = walker::is_metadata_path(path);
+
+        for check in &registry {
+            if !check.applies_to(file_ctx.language) {
+                continue;
+            }
+            if !cfg.is_enabled(&check.id) || !identity.kind.allows_check(&check.id) {
+                continue;
+            }
+            if is_metadata && check.id != "topology/placement" {
+                continue;
+            }
+            if let checks::CheckKind::PerFile(func) = &check.kind {
+                func(&file_ctx, &lines, &cfg, &mut issues, path);
+            }
+        }
+    }
+
+    // Apply severity resolver
+    issues
+        .into_iter()
+        .map(|mut issue| {
+            issue.severity = resolver.resolve(&issue.rule_id, issue.severity);
+            issue
+        })
+        .filter(|issue| issue.severity != issue::Severity::Skip)
+        .collect()
+}
+
 /// Core scan logic — collects files, runs all registered checks.
 pub fn run_scan(root: &Path) -> Vec<Issue> {
     let cfg = Config::load(root);
     let identity = ProjectIdentity::detect(root);
     let resolver = severity::SeverityResolver::for_kind(identity.kind);
-    let files = walker::collect_files(root, &[]);
+    let files = walker::collect_files(root, &cfg.exclude);
     let registry = checks::registry();
 
     let mut issues = Vec::new();
@@ -141,12 +193,13 @@ pub fn run_scan(root: &Path) -> Vec<Issue> {
 
     // Per-file checks
     for (path, content) in &file_contents {
-        let file_ctx = match FileContext::from_path(path) {
+        let mut file_ctx = match FileContext::from_path(path) {
             Some(c) => c,
             None => continue,
         };
         let is_metadata = walker::is_metadata_path(path);
         let lines: Vec<&str> = content.lines().collect();
+        file_ctx.refine_with_content(&lines);
         for check in &registry {
             if !check.applies_to(file_ctx.language) {
                 continue;
