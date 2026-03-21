@@ -4,7 +4,6 @@ use rulestools_scanner::project::ProjectKind;
 
 use super::types::Writer;
 use super::templates::*;
-use super::proj_files::create_proj_files;
 
 pub(super) fn scaffold_kind(
     w: &Writer,
