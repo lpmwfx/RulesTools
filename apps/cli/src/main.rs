@@ -85,14 +85,14 @@ enum Commands {
         path: PathBuf,
     },
 
-    /// Generate man/ documentation for a project.
-    #[command(long_about = "Generate man/ documentation directory.\n\n\
+    /// Report documentation coverage for a project.
+    #[command(long_about = "Report documentation coverage.\n\n\
         Scans all .rs and .slint files for pub items and their /// doc comments.\n\
-        Writes JSON + Markdown to man/ with MANIFEST.\n\
+        Reports total items, undocumented count, and coverage percentage.\n\
         \n\
         Examples:\n  \
-        rulestools gen .                    # generate for current directory\n  \
-        rulestools gen /path/to/project     # generate for specific project")]
+        rulestools gen .                    # report coverage for current directory\n  \
+        rulestools gen /path/to/project     # report coverage for specific project")]
     Gen {
         /// Path to the project root.
         #[arg(default_value = ".")]

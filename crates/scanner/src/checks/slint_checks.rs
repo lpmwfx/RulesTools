@@ -16,7 +16,7 @@ static PX_VALUE_RE: LazyLock<Regex> =
 static CONTROL_FLOW_RE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*(?:if|for|while)\s").unwrap());
 static HARDCODED_TEXT_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"\btext\s*:\s*""#).unwrap());
+    LazyLock::new(|| Regex::new(r#"(?:^|\s)text\s*:\s*"[^"]+""#).unwrap());
 
 /// Check that exported components/structs have `///` doc comments.
 pub fn check_doc_required(
@@ -234,6 +234,20 @@ mod tests {
     fn allows_bound_text() {
         let mut issues = Vec::new();
         check_no_hardcoded_string(&component_ctx(), &["    Text { text: root.label; }"], &Config::default(), &mut issues, Path::new("a.slint"));
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn allows_empty_string_default() {
+        let mut issues = Vec::new();
+        check_no_hardcoded_string(&component_ctx(), &["    in property <string> breadcrumb-text: \"\";"], &Config::default(), &mut issues, Path::new("a.slint"));
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn allows_property_name_containing_text() {
+        let mut issues = Vec::new();
+        check_no_hardcoded_string(&component_ctx(), &["    in property <string> node-text: \"\";"], &Config::default(), &mut issues, Path::new("a.slint"));
         assert!(issues.is_empty());
     }
 

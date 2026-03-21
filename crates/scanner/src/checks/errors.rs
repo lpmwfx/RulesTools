@@ -32,6 +32,12 @@ pub fn check(
         return;
     }
 
+    // build.rs returns () — panic!/expect/unwrap are the only way to abort a build script
+    let filename = path.file_name().and_then(|f| f.to_str()).unwrap_or("");
+    if filename == "build.rs" {
+        return;
+    }
+
     for (line_num, line) in lines.iter().enumerate() {
         let trimmed = line.trim();
         if trimmed.starts_with("//") {
@@ -114,5 +120,19 @@ mod tests {
         let mut issues = Vec::new();
         check(&prod_ctx(), &["panic!(\"boom\");"], &Config::default(), &mut issues, Path::new("a.rs"));
         assert_eq!(issues.len(), 1);
+    }
+
+    #[test]
+    fn skips_build_rs() {
+        let mut issues = Vec::new();
+        check(&prod_ctx(), &["panic!(\"build failed: {e}\");"], &Config::default(), &mut issues, Path::new("build.rs"));
+        assert!(issues.is_empty());
+    }
+
+    #[test]
+    fn skips_build_rs_expect() {
+        let mut issues = Vec::new();
+        check(&prod_ctx(), &["let x = foo.expect(\"build config\");"], &Config::default(), &mut issues, Path::new("build.rs"));
+        assert!(issues.is_empty());
     }
 }

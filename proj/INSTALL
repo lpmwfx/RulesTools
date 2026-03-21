@@ -1,0 +1,98 @@
+# INSTALL — RulesTools
+
+## KRITISK CONSTRAINT
+
+**D: drevet er KUN til udvikling. Intet fra D: bruges i produktion.**
+
+- Produktion installerer ALTID fra GitHub — aldrig lokale stier
+- `cargo install --git` er den eneste produktionsinstallation
+- Ingen `path = "../..."` dependencies i Cargo.toml
+- Ændringer i scanner/documenter er IKKE synlige for andre projekter før push til GitHub
+
+## Binær
+
+Én binær — `rulestools` — CLI + embedded MCP servere.
+
+| Binær | Sti | Funktion |
+|---|---|---|
+| `rulestools.exe` | `~/.cargo/bin/` | CLI scanner + MCP servere (mcp-tools, mcp-rules) |
+
+## Installation — produktion (fra GitHub)
+
+```bash
+cargo install --force --git https://github.com/lpmwfx/RulesTools rulestools
+```
+
+## Installation — udvikling (kun D: drevet)
+
+MCP-processer låser exe-filen. Stop dem først:
+
+```bash
+# 1. Stop MCP servere
+powershell -Command "Stop-Process -Name rulestools -Force -ErrorAction SilentlyContinue"
+
+# 2. Test og installér
+cd D:/REPO/Rules-dev/RulesTools
+cargo test --workspace && cargo install --path apps/cli --force
+
+# 3. Hvis "Access denied" — kopier direkte
+powershell -Command "Stop-Process -Name rulestools -Force; Start-Sleep -Milliseconds 300; Copy-Item 'D:\REPO\Rules-dev\RulesTools\target\release\rulestools.exe' 'C:\Users\mathi\.cargo\bin\rulestools.exe' -Force"
+```
+
+## Fuld opdateringscyklus (dev → produktion)
+
+```bash
+# 1. Test
+cargo test --workspace
+
+# 2. Push til GitHub
+git add ... && git commit -m "..." && git push
+
+# 3. Installér (produktion)
+cargo install --force --git https://github.com/lpmwfx/RulesTools rulestools
+
+# 4. Eller installér lokalt (udvikling)
+powershell -Command "Stop-Process -Name rulestools -Force -ErrorAction SilentlyContinue"
+cargo install --path apps/cli --force
+```
+
+## MCP konfiguration
+
+**Claude Desktop:** `%APPDATA%/Claude/claude_desktop_config.json`
+**Claude Code:** `.claude/settings.json` eller `~/.claude/settings.json`
+
+```json
+{
+  "mcpServers": {
+    "rules": {
+      "command": "rulestools",
+      "args": ["mcp-rules"]
+    },
+    "rulestools": {
+      "command": "rulestools",
+      "args": ["mcp-tools"]
+    }
+  }
+}
+```
+
+## MCP genstart efter opdatering
+
+- **Claude Desktop:** Luk og genåbn appen
+- **Claude Code:** Start ny session (MCP servere startes automatisk)
+
+## Verificér
+
+```bash
+rulestools --version              # Version check
+rulestools list .                 # 50 checks
+rulestools scan .                 # Scanner
+rulestools check .                # Git-aware pre-commit (kun staged filer)
+```
+
+## Noter
+
+- MCP serverne er embedded i `rulestools` — ingen separate binærer
+- Nye checks: kræver ny exe + MCP genstart
+- Nye Rules: kun `git push` til Rules repo (MCP puller fra GitHub)
+- D: drevet: kun udvikling — aldrig reference i produktion

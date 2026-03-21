@@ -5,9 +5,8 @@ use rulestools_scanner::project::{ProjectIdentity, ProjectKind};
 // --- Constants ---
 
 const SCANNER_BUILD_DEP: &str = "rulestools-scanner = { git = \"https://github.com/lpmwfx/RulesTools\" }";
-const DOCUMENTER_BUILD_DEP: &str = "rulestools-documenter = { git = \"https://github.com/lpmwfx/RulesTools\" }";
-const BUILD_RS_SCANNER: &str = "fn main() {\n    rulestools_scanner::scan_project();\n    rulestools_documenter::document_project();\n}\n";
-const BUILD_RS_SCANNER_SLINT: &str = "fn main() {\n    rulestools_scanner::scan_project();\n    rulestools_documenter::document_project();\n    slint_build::compile(\"ui/main.slint\").expect(\"Slint build failed\");\n}\n";
+const BUILD_RS_SCANNER: &str = "fn main() {\n    rulestools_scanner::scan_project();\n}\n";
+const BUILD_RS_SCANNER_SLINT: &str = "fn main() {\n    rulestools_scanner::scan_project();\n    slint_build::compile(\"ui/main.slint\").expect(\"Slint build failed\");\n}\n";
 
 /// CLI topology folders (no UI).
 const CLI_TOPOLOGY: &[&str] = &["core", "adapter", "gateway", "pal", "shared"];
@@ -303,7 +302,7 @@ pub fn update_project(root: &Path, opts: &UpdateOptions) -> Result<ScaffoldResul
         }
     }
 
-    // build.rs — ensure it exists with scanner + documenter
+    // build.rs — ensure it exists with scanner
     let build_rs = root.join("build.rs");
     if !build_rs.exists() && root.join("Cargo.toml").exists() {
         let is_slint = identity.kind == ProjectKind::SlintApp
@@ -529,7 +528,7 @@ fn upgrade_tool_to_cli(
     w.write_if_missing(
         root,
         "Cargo.toml",
-        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP, DOCUMENTER_BUILD_DEP]),
+        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP]),
         created,
     )?;
 
@@ -1278,7 +1277,7 @@ fn scaffold_tool(w: &Writer, root: &Path, name: &str, created: &mut Vec<String>)
     w.write_if_missing(
         root,
         "Cargo.toml",
-        &cargo_toml_bin(name, &[], &[SCANNER_BUILD_DEP, DOCUMENTER_BUILD_DEP]),
+        &cargo_toml_bin(name, &[], &[SCANNER_BUILD_DEP]),
         created,
     )?;
     w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER, created)?;
@@ -1325,7 +1324,7 @@ fn scaffold_cli(
     w.write_if_missing(
         root,
         "Cargo.toml",
-        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP, DOCUMENTER_BUILD_DEP]),
+        &cargo_toml_bin(name, &["clap = { version = \"4\", features = [\"derive\"] }"], &[SCANNER_BUILD_DEP]),
         created,
     )?;
 
@@ -1358,7 +1357,7 @@ fn scaffold_library(
         ),
         created,
     )?;
-    w.write_if_missing(root, "Cargo.toml", &cargo_toml_lib(name, &[], &[SCANNER_BUILD_DEP, DOCUMENTER_BUILD_DEP]), created)?;
+    w.write_if_missing(root, "Cargo.toml", &cargo_toml_lib(name, &[], &[SCANNER_BUILD_DEP]), created)?;
     w.write_if_missing(root, "build.rs", BUILD_RS_SCANNER, created)?;
 
     Ok(())

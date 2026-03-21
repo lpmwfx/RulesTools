@@ -334,11 +334,9 @@ pub fn all() -> Vec<ToolDef> {
         },
         ToolDef {
             name: "generate_docs".into(),
-            description: "Generate documentation for a project.\n\n\
-                Inserts /// stub comments for undocumented pub items in source files,\n\
-                then generates man/ directory with JSON + Markdown documentation.\n\
-                Returns coverage stats and number of stubs inserted.\n\n\
-                Also runs automatically as part of scan_tree.".into(),
+            description: "Report documentation coverage for a project.\n\n\
+                Counts pub items and checks for /// doc comments.\n\
+                Returns coverage stats (items, undocumented count, percentage).".into(),
             input_schema: serde_json::json!({
                 "type": "object",
                 "properties": {

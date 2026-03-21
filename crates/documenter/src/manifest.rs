@@ -56,18 +56,3 @@ pub struct SourceDoc {
     pub source: String,
     pub items: Vec<DocItem>,
 }
-
-/// Aggregated manifest for the entire project.
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Manifest {
-    pub project: String,
-    pub files: Vec<ManifestEntry>,
-}
-
-/// Per-file entry in the manifest.
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ManifestEntry {
-    pub source: String,
-    pub item_count: usize,
-    pub undocumented: usize,
-}
