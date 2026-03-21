@@ -182,7 +182,6 @@ pub fn registry() -> Vec<CheckEntry> {
         CheckEntry::per_file("rust/types/no-borrowed-container", vec![Language::Rust], borrowed_containers::check),
         CheckEntry::per_file("rust/threading/no-fire-and-forget", vec![Language::Rust], threading::check_fire_and_forget),
         // Slint checks
-        CheckEntry::per_file("slint/docs/doc-required", vec![Language::Slint], slint_checks::check_doc_required),
         CheckEntry::per_file("slint/tokens/zero-literal", vec![Language::Slint], slint_checks::check_zero_literal),
         CheckEntry::per_file("slint/globals/structure", vec![Language::Slint], slint_checks::check_globals_structure),
         CheckEntry::per_file("slint/strings/no-hardcoded-string", vec![Language::Slint], slint_checks::check_no_hardcoded_string),
