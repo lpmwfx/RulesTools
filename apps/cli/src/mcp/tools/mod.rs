@@ -1,7 +1,6 @@
 mod definitions;
 mod scan;
 mod project;
-mod issue;
 mod publish;
 mod generate;
 
@@ -26,14 +25,6 @@ fn handle(name: &str, args: &Value) -> ToolResult {
         "new_project" => project::new_project(args),
         "update_project" => project::update_project(args),
         "upgrade_project" => project::upgrade_project(args),
-        "read_issue" => issue::read_issue(args),
-        "report_issue" => issue::report_issue(args),
-        "list_issues" => issue::list_issues(args),
-        "add_label" => issue::add_label(args),
-        "list_labels" => issue::list_labels(args),
-        "comment_issue" => issue::comment_issue(args),
-        "create_label" => issue::create_label(args),
-        "close_issue" => issue::close_issue(args),
         "publish_plan" => publish::plan(args),
         "publish_run" => publish::run(args),
         "publish_status" => publish::status(args),

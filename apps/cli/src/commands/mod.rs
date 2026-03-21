@@ -4,7 +4,5 @@ pub mod scan;
 pub mod project;
 /// mod `generate`.
 pub mod generate;
-/// mod `issue`.
-pub mod issue;
 /// mod `hook`.
 pub mod hook;

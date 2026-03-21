@@ -288,10 +288,6 @@ enum Commands {
     #[command(subcommand)]
     Publish(PublishCmd),
 
-    /// Report, list, or close issues on Forgejo.
-    #[command(subcommand)]
-    Issue(IssueCmd),
-
     /// Start MCP tools server (scan, setup, init, publish — stdio).
     #[command(name = "mcp-tools")]
     McpTools,
@@ -420,70 +416,6 @@ enum PublishCmd {
     },
 }
 
-#[derive(Subcommand)]
-/// enum `IssueCmd`.
-pub enum IssueCmd {
-    /// Report a new issue to Forgejo.
-    Report {
-        /// Issue title.
-        #[arg(long)]
-        title: String,
-        /// Issue body (description).
-        #[arg(long, default_value = "")]
-        body: String,
-        /// Labels (comma-separated).
-        #[arg(long, default_value = "ai-reported")]
-        labels: String,
-    },
-    /// List issues from Forgejo.
-    List {
-        /// Filter by state: open, closed, all.
-        #[arg(long, default_value = "open")]
-        state: String,
-        /// Filter by labels (comma-separated).
-        #[arg(long, default_value = "")]
-        labels: String,
-    },
-    /// Close an issue by number.
-    Close {
-        /// Issue number.
-        number: u64,
-        /// Optional closing comment.
-        #[arg(long, default_value = "")]
-        comment: String,
-    },
-    /// Add a label to an existing issue.
-    #[command(name = "add-label")]
-    AddLabel {
-        /// Issue number.
-        number: u64,
-        /// Label name to add.
-        label: String,
-    },
-    /// Create a new label in the Forgejo repo.
-    #[command(name = "create-label")]
-    CreateLabel {
-        /// Label name.
-        name: String,
-        /// Label color (hex without #, e.g. "e11d48").
-        #[arg(long, default_value = "0075ca")]
-        color: String,
-        /// Label description.
-        #[arg(long, default_value = "")]
-        description: String,
-    },
-    /// List all available labels in the Forgejo repo.
-    #[command(name = "list-labels")]
-    ListLabels,
-    /// Add a comment to an existing issue.
-    Comment {
-        /// Issue number.
-        number: u64,
-        /// Comment body.
-        body: String,
-    },
-}
-
 fn main() {
     let cli = Cli::parse();
 
@@ -506,7 +438,6 @@ fn main() {
         } => commands::project::cmd_upgrade(&path, &to, preview, &format),
         Commands::Setup { path } => commands::project::cmd_setup(&path),
         Commands::Publish(cmd) => cmd_publish(cmd),
-        Commands::Issue(cmd) => commands::issue::cmd_issue(cmd),
         Commands::McpTools => mcp::tools::run(),
         Commands::McpRules => mcp::rules::run(),
         Commands::Hook => commands::hook::cmd_hook(),
